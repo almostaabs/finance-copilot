@@ -100,7 +100,7 @@ bytes -> validate_input        -> DocumentRef
       -> AnalysisResult
 ```
 
-Every stage is a pure function: contract in, contract out, no hidden state, no I/O after `extract_pdf`. This purity is what makes the golden test possible.
+Every stage takes a contract in and returns a contract out, with no hidden state and **no hidden I/O after `extract_pdf`**. External I/O is permitted only through explicitly injected interfaces — in Phases 0-8 that means the LLM client and nothing else. Every deterministic stage remains a pure function. This is what makes the golden test possible: swap the injected client for `NullMapper` and the pipeline performs no I/O at all after extraction.
 
 ### 2.4 Core Invariants
 
@@ -141,7 +141,7 @@ class Unavailable:
     refs: tuple[str, ...] = ()
     cause: "Unavailable | None" = None   # upstream failure, chainable
 
-Maybe = T | Unavailable   # generic alias
+type Maybe[T] = T | Unavailable   # PEP 695 type alias, Python 3.12
 ```
 
 Rules:
@@ -501,7 +501,7 @@ TDD per master-doc §26: tests are written before the implementation they cover,
 
 ### 10.1 Phase 8 Definition of Done
 
-- Both golden PDFs produce **every** expected value exactly.
+- Both golden PDFs produce **every** expected value, compared as **`Decimal` at full internal precision**. Golden tests assert the internal `Decimal` values *before* any presentation formatting. Display-rounded values are never the subject of a golden assertion.
 - The **complete provenance chain** is asserted end to end: PDF -> cell -> `SourceRef` -> `NormalizedCell` -> `FinancialValue` -> `Metric` -> `RedFlag`.
 - **Zero fabricated values** — proven, not assumed.
 - The full pipeline **runs to completion with Ollama uninstalled**.
@@ -552,4 +552,12 @@ Document Q&A (master-doc §16) is P1 and out of scope for this cycle.
 
 ## 14. Final Principle
 
-PDF -> source row -> normalized value -> formula -> insight. Every conclusion the product states must be explainable along that chain. Build the deterministic engine first, prove the numbers, preserve provenance, then add AI for interpretation only.
+Through Phase 8, the chain is:
+
+```text
+PDF -> source row -> normalized value -> formula -> metric -> red flag
+```
+
+Phase 9 extends it one link further, to narrative insight, by requiring the narrative to cite the metric and red-flag IDs it discusses. Through Phase 8 there is no insight link, and Phase 8's definition of done must not be read as requiring one.
+
+Every conclusion the product states must be explainable along that chain. Build the deterministic engine first, prove the numbers, preserve provenance, then add AI for interpretation only.

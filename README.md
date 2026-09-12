@@ -69,12 +69,19 @@ uv run pytest          # 297 tests, no AI needed
 uv run ruff check .
 ```
 
+See it work on a bundled test report:
+
+```bash
+uv run python demo.py                      # or: uv run python demo.py your_report.pdf
+```
+
 From Python:
 
 ```python
 import pipeline
-result = pipeline.analyze(open("report.pdf", "rb").read())        # deterministic only
-result = pipeline.analyze(data, llm=OllamaClient.from_env())        # with optional local AI
+
+result = pipeline.analyze(open("report.pdf", "rb").read())  # deterministic only
+result = pipeline.analyze(data, llm=OllamaClient.from_env())  # with optional local AI
 ```
 
 Optional AI fallback needs [Ollama](https://ollama.com) with `qwen2.5:3b`
@@ -95,6 +102,7 @@ excluded from the normal run and from CI.
 ## Where things live
 
 ```
+demo.py                      run an analysis and print it, to see the output
 pipeline.py                  the stages, in order, and nothing else
 src/fincopilot/types.py      every data contract (the vocabulary of the system)
 src/fincopilot/extract/      PDF gate, statement finding, periods, units

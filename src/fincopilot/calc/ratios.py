@@ -7,7 +7,7 @@ at display, never here.
 
 from __future__ import annotations
 
-from decimal import ROUND_HALF_EVEN, Context, Decimal
+from decimal import ROUND_HALF_EVEN, Context, Decimal, Inexact
 
 from fincopilot.types import (
     AnalyticalConfidence,
@@ -28,6 +28,10 @@ from fincopilot.types import (
 # Phase 6 owns ratio precision: 34 significant digits (IEEE decimal128),
 # banker's rounding. Golden tests assert against this exact context.
 RATIO_CONTEXT = Context(prec=34, rounding=ROUND_HALF_EVEN)
+
+# Sums and differences of document figures must be exact or refuse. The
+# default 28-digit context would round silently; this one traps.
+EXACT_CONTEXT = Context(prec=400, traps=[Inexact])
 
 _RANK = {AnalyticalConfidence.LOW: 0, AnalyticalConfidence.MEDIUM: 1, AnalyticalConfidence.HIGH: 2}
 
@@ -72,10 +76,18 @@ def _derive(
             f"{concept.value} {period.end_year}: inputs in different currencies {currencies}",
             refs=tuple(r for v in vals for r in v.source_refs),
         )
+    try:
+        value = combine(*(v.value for v in vals))
+    except Inexact:
+        return Unavailable(
+            UnavailableReason.UNPARSEABLE,
+            f"{concept.value} {period.end_year}: inputs exceed exact precision",
+            refs=tuple(r for v in vals for r in v.source_refs),
+        )
     return FinancialValue.derived(
         concept=concept,
         period=period,
-        value=combine(*(v.value for v in vals)),
+        value=value,
         currency=vals[0].currency,
         derived_from=tuple(c.value for c in inputs),
         analytical_confidence=_min_confidence(*vals),
@@ -88,7 +100,7 @@ def derive_total_debt(report: MappingReport, period: Period) -> Maybe[FinancialV
         period,
         report,
         (C.SHORT_TERM_BORROWINGS, C.LONG_TERM_BORROWINGS),
-        lambda st, lt: st + lt,
+        lambda st, lt: EXACT_CONTEXT.add(st, lt),
     )
 
 
@@ -99,13 +111,17 @@ def derive_free_cash_flow(report: MappingReport, period: Period) -> Maybe[Financ
         period,
         report,
         (C.OPERATING_CASH_FLOW, C.CAPEX),
-        lambda ocf, capex: ocf - abs(capex),
+        lambda ocf, capex: EXACT_CONTEXT.subtract(ocf, abs(capex)),
     )
 
 
 def derive_ebitda(report: MappingReport, period: Period) -> Maybe[FinancialValue]:
     return _derive(
-        C.EBITDA, period, report, (C.OPERATING_INCOME, C.D_AND_A), lambda oi, da: oi + da
+        C.EBITDA,
+        period,
+        report,
+        (C.OPERATING_INCOME, C.D_AND_A),
+        lambda oi, da: EXACT_CONTEXT.add(oi, da),
     )
 
 
@@ -121,6 +137,10 @@ def _ratio(
     unit: MetricUnit = MetricUnit.RATIO,
 ) -> Maybe[Metric]:
     causes = [x for x in (numerator, denominator) if isinstance(x, Unavailable)]
+    for cause in causes:
+        # "Not meaningful" is a verdict about this ratio, not a missing input.
+        if cause.reason is UnavailableReason.AMBIGUOUS:
+            return cause
     if causes:
         return _missing(name, period, *causes)
     assert isinstance(numerator, FinancialValue) and isinstance(denominator, FinancialValue)
@@ -148,6 +168,20 @@ def _margin(name: str, period: Period, num: Maybe[FinancialValue], revenue: Mayb
             refs=revenue.source_refs,
         )
     return _ratio(name, period, num, revenue, unit=MetricUnit.PERCENT)
+
+
+def ocf_to_net_income(
+    ocf: Maybe[FinancialValue], net_income: Maybe[FinancialValue], period: Period
+) -> Maybe[Metric]:
+    """Cash backing of profit. Meaningless against a loss: -100 / -50 reads as +2."""
+    if isinstance(net_income, FinancialValue) and net_income.value <= 0:
+        return Unavailable(
+            UnavailableReason.AMBIGUOUS,
+            f"ocf_to_net_income {period.end_year}: net income is not positive; "
+            "ratio not meaningful",
+            refs=net_income.source_refs,
+        )
+    return _ratio("ocf_to_net_income", period, ocf, net_income)
 
 
 def debt_to_equity(debt: Maybe[FinancialValue], equity: Maybe[FinancialValue], period: Period):
@@ -183,10 +217,19 @@ def _average_denominator(
         )
     if current.currency != previous.currency:
         return Unavailable(UnavailableReason.CONFLICT, f"{name}: currency differs across periods")
+    average = RATIO_CONTEXT.divide(EXACT_CONTEXT.add(current.value, previous.value), Decimal(2))
+    if average < 0:
+        # Two negatives cancel: a loss over negative equity would read as a
+        # tidy positive return. Same analytical trap as debt-to-equity.
+        return Unavailable(
+            UnavailableReason.AMBIGUOUS,
+            f"{name} {period.end_year}: average {concept.value} is negative; ratio not meaningful",
+            refs=current.source_refs + previous.source_refs,
+        )
     return FinancialValue.derived(
         concept=concept,
         period=period,
-        value=RATIO_CONTEXT.divide(current.value + previous.value, Decimal(2)),
+        value=average,
         currency=current.currency,
         derived_from=(f"{concept.value}_{period.end_year}", f"{concept.value}_{prior.end_year}"),
         analytical_confidence=_min_confidence(current, previous),
@@ -285,11 +328,10 @@ def calculate_metrics(report: MappingReport, periods: tuple[Period, ...]) -> Met
         keep(
             "ocf_to_net_income",
             period,
-            _ratio(
-                "ocf_to_net_income",
-                period,
+            ocf_to_net_income(
                 report.get(C.OPERATING_CASH_FLOW, period),
                 report.get(C.NET_INCOME, period),
+                period,
             ),
         )
 

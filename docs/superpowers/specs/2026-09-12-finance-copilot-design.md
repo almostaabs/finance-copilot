@@ -393,6 +393,9 @@ Pure functions over mapped values, each returning `Maybe[Metric]`. All master-do
 - **Negative equity** -> D/E is `Unavailable(AMBIGUOUS, "equity is negative; ratio not meaningful")`. A distressed company would otherwise display a tidy negative D/E that reads as *low* leverage. This is an analytical trap, not a math one.
 - **Zero or negative revenue** -> all margin metrics `Unavailable`.
 - **ROA / ROE** require two periods of the balance-sheet denominator for the average. One period -> `Unavailable(MISSING_INPUT, "prior-period total assets required for average")`. Never substitute a single period.
+- **Negative average denominator** -> ROA / ROE are `Unavailable(AMBIGUOUS, "average equity is negative; ratio not meaningful")`. Same trap as D/E: a loss over negative equity would otherwise cancel to a tidy positive return. *(Amended 2026-09-12 after the stress pass; see `docs/KNOWN_ISSUES.md` issue 2.)*
+- **Non-positive net income** -> `ocf_to_net_income` is `Unavailable(AMBIGUOUS)`. Cash flow "backing" a loss has no meaning, and -100 / -50 would read as +2. Negative OCF against a profit stays computable and reads as bad, honestly. *(Same amendment.)*
+- **Arithmetic precision.** Sums, differences, and unit scaling run in an exact context that traps rather than rounds; a figure that cannot be represented exactly becomes `Unavailable(UNPARSEABLE)`. Only division rounds, at the declared 34 significant digits. *(Same amendment.)*
 
 ### 7.2 Derived Values — Strict Pattern
 

@@ -30,6 +30,7 @@ from fincopilot.types import (
 log = logging.getLogger(__name__)
 
 MAX_CANDIDATES = 40
+MAX_RESPONSE_BYTES = 64 * 1024  # a row ID and a sentence; anything bigger is not an answer
 
 RESPONSE_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -105,6 +106,16 @@ def _has_numeric(value: Any) -> bool:
     return False
 
 
+def _no_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """A response that declines AND picks is malformed, not last-wins."""
+    out: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in out:
+            raise ValueError(f"duplicate key {key!r}")
+        out[key] = value
+    return out
+
+
 def validate_response(
     raw: str,
     *,
@@ -113,10 +124,17 @@ def validate_response(
     refs: Mapping[str, SourceRef],
     already_mapped: Mapping[str, CanonicalConcept],
 ) -> RowMapping | Unavailable | None:
-    """Six rejection paths from spec 6.3. None means the model declined."""
+    """Six rejection paths from spec 6.3. None means the model declined.
+
+    Parsing is fenced with a size cap and a catch-all: deep nesting raises
+    RecursionError, which is not a ValueError, and an untrusted model must
+    never be able to raise anything out of this function.
+    """
+    if not isinstance(raw, str | bytes) or len(raw) > MAX_RESPONSE_BYTES:
+        return Unavailable(UnavailableReason.UNPARSEABLE, "LLM response is absent or oversized")
     try:
-        data = json.loads(raw)
-    except (ValueError, TypeError):
+        data = json.loads(raw, object_pairs_hook=_no_duplicate_keys)
+    except Exception:  # ValueError, TypeError, RecursionError, UnicodeDecodeError
         return Unavailable(UnavailableReason.UNPARSEABLE, "LLM response is not valid JSON")
 
     if _has_numeric(data):  # path 6, checked first so it is logged even when shape is fine
@@ -181,16 +199,16 @@ def fill_unmapped(
             continue
         try:
             raw = client.complete_json(build_prompt(concept, candidates), RESPONSE_SCHEMA)
+            result = validate_response(
+                raw,
+                concept=concept,
+                candidate_ids={c[0] for c in candidates},
+                refs=refs,
+                already_mapped=already,
+            )
         except Exception as exc:  # unreachable, timeout, garbage: the concept stays unmapped
             log.info("LLM fallback unavailable for %s: %s", concept.value, type(exc).__name__)
             continue
-        result = validate_response(
-            raw,
-            concept=concept,
-            candidate_ids={c[0] for c in candidates},
-            refs=refs,
-            already_mapped=already,
-        )
         if isinstance(result, RowMapping):
             added.append(result)
             already[result.ref_id] = concept

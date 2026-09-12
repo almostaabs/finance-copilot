@@ -21,8 +21,11 @@ from fincopilot.types import (
 )
 
 # "FY 2023-24", "2023-2024", "FY2023-24": the END of the range is the period.
-_RANGE = re.compile(r"(?<!\d)((?:19|20)\d{2})\s*[-\u2013/]\s*((?:19|20)?\d{2})(?!\d)")
-_YEAR = re.compile(r"(?<!\d)((?:19|20)\d{2})(?!\d)")
+# ASCII digits only ([0-9], not backslash-d) and years 1900-2199.
+_RANGE = re.compile(
+    r"(?<![0-9])((?:19|20|21)[0-9]{2})\s*[-\u2013/]\s*((?:19|20|21)?[0-9]{2})(?![0-9])"
+)
+_YEAR = re.compile(r"(?<![0-9])((?:19|20|21)[0-9]{2})(?![0-9])")
 
 
 def parse_period(label: str) -> Maybe[Period]:

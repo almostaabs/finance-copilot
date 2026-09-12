@@ -41,7 +41,7 @@ _ANCHOR_RE = {
     for kind, pats in _KIND_PATTERNS.items()
 }
 
-_YEAR = re.compile(r"(?<!\d)(?:19|20)\d{2}(?!\d)")
+_YEAR = re.compile(r"(?<![0-9])(?:19|20|21)[0-9]{2}(?![0-9])")
 _AMOUNT = re.compile(r"^\(?[-+]?\d[\d,]*(?:\.\d+)?\)?-?$")
 _NUMERIC_TOKEN = re.compile(r"\(?\d[\d,]*(?:\.\d+)?\)?")
 

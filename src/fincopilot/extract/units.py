@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import replace
-from decimal import Decimal
+from decimal import Context, Decimal, Inexact
 from enum import Enum
 
 from fincopilot.types import (
@@ -24,14 +24,20 @@ from fincopilot.types import (
 
 # --- number grammar ---------------------------------------------------------
 
-_WESTERN = re.compile(r"^\d{1,3}(?:,\d{3})*(?:\.\d+)?$")
-_INDIAN = re.compile(r"^\d{1,2}(?:,\d{2})+,\d{3}(?:\.\d+)?$")
-_PLAIN = re.compile(r"^\d+(?:\.\d+)?$")
+# [0-9] on purpose: \d matches every Unicode decimal digit, and the grammar is
+# explicit ASCII. Devanagari or Arabic-Indic numerals are UNPARSEABLE.
+_WESTERN = re.compile(r"^[0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?$")
+_INDIAN = re.compile(r"^[0-9]{1,2}(?:,[0-9]{2})+,[0-9]{3}(?:\.[0-9]+)?$")
+_PLAIN = re.compile(r"^[0-9]+(?:\.[0-9]+)?$")
 
 _CURRENCY_PREFIX = re.compile(r"^(?:rs\.?|inr|usd|us\$|\$|\u20b9|\u20ac|\u00a3)\s*", re.I)
 _FOOTNOTE_SUFFIX = re.compile(r"[*\u2020\u2021\u00a7]+$")
 
 DASH_TOKENS = frozenset({"-", "\u2013", "\u2014", "Nil", "NIL", "nil"})
+
+# Scaling must be exact or refuse. The default 28-digit context would round a
+# 29-digit figure silently; this one traps instead of rounding.
+EXACT_CONTEXT = Context(prec=400, traps=[Inexact])
 
 
 def parse_number(token: str) -> Maybe[Decimal]:
@@ -175,10 +181,18 @@ def normalized_cell(
     if kind is CellKind.TEXT:
         return None
     assert value is not None
+    try:
+        scaled = EXACT_CONTEXT.multiply(value, SCALE_MULTIPLIER[scale])
+    except Inexact:
+        return Unavailable(
+            UnavailableReason.UNPARSEABLE,
+            f"{token!r} exceeds {EXACT_CONTEXT.prec} significant digits after scaling",
+            refs=(ref.ref_id,),
+        )
     return NormalizedCell(
         ref=ref,
         raw_token=token,
-        value=value * SCALE_MULTIPLIER[scale],
+        value=scaled,
         scale=scale,
         scale_source=scale_source,
         currency=currency,

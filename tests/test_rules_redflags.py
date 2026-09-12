@@ -135,8 +135,11 @@ def test_earnings_quality_requires_both_positive():
     assert flags["earnings_quality"].outcome is RuleOutcome.FIRED
     flags = _flags(_fv(C.OPERATING_CASH_FLOW, P24, "70", 0), _fv(C.NET_INCOME, P24, "100", 1))
     assert flags["earnings_quality"].outcome is RuleOutcome.CLEAR
+    # Against a loss the ratio itself is not meaningful (spec 7.1), so the
+    # rule reports that it could not check rather than a silent clear.
     flags = _flags(_fv(C.OPERATING_CASH_FLOW, P24, "60", 0), _fv(C.NET_INCOME, P24, "-100", 1))
-    assert flags["earnings_quality"].outcome is RuleOutcome.CLEAR  # precondition not met
+    assert flags["earnings_quality"].outcome is RuleOutcome.NOT_EVALUATED
+    assert flags["earnings_quality"].reason.reason is UnavailableReason.AMBIGUOUS
 
 
 def test_reconciliation_warning_fires_on_a_warning_and_is_not_evaluated_without_checks():

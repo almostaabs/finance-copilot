@@ -403,6 +403,37 @@ class FinancialValue:
         return self.cell.raw_token if self.cell is not None else None
 
 
+@dataclass(frozen=True, slots=True)
+class RowMapping:
+    """A claim that one document row carries one concept. Numbers come later."""
+
+    concept: CanonicalConcept
+    ref_id: str
+    kind: StatementKind
+    extraction_confidence: ExtractionConfidence
+
+
+@dataclass(frozen=True, slots=True)
+class MappingReport:
+    """Validated values plus an explicit reason for every value that is absent."""
+
+    values: tuple[FinancialValue, ...]
+    unavailable: Mapping[tuple[CanonicalConcept, Period], Unavailable]
+    unmapped: tuple[CanonicalConcept, ...]
+    conflicts: tuple[Unavailable, ...]
+
+    def get(self, concept: CanonicalConcept, period: Period) -> Maybe[FinancialValue]:
+        for v in self.values:
+            if v.concept is concept and v.period == period:
+                return v
+        found = self.unavailable.get((concept, period))
+        if found is not None:
+            return found
+        return Unavailable(
+            UnavailableReason.MISSING_INPUT, f"{concept.value} not mapped for {period.end_year}"
+        )
+
+
 class MetricUnit(Enum):
     RATIO = "ratio"
     PERCENT = "percent"

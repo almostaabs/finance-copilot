@@ -26,7 +26,7 @@
     "long_term_borrowings":  {"2024": "28500000000",  "2023": "26400000000",  "source_label": "Long-term borrowings", "page": 42},
     "short_term_borrowings": {"2024": "9000000000",   "2023": "8200000000",   "source_label": "Short-term borrowings", "page": 42},
     "operating_cash_flow":   {"2024": "21800000000",  "2023": "17600000000",  "source_label": "Net cash generated from operating activities", "page": 43},
-    "capex":                 {"2024": "12400000000",  "2023": "10800000000",  "source_label": "Purchase of property, plant and equipment", "page": 43}
+    "capex":                 {"2024": "-12400000000", "2023": "-10800000000",  "source_label": "Purchase of property, plant and equipment", "page": 43}
   },
   "derived": {
     "total_debt":     {"2024": "37500000000", "2023": "34600000000", "from": ["short_term_borrowings", "long_term_borrowings"]},
@@ -35,7 +35,7 @@
   },
   "unmapped": ["gross_profit"],
   "notes": [
-    "capex is printed in parentheses and must normalise to a POSITIVE magnitude before FCF.",
+    "capex is printed in parentheses: the MAPPED value keeps the document sign (-1,240.00 cr) because a mapped FinancialValue must equal its cell. FCF derivation takes the magnitude first (spec 7.2).",
     "gross_profit has no line in an Ind-AS P&L, so gross_margin must be Unavailable(MISSING_INPUT) and the gross-profit reconciliation must be unavailable.",
     "Total income (12,770.50 cr) includes other income and must NEVER map to revenue.",
     "Standalone figures differ from consolidated at every line, so wrong-scope selection fails on values, not just on a label."

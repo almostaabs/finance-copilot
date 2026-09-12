@@ -32,7 +32,7 @@
     "total_liabilities":     {"2024": "3150000000", "2023": "3290000000", "source_label": "Total liabilities", "page": 27},
     "equity":                {"2024": "4440000000", "2023": "3660000000", "source_label": "Total stockholders' equity", "page": 27},
     "operating_cash_flow":   {"2024": "1210000000", "2023": "1020000000", "2022": "880000000", "source_label": "Net cash provided by operating activities", "page": 28},
-    "capex":                 {"2024": "540000000",  "2023": "480000000",  "2022": "430000000", "source_label": "Purchases of property and equipment", "page": 28}
+    "capex":                 {"2024": "-540000000", "2023": "-480000000", "2022": "-430000000", "source_label": "Purchases of property and equipment", "page": 28}
   },
   "derived": {
     "total_debt":     {"2024": "2170000000", "2023": "2380000000", "from": ["short_term_borrowings", "long_term_borrowings"]},
@@ -48,7 +48,7 @@
     "Income statement has THREE periods; the balance sheet has TWO. PeriodMap must be keyed per statement.",
     "gross_profit IS mapped here, unlike golden_indian - so gross_margin resolves and the gross-profit reconciliation runs.",
     "The header first column is blank, which is normal in 10-K tables; the label column must still be identified.",
-    "capex is parenthesised and must normalise to a positive magnitude."
+    "capex is parenthesised: the MAPPED value keeps the document sign because a mapped FinancialValue must equal its cell. FCF derivation takes the magnitude first (spec 7.2)."
   ],
   "arithmetic_checks": [
     "gross profit 2024: 8,420.0 - 5,180.0 = 3,240.0",

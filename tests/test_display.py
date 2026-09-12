@@ -43,3 +43,9 @@ def test_unavailable_text_reports_root_cause():
     root = Unavailable(UnavailableReason.NOT_LOCATED, "no cash flow statement")
     outer = Unavailable(UnavailableReason.MISSING_INPUT, "fcf needs ocf", cause=root)
     assert unavailable_text(outer) == "N/A - not located: no cash flow statement"
+
+
+def test_money_ascii_only_uses_iso_code():
+    assert (
+        money(Decimal("124500000000"), "INR", Scale.CRORE, ascii_only=True) == "INR 12,450.00 crore"
+    )

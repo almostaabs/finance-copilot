@@ -30,17 +30,21 @@ _SCALE_WORD = {
 _CURRENCY_SYMBOL = {"INR": "\u20b9", "USD": "$"}
 
 
-def money(value: Decimal, currency: str, scale: Scale) -> str:
-    """Base units back to the report's own scale: 124500000000 INR crore -> Rs 12,450.00 crore."""
+def money(value: Decimal, currency: str, scale: Scale, *, ascii_only: bool = False) -> str:
+    """Base units back to the report's own scale: 124500000000 INR crore -> Rs 12,450.00 crore.
+
+    ascii_only swaps the currency glyph for its ISO code. Small local models
+    re-escape non-ASCII glyphs in their output, and the narrative gate then
+    reads the escape's digits as numbers."""
     shown = (value / SCALE_MULTIPLIER[scale]).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
     word = _SCALE_WORD[scale]
-    symbol = _CURRENCY_SYMBOL.get(currency, currency + " ")
+    symbol = currency + " " if ascii_only else _CURRENCY_SYMBOL.get(currency, currency + " ")
     return f"{symbol}{shown:,.2f} {word}".strip()
 
 
-def value_text(v: FinancialValue) -> str:
+def value_text(v: FinancialValue, *, ascii_only: bool = False) -> str:
     scale = v.cell.scale if v.cell is not None else Scale.UNIT
-    return money(v.value, v.currency, scale)
+    return money(v.value, v.currency, scale, ascii_only=ascii_only)
 
 
 def metric_text(m: Metric) -> str:

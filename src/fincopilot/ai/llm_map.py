@@ -43,6 +43,14 @@ RESPONSE_SCHEMA: dict[str, Any] = {
     "additionalProperties": False,
 }
 
+# Derived concepts are computed by calc/ from their inputs (spec 7.2). Reports
+# do not print them as statement lines, and a small model asked to find one
+# picks a neighbour instead: Wipro's "net cash from investing activities" came
+# back as free cash flow. The exact-match tables may still map a printed row.
+NEVER_ASK = frozenset(
+    {CanonicalConcept.EBITDA, CanonicalConcept.FREE_CASH_FLOW, CanonicalConcept.TOTAL_DEBT}
+)
+
 DEFINITIONS: dict[CanonicalConcept, str] = {
     CanonicalConcept.REVENUE: "Revenue from the core business (net sales). NOT total income, "
     "which includes other income.",
@@ -194,7 +202,7 @@ def fill_unmapped(
     mapped_concepts = {m.concept for m in mappings}
     added: list[RowMapping] = []
     for concept in CanonicalConcept:
-        if concept in mapped_concepts:
+        if concept in mapped_concepts or concept in NEVER_ASK:
             continue
         table = tables.get(CONCEPT_STATEMENT[concept])
         if table is None:

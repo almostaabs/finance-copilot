@@ -226,3 +226,26 @@ def test_ollama_contract_live():
     )
     data = json.loads(raw)
     assert set(data) <= {"source_row_id", "confidence", "reasoning"}
+
+
+def test_derived_concepts_are_never_asked_of_the_model():
+    """Phase 12 finding: the model returned 'net cash from investing activities'
+    as free cash flow. Derived concepts come only from calc/."""
+    from pathlib import Path
+
+    import pipeline
+
+    from fincopilot.ai.llm_map import NEVER_ASK
+    from fincopilot.types import CanonicalConcept as C
+
+    asked: list[str] = []
+
+    class Spy:
+        def complete_json(self, prompt, schema):
+            asked.append(prompt)
+            return '{"source_row_id": null}'
+
+    pipeline.analyze(Path("tests/fixtures/golden_indian.pdf").read_bytes(), llm=Spy())
+    assert {C.EBITDA, C.FREE_CASH_FLOW, C.TOTAL_DEBT} == NEVER_ASK
+    for concept in NEVER_ASK:
+        assert not any(f"Concept: {concept.value}" in p for p in asked), concept

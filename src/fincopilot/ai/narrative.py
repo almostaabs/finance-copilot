@@ -76,7 +76,7 @@ def build_evidence(result: AnalysisResult) -> dict[str, Any]:
 
     for v in result.values:
         key = f"{v.concept.value}@{v.period.end_year}"
-        shown = value_text(v)
+        shown = value_text(v, ascii_only=True)
         values[key] = {
             "display": shown,
             "source": (

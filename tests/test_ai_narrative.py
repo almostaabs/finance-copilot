@@ -223,3 +223,9 @@ def test_client_returning_non_string_is_unavailable(result):
             return None
 
     assert isinstance(generate_narrative(result, Weird()), Unavailable)
+
+
+def test_evidence_is_ascii_so_small_models_cannot_mangle_it():
+    indian = pipeline.analyze(Path("tests/fixtures/golden_indian.pdf").read_bytes())
+    blob = json.dumps(build_evidence(indian), ensure_ascii=False)
+    assert "₹" not in blob and "INR " in blob

@@ -51,9 +51,13 @@ def test_garbage_model_output_leaves_pipeline_intact(client):
     assert C.GROSS_PROFIT in result.mapping.unmapped
 
 
-def test_deep_nesting_is_rejected_not_raised():
+@pytest.mark.parametrize("depth", [200, 2000, 5000, 100_000])
+def test_deep_nesting_is_rejected_not_raised(depth):
+    # 2000 sits past the Python recursion limit but inside the C decoder's:
+    # the decoder succeeds and a recursive walk would raise. Any depth must
+    # come back as a verdict, never an exception.
     r = validate_response(
-        "[" * 5000 + "]" * 5000,
+        "[" * depth + "]" * depth,
         concept=C.GROSS_PROFIT,
         candidate_ids=set(),
         refs={},

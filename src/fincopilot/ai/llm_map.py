@@ -95,14 +95,18 @@ def build_prompt(concept: CanonicalConcept, candidates: Sequence[tuple[str, str]
 
 
 def _has_numeric(value: Any) -> bool:
-    if isinstance(value, bool):
-        return False
-    if isinstance(value, int | float):
-        return True
-    if isinstance(value, dict):
-        return any(_has_numeric(v) for v in value.values())
-    if isinstance(value, list):
-        return any(_has_numeric(v) for v in value)
+    """Iterative on purpose: model output picks the nesting depth, not us."""
+    stack = [value]
+    while stack:
+        item = stack.pop()
+        if isinstance(item, bool):
+            continue
+        if isinstance(item, int | float):
+            return True
+        if isinstance(item, dict):
+            stack.extend(item.values())
+        elif isinstance(item, list):
+            stack.extend(item)
     return False
 
 
@@ -134,21 +138,22 @@ def validate_response(
         return Unavailable(UnavailableReason.UNPARSEABLE, "LLM response is absent or oversized")
     try:
         data = json.loads(raw, object_pairs_hook=_no_duplicate_keys)
-    except Exception:  # ValueError, TypeError, RecursionError, UnicodeDecodeError
+        numeric = _has_numeric(data)
+        shape_ok = (
+            isinstance(data, dict)
+            and "source_row_id" in data
+            and set(data) <= {"source_row_id", "confidence", "reasoning"}
+            and (data["source_row_id"] is None or isinstance(data["source_row_id"], str))
+            and ("confidence" not in data or data["confidence"] in ("high", "medium", "low"))
+            and ("reasoning" not in data or isinstance(data["reasoning"], str))
+        )
+    except Exception:  # ValueError, TypeError, RecursionError, UnicodeDecodeError, ...
         return Unavailable(UnavailableReason.UNPARSEABLE, "LLM response is not valid JSON")
 
-    if _has_numeric(data):  # path 6, checked first so it is logged even when shape is fine
+    if numeric:  # path 6, checked first so it is logged even when shape is fine
         log.warning("LLM contract violation: numeric field in response for %s", concept.value)
         return Unavailable(UnavailableReason.CONFLICT, "LLM response contains a numeric field")
-
-    if (
-        not isinstance(data, dict)
-        or "source_row_id" not in data
-        or not set(data) <= {"source_row_id", "confidence", "reasoning"}
-        or not (data["source_row_id"] is None or isinstance(data["source_row_id"], str))
-        or ("confidence" in data and data["confidence"] not in ("high", "medium", "low"))
-        or ("reasoning" in data and not isinstance(data["reasoning"], str))
-    ):
+    if not shape_ok:
         return Unavailable(UnavailableReason.UNPARSEABLE, "LLM response violates the schema")
 
     row_id = data["source_row_id"]

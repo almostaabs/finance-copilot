@@ -31,6 +31,10 @@ from fincopilot.types import (
 )
 
 MAX_INSIGHTS = 8
+MAX_CITES_PER_INSIGHT = 12
+# Plain prose only. Markdown and HTML control characters are refused so model
+# output can never become a link, an image, or markup on the dashboard.
+_SAFE_TEXT = re.compile(r"^[A-Za-z0-9 .,;:%'\"()\-/&+₹$\n]*$")
 MAX_TEXT_CHARS = 400
 MAX_SUMMARY_CHARS = 600
 _NUMBER = re.compile(r"[0-9][0-9,]*(?:\.[0-9]+)?")
@@ -172,7 +176,7 @@ def validate_response(raw: str, evidence: dict[str, Any], *, model: str) -> Narr
             return rejected
         ids = set(evidence["ids"])
         allowed = set(evidence["_numbers"])
-        if not _numbers_ok(summary, allowed):
+        if not _numbers_ok(summary, allowed) or not _SAFE_TEXT.match(summary):
             return rejected
         out: list[Insight] = []
         for item in insights:
@@ -183,9 +187,11 @@ def validate_response(raw: str, evidence: dict[str, Any], *, model: str) -> Narr
                 return rejected
             if len(text) > MAX_TEXT_CHARS or not text.strip():
                 return rejected
+            if len(cites) > MAX_CITES_PER_INSIGHT:
+                return rejected
             if not all(isinstance(c, str) and c in ids for c in cites):
                 return rejected
-            if not _numbers_ok(text, allowed):
+            if not _numbers_ok(text, allowed) or not _SAFE_TEXT.match(text):
                 return rejected
             out.append(Insight(text=text.strip(), cites=tuple(dict.fromkeys(cites))))
         return Narrative(summary=summary.strip(), insights=tuple(out), model=model)

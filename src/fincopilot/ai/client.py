@@ -45,6 +45,8 @@ class OllamaClient:
         model: str = DEFAULT_MODEL,
         timeout_s: float = DEFAULT_TIMEOUT_S,
     ) -> None:
+        if not host.startswith(("http://", "https://")):
+            raise ValueError("Ollama host must start with http:// or https://")
         self.host = host.rstrip("/")
         self.model = model
         self.timeout_s = timeout_s

@@ -193,3 +193,33 @@ def test_generate_never_mutates_result(result, evidence):
     before = (result.values, result.metrics, result.red_flags)
     generate_narrative(result, ScriptedClient(_ok_response(evidence)))
     assert (result.values, result.metrics, result.red_flags) == before
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["[click](http://evil)", "![i](http://x)", "<b>bold</b>", "*emph*", "`code`", "a | b", "#h"],
+)
+def test_markup_in_text_is_rejected(evidence, text):
+    metric_id = next(i for i in evidence["ids"] if i.startswith("net_margin@"))
+    raw = json.dumps({"summary": "x", "insights": [{"text": text, "cites": [metric_id]}]})
+    assert isinstance(validate_response(raw, evidence, model="m"), Unavailable)
+    assert isinstance(
+        validate_response(json.dumps({"summary": text, "insights": []}), evidence, model="m"),
+        Unavailable,
+    )
+
+
+def test_too_many_cites_rejected(evidence):
+    metric_id = next(i for i in evidence["ids"] if i.startswith("net_margin@"))
+    raw = json.dumps({"summary": "x", "insights": [{"text": "ok", "cites": [metric_id] * 13}]})
+    assert isinstance(validate_response(raw, evidence, model="m"), Unavailable)
+
+
+def test_client_returning_non_string_is_unavailable(result):
+    class Weird:
+        model = "w"
+
+        def complete_json(self, prompt, schema):
+            return None
+
+    assert isinstance(generate_narrative(result, Weird()), Unavailable)

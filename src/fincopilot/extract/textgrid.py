@@ -16,6 +16,7 @@ the exact token printed on the page.
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass
 
@@ -42,7 +43,8 @@ class Word:
 
 def _lines(words: list[Word]) -> list[list[Word]]:
     out: list[list[Word]] = []
-    for w in sorted(words, key=lambda w: (round(w.top), w.x0)):
+    finite = [w for w in words if all(map(math.isfinite, (w.x0, w.x1, w.top))) and w.text]
+    for w in sorted(finite, key=lambda w: (round(w.top), w.x0)):
         if out and abs(out[-1][0].top - w.top) <= LINE_TOL:
             out[-1].append(w)
         else:

@@ -122,3 +122,11 @@ def test_cash_flow_ignores_convenience_column(result):
 def test_every_reconciliation_passes(result):
     checks = [c for c in result.reconciliations if c.period == P24]
     assert checks and all(c.status is ReconciliationStatus.PASSED for c in checks)
+
+
+def test_non_finite_and_empty_words_are_ignored():
+    nan = float("nan")
+    words = _statement([("A", ("1", "2")), ("B", ("3", "4")), ("C", ("5", "6"))])
+    words += [Word("9", nan, nan, nan), Word("", 1, 2, 3), Word("7", float("inf"), 1, 1)]
+    rows, _ = text_grid(words)
+    assert rows[1] == ["A", "1", "2"]

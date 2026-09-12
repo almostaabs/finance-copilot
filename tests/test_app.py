@@ -72,3 +72,23 @@ def test_kpi_cards_use_newest_period():
     at = _run_with(GOLDEN_US)
     body = " ".join(m.value for m in at.markdown)
     assert "for 2022" not in body
+
+
+def test_load_rejects_bad_files_without_raising(monkeypatch):
+    import app
+
+    calls = []
+    monkeypatch.setattr(app.st.sidebar, "error", lambda msg: calls.append(msg))
+    monkeypatch.setattr(app.st, "session_state", {})
+    app._load(
+        "scanned.pdf", Path("tests/fixtures/scanned.pdf").read_bytes(), False, "http://x", "m"
+    )
+    app._load("junk.pdf", b"not a pdf at all", False, "http://x", "m")
+    assert len(calls) == 2 and "current" not in app.st.session_state
+
+
+def test_ollama_host_must_be_http():
+    from fincopilot.ai.client import OllamaClient
+
+    with pytest.raises(ValueError):
+        OllamaClient(host="file:///etc/passwd")

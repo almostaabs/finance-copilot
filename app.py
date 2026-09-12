@@ -284,4 +284,5 @@ def main() -> None:
         _history_tab()
 
 
-main()
+if __name__ == "__main__":
+    main()

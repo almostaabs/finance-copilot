@@ -1,0 +1,54 @@
+{
+  "fixture": "golden_indian.pdf",
+  "currency": "INR",
+  "scale": "crore",
+  "scale_source": "table",
+  "basis": "consolidated",
+  "page_count": 60,
+  "statement_pages": {"income": 41, "balance": 42, "cash_flow": 43},
+  "standalone_pages": {"income": 44, "balance": 45, "cash_flow": 46},
+  "periods": [
+    {"end_year": 2024, "label": "FY 2023-24"},
+    {"end_year": 2023, "label": "FY 2022-23"}
+  ],
+  "mapped": {
+    "revenue":               {"2024": "124500000000", "2023": "109800000000", "source_label": "Revenue from operations", "page": 41},
+    "cogs":                  {"2024": "71800000000",  "2023": "64200000000",  "source_label": "Cost of materials consumed", "page": 41},
+    "d_and_a":               {"2024": "6400000000",   "2023": "5800000000",   "source_label": "Depreciation and amortisation expense", "page": 41},
+    "operating_income":      {"2024": "19405000000",  "2023": "15300000000",  "source_label": "Profit from operations", "page": 41},
+    "net_income":            {"2024": "12455000000",  "2023": "9500000000",   "source_label": "Profit for the year", "page": 41},
+    "total_assets":          {"2024": "136200000000", "2023": "121600000000", "source_label": "Total assets", "page": 42},
+    "current_assets":        {"2024": "56500000000",  "2023": "49400000000",  "source_label": "Total current assets", "page": 42},
+    "cash":                  {"2024": "13800000000",  "2023": "11200000000",  "source_label": "Cash and cash equivalents", "page": 42},
+    "equity":                {"2024": "69300000000",  "2023": "59800000000",  "source_label": "Total equity", "page": 42},
+    "total_liabilities":     {"2024": "66900000000",  "2023": "61800000000",  "source_label": "Total liabilities", "page": 42},
+    "current_liabilities":   {"2024": "32000000000",  "2023": "29600000000",  "source_label": "Total current liabilities", "page": 42},
+    "long_term_borrowings":  {"2024": "28500000000",  "2023": "26400000000",  "source_label": "Long-term borrowings", "page": 42},
+    "short_term_borrowings": {"2024": "9000000000",   "2023": "8200000000",   "source_label": "Short-term borrowings", "page": 42},
+    "operating_cash_flow":   {"2024": "21800000000",  "2023": "17600000000",  "source_label": "Net cash generated from operating activities", "page": 43},
+    "capex":                 {"2024": "12400000000",  "2023": "10800000000",  "source_label": "Purchase of property, plant and equipment", "page": 43}
+  },
+  "derived": {
+    "total_debt":     {"2024": "37500000000", "2023": "34600000000", "from": ["short_term_borrowings", "long_term_borrowings"]},
+    "ebitda":         {"2024": "25805000000", "2023": "21100000000", "from": ["operating_income", "d_and_a"]},
+    "free_cash_flow": {"2024": "9400000000",  "2023": "6800000000",  "from": ["operating_cash_flow", "capex"]}
+  },
+  "unmapped": ["gross_profit"],
+  "notes": [
+    "capex is printed in parentheses and must normalise to a POSITIVE magnitude before FCF.",
+    "gross_profit has no line in an Ind-AS P&L, so gross_margin must be Unavailable(MISSING_INPUT) and the gross-profit reconciliation must be unavailable.",
+    "Total income (12,770.50 cr) includes other income and must NEVER map to revenue.",
+    "Standalone figures differ from consolidated at every line, so wrong-scope selection fails on values, not just on a label."
+  ],
+  "arithmetic_checks": [
+    "assets: 7,970.00 + 5,650.00 = 13,620.00",
+    "equity+liabilities: 6,930.00 + 6,690.00 = 13,620.00",
+    "liabilities: 3,490.00 + 3,200.00 = 6,690.00",
+    "operating profit: 12,770.50 - (7,180.00 + 1,890.00 + 640.00 + 1,120.00) = 1,940.50",
+    "net income: 1,940.50 - 280.00 - 415.00 = 1,245.50",
+    "cash flow: 2,180.00 - 1,310.00 - 610.00 = 260.00, and 1,380.00 - 1,120.00 = 260.00",
+    "ebitda: 1,940.50 + 640.00 = 2,580.50",
+    "fcf: 2,180.00 - 1,240.00 = 940.00",
+    "total_debt: 900.00 + 2,850.00 = 3,750.00"
+  ]
+}

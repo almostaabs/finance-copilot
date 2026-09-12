@@ -1,0 +1,65 @@
+{
+  "fixture": "golden_us.pdf",
+  "currency": "USD",
+  "scale": "million",
+  "scale_source": "table",
+  "basis": "consolidated",
+  "page_count": 34,
+  "statement_pages": {"income": 26, "balance": 27, "cash_flow": 28},
+  "periods": [
+    {"end_year": 2024, "label": "2024"},
+    {"end_year": 2023, "label": "2023"},
+    {"end_year": 2022, "label": "2022"}
+  ],
+  "periods_by_statement": {
+    "income": [2024, 2023, 2022],
+    "balance": [2024, 2023],
+    "cash_flow": [2024, 2023, 2022]
+  },
+  "mapped": {
+    "revenue":               {"2024": "8420000000", "2023": "7650000000", "2022": "6980000000", "source_label": "Net sales", "page": 26},
+    "cogs":                  {"2024": "5180000000", "2023": "4790000000", "2022": "4420000000", "source_label": "Cost of sales", "page": 26},
+    "gross_profit":          {"2024": "3240000000", "2023": "2860000000", "2022": "2560000000", "source_label": "Gross profit", "page": 26},
+    "d_and_a":               {"2024": "410000000",  "2023": "380000000",  "2022": "350000000",  "source_label": "Depreciation and amortization", "page": 26},
+    "operating_income":      {"2024": "930000000",  "2023": "750000000",  "2022": "610000000",  "source_label": "Operating income", "page": 26},
+    "net_income":            {"2024": "643000000",  "2023": "510000000",  "2022": "407000000",  "source_label": "Net income", "page": 26},
+    "cash":                  {"2024": "1180000000", "2023": "960000000",  "source_label": "Cash and cash equivalents", "page": 27},
+    "current_assets":        {"2024": "3410000000", "2023": "2990000000", "source_label": "Total current assets", "page": 27},
+    "total_assets":          {"2024": "7590000000", "2023": "6950000000", "source_label": "Total assets", "page": 27},
+    "current_liabilities":   {"2024": "1300000000", "2023": "1310000000", "source_label": "Total current liabilities", "page": 27},
+    "short_term_borrowings": {"2024": "320000000",  "2023": "400000000",  "source_label": "Short-term debt", "page": 27},
+    "long_term_borrowings":  {"2024": "1850000000", "2023": "1980000000", "source_label": "Long-term debt", "page": 27},
+    "total_liabilities":     {"2024": "3150000000", "2023": "3290000000", "source_label": "Total liabilities", "page": 27},
+    "equity":                {"2024": "4440000000", "2023": "3660000000", "source_label": "Total stockholders' equity", "page": 27},
+    "operating_cash_flow":   {"2024": "1210000000", "2023": "1020000000", "2022": "880000000", "source_label": "Net cash provided by operating activities", "page": 28},
+    "capex":                 {"2024": "540000000",  "2023": "480000000",  "2022": "430000000", "source_label": "Purchases of property and equipment", "page": 28}
+  },
+  "derived": {
+    "total_debt":     {"2024": "2170000000", "2023": "2380000000", "from": ["short_term_borrowings", "long_term_borrowings"]},
+    "ebitda":         {"2024": "1340000000", "2023": "1130000000", "2022": "960000000", "from": ["operating_income", "d_and_a"]},
+    "free_cash_flow": {"2024": "670000000",  "2023": "540000000",  "2022": "450000000", "from": ["operating_cash_flow", "capex"]}
+  },
+  "unavailable": {
+    "total_debt_2022": "MISSING_INPUT - the balance sheet carries only 2024 and 2023",
+    "roa_2022": "MISSING_INPUT - average total assets needs a 2021 balance sheet",
+    "roe_2022": "MISSING_INPUT - average equity needs a 2021 balance sheet"
+  },
+  "notes": [
+    "Income statement has THREE periods; the balance sheet has TWO. PeriodMap must be keyed per statement.",
+    "gross_profit IS mapped here, unlike golden_indian - so gross_margin resolves and the gross-profit reconciliation runs.",
+    "The header first column is blank, which is normal in 10-K tables; the label column must still be identified.",
+    "capex is parenthesised and must normalise to a positive magnitude."
+  ],
+  "arithmetic_checks": [
+    "gross profit 2024: 8,420.0 - 5,180.0 = 3,240.0",
+    "operating income 2024: 3,240.0 - 780.0 - 1,120.0 - 410.0 = 930.0",
+    "net income 2024: 930.0 - 95.0 - 192.0 = 643.0",
+    "assets 2024: 3,410.0 + 2,760.0 + 1,420.0 = 7,590.0",
+    "liabilities+equity 2024: 3,150.0 + 4,440.0 = 7,590.0",
+    "liabilities 2024: 1,300.0 + 1,850.0 = 3,150.0",
+    "cash flow 2024: 1,210.0 - 610.0 - 380.0 = 220.0, and 1,180.0 - 960.0 = 220.0",
+    "ebitda 2024: 930.0 + 410.0 = 1,340.0",
+    "fcf 2024: 1,210.0 - 540.0 = 670.0",
+    "total_debt 2024: 320.0 + 1,850.0 = 2,170.0"
+  ]
+}

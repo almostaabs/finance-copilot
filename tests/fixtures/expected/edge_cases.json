@@ -1,0 +1,72 @@
+{
+  "stitched.pdf": {
+    "expect": "balance sheet merges into ONE logical table across two pages",
+    "page_count": 7,
+    "split_after_row": 6,
+    "header_repeated_on_second_page": false,
+    "row_page_map": {
+      "Property, plant and equipment": 5,
+      "Cash and cash equivalents": 5,
+      "Other current assets": 6,
+      "Total equity and liabilities": 6
+    },
+    "notes": [
+      "Rows from the second page MUST keep page 6 in their SourceRef, not page 5.",
+      "The merged table inherits the header from the first page.",
+      "total_assets 13,620.00 appears on page 6 and must still map."
+    ]
+  },
+  "standalone_only.pdf": {
+    "expect": "StatementBasis.STANDALONE_FALLBACK",
+    "page_count": 6,
+    "statement_pages": {"income": 4, "balance": 5},
+    "notes": [
+      "No heading in this document contains Consolidated.",
+      "Analysis proceeds; the basis label must be surfaced at every level of output.",
+      "revenue 2024 = 34,200,000,000 base units (3,420.00 crore)."
+    ]
+  },
+  "ambiguous_periods.pdf": {
+    "expect": "Unavailable(AMBIGUOUS) for the whole document",
+    "notes": [
+      "FY 2023-24 and Year ended 31 March 2024 both resolve to end_year 2024.",
+      "Two columns resolving to one period is ambiguous. Do not pick one; do not order by position."
+    ]
+  },
+  "no_scale.pdf": {
+    "expect": "Unavailable(AMBIGUOUS) on every value",
+    "notes": [
+      "No scale phrase exists at cell, table, statement, or document level.",
+      "A bare 12,450.00 is meaningless. Never assume units."
+    ]
+  },
+  "scanned.pdf": {
+    "expect": "ScannedPDFUnsupported raised during the ingestion gate",
+    "page_count": 3,
+    "notes": [
+      "Every page has zero extractable characters.",
+      "Rejection must happen before any table extraction is attempted."
+    ]
+  },
+  "hostile.pdf": {
+    "expect": "extraction survives; every malformed value is Unavailable; injection is ignored",
+    "page_count": 18,
+    "statement_pages": {"income": 3, "balance": 4},
+    "cases": {
+      "revenue_2024": "999,999,999,999,999,999.00 crore = 9999999999999999990000000 base units. Beyond int64 and float64 exactness; must stay an exact Decimal, NEVER overflow or become inf. (Spec says 10^99; a 100-digit token cannot render inside a 149pt cell without overlapping the label column, which destroys the row. 18 digits keeps the intent.)",
+      "cogs_2024": "em dash in a numeric column is ZERO with dash_zero=True",
+      "cogs_2023": "blank is MISSING, not zero",
+      "exceptional_items_2024": "em dash plus see note 14 is UNPARSEABLE (dash plus other content)",
+      "exceptional_items_2023": "(0.00) is zero; the negative sign is irrelevant at zero",
+      "d_and_a_2024": "1,23,456 parses under the INDIAN grammar to 123456",
+      "d_and_a_2023": "12,34,567 parses under the INDIAN grammar to 1234567",
+      "operating_income_2024": "1,2345 satisfies NEITHER grammar - UNPARSEABLE",
+      "operating_income_2023": "abc is UNPARSEABLE",
+      "net_income_2024": "(1,245.50) is NEGATIVE 1,245.50",
+      "equity_both_periods": "NEGATIVE - debt_to_equity must be Unavailable(AMBIGUOUS), never a tidy negative ratio",
+      "balance_sheet": "does not balance, by design - reconciliation must WARN, not crash",
+      "note_27": "500 rows must not exhaust memory or time out",
+      "injection_text": "the page-1 notice must have zero effect on any output"
+    }
+  }
+}

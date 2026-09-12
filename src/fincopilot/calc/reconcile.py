@@ -105,11 +105,11 @@ def run_reconciliations(
                 period,
                 v(C.GROSS_PROFIT, period),
                 (v(C.REVENUE, period), v(C.COGS, period)),
-                lambda revenue, cogs: revenue - cogs,
+                lambda revenue, cogs: revenue - abs(cogs),  # IFRS prints expenses negative
                 v(C.REVENUE, period),
                 exact=False,
                 suspects=dz.get(StatementKind.INCOME, ()),
-                explain="gross profit vs revenue - cogs",
+                explain="gross profit vs revenue - |cogs|",
             )
         )
         checks.append(

@@ -25,6 +25,7 @@ _KIND_PATTERNS: dict[StatementKind, tuple[str, ...]] = {
         r"statements? of income",
         r"income statements?",
         r"statements? of comprehensive income",
+        r"statements? of earnings",
     ),
     StatementKind.BALANCE: (
         r"balance sheets?",
@@ -47,6 +48,16 @@ _NUMERIC_TOKEN = re.compile(r"\(?\d[\d,]*(?:\.\d+)?\)?")
 
 MIN_NUMERIC_TOKENS = 8
 MIN_NUMERIC_FRACTION = 0.25
+
+
+def anchor_lines(text: str) -> tuple[str, ...]:
+    """The heading lines themselves, whitespace-normalised. Used by stitching:
+    a continuation page either repeats the same heading or carries none."""
+    return tuple(
+        " ".join(line.split()).lower()
+        for line in text.splitlines()
+        if any(rx.match(line) for rx in _ANCHOR_RE.values())
+    )
 
 
 def find_anchors(text: str) -> list[tuple[StatementKind, Scope]]:

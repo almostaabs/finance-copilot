@@ -98,16 +98,18 @@ def test_missing_statement_does_not_sink_the_others(golden_indian):
 # --- stitching rules, in isolation
 
 
-def _table(page: int, header: tuple[str, ...], labels: list[str], ncols: int = 3):
+def _table(
+    page: int, header: tuple[str, ...], labels: list[str], ncols: int = 3, table_idx: int = 0
+):
     rows = tuple(
         TableRow(
-            ref=make_source_ref(page=page, table_idx=0, row_idx=i, row_label=lbl),
+            ref=make_source_ref(page=page, table_idx=table_idx, row_idx=i, row_label=lbl),
             label=lbl,
             cells=(lbl,) + ("1.00",) * (ncols - 1),
         )
         for i, lbl in enumerate(labels)
     )
-    return ExtractedTable(f"page_{page}_table_0", page, (page,), header, rows, None)
+    return ExtractedTable(f"page_{page}_table_{table_idx}", page, (page,), header, rows, None)
 
 
 HDR = ("Particulars", "FY2024", "FY2023")
@@ -125,10 +127,22 @@ def test_stitch_requires_matching_column_count():
     assert len(stitch_tables((a, b))) == 2
 
 
-def test_stitch_requires_the_continuation_to_have_no_header():
+def test_stitch_accepts_no_header_or_the_identical_header_only():
     a = _table(5, HDR, ["Total assets"])
-    b = _table(6, HDR, ["Total equity"])
-    assert len(stitch_tables((a, b))) == 2
+    same = _table(6, HDR, ["Total equity"])
+    (merged,) = stitch_tables((a, same))
+    assert merged.pages == (5, 6)
+    other = _table(6, ("Particulars", "2019", "2018"), ["Total equity"])
+    assert len(stitch_tables((a, other))) == 2
+
+
+def test_stitch_looks_past_an_unrelated_table_on_the_same_page():
+    a = _table(5, HDR, ["Total assets"])
+    noise = _table(5, ("x", "2001", "2000"), ["Note"], table_idx=1)
+    b = _table(6, (), ["Total equity"])
+    out = stitch_tables((a, noise, b))
+    assert len(out) == 2
+    assert next(t for t in out if t.table_id == a.table_id).pages == (5, 6)
 
 
 def test_stitch_merges_when_all_conditions_hold():
@@ -155,3 +169,13 @@ def test_stitch_requires_approximately_matching_column_positions():
     a = ExtractedTable(a.table_id, 5, (5,), a.header, a.rows, None, col_x=(40.0, 250.0, 400.0))
     b = ExtractedTable(b.table_id, 6, (6,), b.header, b.rows, None, col_x=(40.0, 300.0, 400.0))
     assert len(stitch_tables((a, b))) == 2
+
+
+def test_stitch_refuses_a_page_that_starts_a_different_statement():
+    a = _table(5, HDR, ["Total assets"])
+    b = _table(6, HDR, ["Net income"])
+    bs = "Consolidated Balance Sheet" + chr(10) + "1 2"
+    cf = "Consolidated Statement of Cash Flows" + chr(10) + "1 2"
+    assert len(stitch_tables((a, b), ("",) * 4 + (bs, cf))) == 2
+    assert len(stitch_tables((a, b), ("",) * 4 + (bs, bs))) == 1
+    assert len(stitch_tables((a, b), ("",) * 4 + (bs, "just numbers"))) == 1

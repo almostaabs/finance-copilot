@@ -23,10 +23,11 @@ EXPECTED_FIXTURES = {
     "no_scale.pdf",
     "scanned.pdf",
     "hostile.pdf",
+    "text_aligned.pdf",
 }
 
 
-def test_all_eight_fixtures_are_present():
+def test_all_nine_fixtures_are_present():
     found = {p.name for p in FIXTURE_DIR.glob("*.pdf")}
     assert found == EXPECTED_FIXTURES
 

@@ -14,7 +14,13 @@ from dataclasses import dataclass
 
 import pdfplumber
 
-from fincopilot.extract.anchors import candidate_table_pages, find_anchors, looks_like_header
+from fincopilot.extract.anchors import (
+    candidate_table_pages,
+    find_anchors,
+    is_amount_token,
+    looks_like_header,
+)
+from fincopilot.extract.textgrid import Word, text_grid
 from fincopilot.types import ExtractedTable, RawDocument, SourceRef, TableRow, make_ref_id
 
 DEFAULT_MAX_BYTES = 50 * 1024 * 1024
@@ -85,6 +91,33 @@ def _probe_text_layer(page_texts: list[str]) -> None:
         raise ScannedPDFUnsupported(
             "sparse text layer: fewer than 30% of sampled pages contain readable words"
         )
+
+
+_YEAR_RE = re.compile(r"(?<![0-9])(?:19|20|21)[0-9]{2}(?![0-9])")
+DEFAULT_X_TOLERANCE = 3.0
+TIGHT_X_TOLERANCE = 1.5
+MIN_SPACE_RATIO = 0.08  # ordinary prose is ~0.12-0.18 spaces per character
+
+
+def _space_ratio(page_texts: list[str]) -> float:
+    total = sum(len(t) for t in page_texts)
+    return sum(t.count(" ") for t in page_texts) / total if total else 1.0
+
+
+def _usable(t: ExtractedTable) -> bool:
+    """Two period-bearing header cells, two mostly-numeric columns, three rows.
+
+    Anything less and the word-position grid is built as well; location
+    scoring then picks whichever reads better."""
+    if len(t.rows) < 3 or sum(1 for c in t.header if _YEAR_RE.search(c)) < 2:
+        return False
+    width = max(len(r.cells) for r in t.rows)
+    numeric = 0
+    for col in range(1, width):
+        cells = [r.cells[col] for r in t.rows if col < len(r.cells) and r.cells[col]]
+        if cells and sum(1 for c in cells if is_amount_token(c)) * 2 > len(cells):
+            numeric += 1
+    return numeric >= 2
 
 
 def _clean(cell: str | None) -> str:
@@ -170,6 +203,15 @@ def extract_pdf(
             raise TooManyPages(f"{page_count} pages; limit is {max_pages}")
 
         page_texts = [pdf.pages[i].extract_text() or "" for i in range(page_count)]
+        x_tol = DEFAULT_X_TOLERANCE
+        if _space_ratio(page_texts) < MIN_SPACE_RATIO:
+            # Some fonts (Berkshire's 10-K, for one) pack glyphs so tightly that
+            # pdfplumber's default tolerance swallows every space. Re-read once,
+            # document-wide, with a tighter tolerance. Deterministic.
+            x_tol = TIGHT_X_TOLERANCE
+            page_texts = [
+                pdf.pages[i].extract_text(x_tolerance=x_tol) or "" for i in range(page_count)
+            ]
         _probe_text_layer(page_texts)
 
         tables: list[ExtractedTable] = []
@@ -184,11 +226,26 @@ def extract_pdf(
                     page_no,
                     page_texts[page_no - 1],
                     table_idx,
-                    found.extract(),
+                    found.extract(x_tolerance=x_tol),
                     col_x,
                 )
                 if built is not None:
                     tables.append(built)
+            if not any(_usable(t) for t in tables if t.first_page == page_no):
+                # No ruled table worth reading: rebuild the grid from word positions.
+                words = [
+                    Word(w["text"], float(w["x0"]), float(w["x1"]), float(w["top"]))
+                    for w in page.extract_words(x_tolerance=x_tol)
+                ]
+                grid = text_grid(words)
+                if grid is not None:
+                    rows, col_x = grid
+                    n = sum(1 for t in tables if t.first_page == page_no)
+                    built = _build_table(
+                        ref.document_id, page_no, page_texts[page_no - 1], n, rows, col_x
+                    )
+                    if built is not None:
+                        tables.append(built)
 
     refs = {row.ref.ref_id: row.ref for t in tables for row in t.rows}
     return RawDocument(

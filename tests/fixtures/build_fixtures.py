@@ -257,7 +257,172 @@ def main() -> None:
     build_scanned_pdf(scanned)
     print(f"wrote {scanned}")
 
+    aligned = FIXTURE_DIR / "text_aligned.pdf"
+    build_text_aligned_pdf(aligned)
+    print(f"wrote {aligned}")
+
     write_hashes()
+
+
+# --- text_aligned.pdf: statements printed without ruling lines (the real-world case)
+
+_TA_FONT = "Helvetica"
+_TA_COLS = (400, 470, 540)  # right edges of the three value columns, in points
+
+
+def _ta_page(c, heading: str, scale_line: str, header_lines: list[str], years: tuple[str, ...]):
+    """Title block, then a header whose years sit right-aligned over the value columns."""
+    _, height = A4
+    y = height - 60
+    c.setFont(_TA_FONT, 11)
+    c.drawString(60, y, "Text Aligned Holdings Inc.")
+    y -= 16
+    c.setFont(_TA_FONT + "-Bold", 12)
+    c.drawString(60, y, heading)
+    y -= 16
+    c.setFont(_TA_FONT, 9)
+    c.drawString(60, y, scale_line)
+    y -= 14
+    for line in header_lines:
+        c.drawString(_TA_COLS[0] - 60, y, line)
+        y -= 12
+    for x, yr in zip(_TA_COLS, years, strict=False):
+        c.drawRightString(x, y, yr)
+    return y - 14
+
+
+def _ta_rows(c, y: float, rows: list[tuple], *, note_x: float | None = None, extra: int = 0):
+    """rows: (label, values...) where values are strings; '' leaves a gap.
+    A note number may precede the values; a fourth value goes to a column with no year."""
+    c.setFont(_TA_FONT, 9)
+    cols = _TA_COLS + ((_TA_COLS[-1] + 70,) if extra else ())
+    for row in rows:
+        label, *values = row
+        note = None
+        if note_x is not None and values and values[0].isdigit() and len(values[0]) <= 2:
+            note, values = values[0], values[1:]
+        c.drawString(60 + (8 if label[:1].islower() else 0), y, label)
+        if note is not None:
+            c.drawRightString(note_x, y, note)
+        for x, v in zip(cols, values, strict=False):
+            if v:
+                c.drawRightString(x, y, v)
+        y -= 13
+    return y
+
+
+def build_text_aligned_pdf(out_path: Path) -> None:
+    """Four pages, no ruling lines anywhere:
+
+    1 income statement, three years, '$' signs on the first row, one negative
+    2 balance sheet assets with a Notes column
+    3 balance sheet liabilities and equity: same heading, same header (continuation)
+    4 cash flow with a fourth, year-less 'Convenience' column that must be ignored
+    """
+    from reportlab.pdfgen import canvas as pdfcanvas
+
+    c = pdfcanvas.Canvas(str(out_path), pagesize=A4, invariant=1)
+    y = _ta_page(
+        c,
+        "CONSOLIDATED STATEMENTS OF OPERATIONS",
+        "(In millions, except per-share amounts)",
+        ["Years ended", "December 31,"],
+        ("2024", "2023", "2022"),
+    )
+    _ta_rows(
+        c,
+        y,
+        [
+            ("Net sales:",),
+            ("Products", "$ 298,085", "$ 316,199", "$ 297,392"),
+            ("Services", "85,200", "78,129", "68,425"),
+            ("Total net sales", "383,285", "394,328", "365,817"),
+            ("Cost of sales", "214,137", "223,546", "212,981"),
+            ("Gross margin", "169,148", "170,782", "152,836"),
+            ("Operating expenses", "54,847", "51,345", "43,887"),
+            ("Operating income", "114,301", "119,437", "108,949"),
+            ("Other income/(expense), net", "(565)", "(334)", "258"),
+            ("Provision for income taxes", "16,741", "19,300", "14,527"),
+            ("Net income", "$ 96,995", "$ 99,803", "$ 94,680"),
+        ],
+    )
+    c.showPage()
+    y = _ta_page(
+        c, "CONSOLIDATED BALANCE SHEETS", "(In millions)", ["December 31,"], ("2024", "2023")
+    )
+    c.setFont(_TA_FONT, 9)
+    c.drawRightString(330, y + 14, "Notes")
+    _ta_rows(
+        c,
+        y,
+        [
+            ("ASSETS:",),
+            ("Current assets:",),
+            ("Cash and cash equivalents", "4", "29,965", "23,646"),
+            ("Marketable securities", "5", "31,590", "24,658"),
+            ("Accounts receivable, net", "6", "29,508", "28,184"),
+            ("Inventories", "6,331", "4,946"),
+            ("Other current assets", "7", "46,172", "53,971"),
+            ("Total current assets", "143,566", "135,405"),
+            ("Non-current assets", "8", "209,017", "217,350"),
+            ("Total assets", "$ 352,583", "$ 352,755"),
+        ],
+        note_x=330,
+    )
+    c.showPage()
+    y = _ta_page(
+        c, "CONSOLIDATED BALANCE SHEETS", "(In millions)", ["December 31,"], ("2024", "2023")
+    )
+    c.setFont(_TA_FONT, 9)
+    c.drawRightString(330, y + 14, "Notes")
+    _ta_rows(
+        c,
+        y,
+        [
+            ("LIABILITIES AND SHAREHOLDERS' EQUITY:",),
+            ("Current liabilities:",),
+            ("Accounts payable", "9", "62,611", "64,115"),
+            ("Other current liabilities", "82,697", "89,867"),
+            ("Total current liabilities", "145,308", "153,982"),
+            ("Non-current liabilities", "10", "145,129", "148,101"),
+            ("Total liabilities", "290,437", "302,083"),
+            ("Total shareholders' equity", "62,146", "50,672"),
+            ("Total liabilities and shareholders' equity", "$ 352,583", "$ 352,755"),
+        ],
+        note_x=330,
+    )
+    c.showPage()
+    y = _ta_page(
+        c,
+        "CONSOLIDATED STATEMENTS OF CASH FLOWS",
+        "(In millions)",
+        ["Years ended December 31,"],
+        ("2024", "2023", "2022"),
+    )
+    c.setFont(_TA_FONT, 9)
+    c.drawRightString(_TA_COLS[-1] + 70, y + 14, "Convenience")
+    _ta_rows(
+        c,
+        y,
+        [
+            ("Operating activities:",),
+            ("Net income", "96,995", "99,803", "94,680", "1,105"),
+            ("Depreciation and amortization", "11,519", "11,104", "11,284", "131"),
+            ("Cash generated by operating activities", "110,543", "122,151", "104,038", "1,259"),
+            ("Investing activities:",),
+            (
+                "Payments for acquisition of property, plant and equipment",
+                "(10,959)",
+                "(10,708)",
+                "(11,085)",
+                "(125)",
+            ),
+            ("Cash used in investing activities", "3,705", "(22,354)", "(14,545)", "42"),
+        ],
+        extra=1,
+    )
+    c.showPage()
+    c.save()
 
 
 if __name__ == "__main__":

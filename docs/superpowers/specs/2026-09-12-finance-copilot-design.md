@@ -416,12 +416,13 @@ YoY between **adjacent periods only**. Direction is computed in Python and carri
 | Check | Tolerance |
 |---|---|
 | Assets ≈ Liabilities + Equity | 0.5% of total assets |
-| Gross Profit ≈ Revenue − COGS | 0.5% of revenue |
+| Gross Profit ≈ Revenue − \|COGS\| | 0.5% of revenue |
 | FCF = OCF − Capex | exact (we compute it) |
 
 - Within tolerance -> `passed`.
 - Outside tolerance, inputs present -> `warning`, showing both sides and the delta.
 - Inputs missing -> `unavailable`.
+- COGS enters as an absolute value, as capex does in the FCF check: IFRS presentations print expenses negative, and the sign is presentational, not economic (Phase 12 amendment).
 
 **No hard failures.** Presentation rounding in a crore-denominated report routinely produces sub-1% gaps; a brittle equality check would fire on nearly every real report.
 

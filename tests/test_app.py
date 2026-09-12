@@ -52,3 +52,23 @@ def test_hostile_renders_na_cards_distinctly():
 def test_ambiguous_periods_renders_error_not_crash():
     at = _run_with(AMBIGUOUS)
     assert at.error
+
+
+def test_history_tab_renders_saved_document(tmp_path):
+    from fincopilot.store import Store
+    from fincopilot.types import Insight, Narrative
+
+    result = pipeline.analyze(GOLDEN_US.read_bytes())
+    store = Store(tmp_path / "t.sqlite")
+    store.save(result, name="golden_us.pdf", data=GOLDEN_US.read_bytes())
+    store.save_narrative(result.document_id, Narrative("Summary.", (Insight("P.", ("x",)),), "m"))
+    store.close()
+    at = _run_with(None)
+    assert at.expander and "golden_us.pdf" in at.expander[0].label
+    assert any("Summary." in m.value for m in at.markdown)
+
+
+def test_kpi_cards_use_newest_period():
+    at = _run_with(GOLDEN_US)
+    body = " ".join(m.value for m in at.markdown)
+    assert "for 2022" not in body

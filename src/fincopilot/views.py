@@ -55,6 +55,7 @@ class Kpi:
     period: int
     value: str  # display text or "N/A"
     delta: str  # "+1.2%" vs prior period, or ""
+    delta_reads: str  # positive | negative | neutral (economic sense, not sign)
     status: str  # ok | low | na
     note: str  # reason when na, confidence text otherwise
 
@@ -95,17 +96,28 @@ def period_notice(result: AnalysisResult) -> Notice | None:
 def kpi_cards(result: AnalysisResult) -> list[Kpi]:
     if isinstance(result.periods, Unavailable) or not result.periods.ordered:
         return []
-    latest = result.periods.ordered[-1]
+    latest = result.periods.ordered[0]  # newest first
     cards: list[Kpi] = []
     for name in KPI_ORDER:
         m = result.metric_set.metric(name, latest)
         if isinstance(m, Unavailable):
             cards.append(
-                Kpi(name, KPI_LABEL[name], latest.end_year, "N/A", "", "na", unavailable_text(m))
+                Kpi(
+                    name,
+                    KPI_LABEL[name],
+                    latest.end_year,
+                    "N/A",
+                    "",
+                    "neutral",
+                    "na",
+                    unavailable_text(m),
+                )
             )
             continue
         t = result.trend_set.get(name, latest)
-        delta = "" if isinstance(t, Unavailable) or t is None else relative_text(t.relative_change)
+        has_trend = t is not None and not isinstance(t, Unavailable)
+        delta = relative_text(t.relative_change) if has_trend else ""
+        reads = t.economic.value if has_trend else "neutral"
         conf = (
             "high confidence"
             if m.analytical_confidence is AnalyticalConfidence.HIGH
@@ -118,6 +130,7 @@ def kpi_cards(result: AnalysisResult) -> list[Kpi]:
                 latest.end_year,
                 metric_text(m),
                 delta,
+                reads,
                 _status(m.analytical_confidence),
                 conf,
             )

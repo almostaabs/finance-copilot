@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import html
 import os
+from dataclasses import asdict
 from pathlib import Path
 
 import pandas as pd
@@ -22,6 +23,7 @@ from fincopilot.store import Store
 from fincopilot.types import Narrative, Unavailable
 
 DB_PATH = Path(os.environ.get("FINCOPILOT_DB", "data/fincopilot.sqlite"))
+SAMPLE_PDF = Path(__file__).parent / "tests" / "fixtures" / "golden_us.pdf"
 
 STATUS_STYLE = {
     "ok": "background-color:#eaf6ee;",
@@ -85,7 +87,7 @@ def _table(rows: list[dict], *, hide: tuple[str, ...] = ()) -> None:
 def _kpi_html(c: views.Kpi) -> str:
     delta = ""
     if c.delta:
-        cls = "up" if c.delta.startswith("+") else "down"
+        cls = {"positive": "up", "negative": "down"}.get(c.delta_reads, "")
         delta = f'<div class="delta {cls}">{html.escape(c.delta)} vs prior year</div>'
     return (
         f'<div class="kpi {c.status}"><div class="label">{html.escape(c.label)}</div>'
@@ -117,24 +119,35 @@ def _sidebar() -> tuple[bool, str, str]:
     )
     model = st.sidebar.text_input("Model", os.environ.get("FINCOPILOT_OLLAMA_MODEL", "qwen2.5:3b"))
     if upload is not None:
-        data = upload.getvalue()
-        sha = hashlib.sha256(data).hexdigest()
-        if st.session_state.get("current", {}).get("sha256") != sha:
-            try:
-                with st.spinner("Reading statements..."):
-                    result = _analyze(data, use_ai, host, model)
-            except IngestionError as exc:
-                st.sidebar.error(f"Cannot analyse this file: {exc}")
-                return use_ai, host, model
-            except Exception as exc:
-                st.sidebar.error(f"Analysis failed ({type(exc).__name__}). Nothing was saved.")
-                return use_ai, host, model
-            st.session_state["current"] = {"name": upload.name, "sha256": sha, "result": result}
-            st.session_state.pop("narrative", None)
-            if (store := _store()) is not None:
-                store.save(result, name=upload.name, data=data)
-                store.close()
+        _load(upload.name, upload.getvalue(), use_ai, host, model)
+    elif st.sidebar.button("Load sample report", help="A synthetic US-style report used in tests."):
+        if SAMPLE_PDF.is_file():
+            _load(SAMPLE_PDF.name, SAMPLE_PDF.read_bytes(), use_ai, host, model)
+        else:
+            st.sidebar.error(
+                "Sample not found. Run: uv run python tests/fixtures/build_fixtures.py"
+            )
     return use_ai, host, model
+
+
+def _load(name: str, data: bytes, use_ai: bool, host: str, model: str) -> None:
+    sha = hashlib.sha256(data).hexdigest()
+    if st.session_state.get("current", {}).get("sha256") == sha:
+        return
+    try:
+        with st.spinner("Reading statements..."):
+            result = _analyze(data, use_ai, host, model)
+    except IngestionError as exc:
+        st.sidebar.error(f"Cannot analyse this file: {exc}")
+        return
+    except Exception as exc:
+        st.sidebar.error(f"Analysis failed ({type(exc).__name__}). Nothing was saved.")
+        return
+    st.session_state["current"] = {"name": name, "sha256": sha, "result": result}
+    st.session_state.pop("narrative", None)
+    if (store := _store()) is not None:
+        store.save(result, name=name, data=data)
+        store.close()
 
 
 def _history_tab() -> None:
@@ -154,7 +167,7 @@ def _history_tab() -> None:
             metrics = store.load_metrics(d.document_id)
             if metrics:
                 st.dataframe(
-                    pd.DataFrame([m.__dict__ for m in metrics]), width="stretch", hide_index=True
+                    pd.DataFrame([asdict(m) for m in metrics]), width="stretch", hide_index=True
                 )
             if (n := store.load_narrative(d.document_id)) is not None:
                 st.markdown(f"**AI summary ({n.model}):** {n.summary}")

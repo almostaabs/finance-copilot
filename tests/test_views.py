@@ -30,7 +30,7 @@ def hostile():
 def test_kpis_cover_latest_period_with_status(golden):
     cards = views.kpi_cards(golden)
     assert [c.name for c in cards] == list(views.KPI_ORDER)
-    latest = golden.periods.ordered[-1].end_year
+    latest = max(p.end_year for p in golden.periods.ordered)
     assert all(c.period == latest for c in cards)
     ok = [c for c in cards if c.status == "ok"]
     assert ok and all(c.value for c in ok)
@@ -91,3 +91,11 @@ def test_ambiguous_periods_still_render():
     assert views.kpi_cards(result) == []
     assert views.period_notice(result) is not None
     assert views.value_rows(result) == []
+
+
+def test_kpi_delta_reads_by_economic_sense_not_sign(golden):
+    cards = {c.name: c for c in views.kpi_cards(golden)}
+    d2e = cards["debt_to_equity"]
+    if d2e.delta.startswith("-"):
+        assert d2e.delta_reads == "positive"  # less leverage is good news
+    assert cards["roe"].value.endswith("%")

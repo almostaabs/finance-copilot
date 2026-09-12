@@ -313,6 +313,7 @@ def calculate_metrics(report: MappingReport, periods: tuple[Period, ...]) -> Met
                 period,
                 report.get(C.NET_INCOME, period),
                 _average_denominator("roa", C.TOTAL_ASSETS, period, prior, report),
+                unit=MetricUnit.PERCENT,
             ),
         )
         keep(
@@ -323,6 +324,7 @@ def calculate_metrics(report: MappingReport, periods: tuple[Period, ...]) -> Met
                 period,
                 report.get(C.NET_INCOME, period),
                 _average_denominator("roe", C.EQUITY, period, prior, report),
+                unit=MetricUnit.PERCENT,
             ),
         )
         keep(

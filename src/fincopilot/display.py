@@ -30,6 +30,17 @@ _SCALE_WORD = {
 _CURRENCY_SYMBOL = {"INR": "\u20b9", "USD": "$"}
 
 
+CHECK_LABEL = {
+    "assets_equal_liabilities_plus_equity": "Assets = liabilities + equity",
+    "gross_profit_equals_revenue_minus_cogs": "Gross profit = revenue - cost of sales",
+    "fcf_equals_ocf_minus_capex": "Free cash flow = operating cash flow - capex",
+}
+
+
+def check_label(name: str) -> str:
+    return CHECK_LABEL.get(name, name.replace("_", " "))
+
+
 def money(value: Decimal, currency: str, scale: Scale, *, ascii_only: bool = False) -> str:
     """Base units back to the report's own scale: 124500000000 INR crore -> Rs 12,450.00 crore.
 

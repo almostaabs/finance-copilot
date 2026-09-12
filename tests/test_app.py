@@ -39,7 +39,7 @@ def test_empty_state_renders():
 def test_golden_renders_kpis_and_tabs():
     at = _run_with(GOLDEN_US)
     assert at.title[0].value == "golden_us.pdf"
-    assert len(at.tabs) == 7
+    assert len(at.tabs) == 6
     body = " ".join(m.value for m in at.markdown)
     assert "Net margin" in body and 'class="kpi ok"' in body
 
@@ -93,3 +93,24 @@ def test_ollama_host_must_be_http():
 
     with pytest.raises(ValueError):
         OllamaClient(host="file:///etc/passwd")
+
+
+def _chart_count(at) -> int:
+    """AppTest has no typed accessor for vega_lite_chart; it lands as UnknownElement."""
+    return sum(1 for e in at.main if type(e).__name__ == "UnknownElement")
+
+
+def test_results_tab_draws_a_chart_per_result_and_a_flag_grid():
+    from fincopilot import charts
+
+    result = pipeline.analyze(GOLDEN_US.read_bytes())
+    at = _run_with(GOLDEN_US)
+    body = " ".join(m.value for m in at.markdown)
+    assert 'class="flags"' in body and 'class="flag clear"' in body
+    assert _chart_count(at) == len(charts.charts(result)) == 5
+
+
+def test_charts_absent_when_periods_are_ambiguous():
+    at = _run_with(AMBIGUOUS)
+    assert _chart_count(at) == 0
+    assert at.error

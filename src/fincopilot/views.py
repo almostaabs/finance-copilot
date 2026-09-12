@@ -13,6 +13,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from fincopilot.display import (
+    check_label,
     confidence_text,
     format_metric,
     metric_text,
@@ -50,6 +51,18 @@ KPI_LABEL = {
     "ocf_to_net_income": "Cash backing of profit",
 }
 
+
+STATUS_WORD = {
+    "ok": "Verified",
+    "passed": "Passed",
+    "clear": "Clear",
+    "low": "Lower confidence",
+    "warning": "Warning",
+    "fired": "Fired",
+    "na": "Not available",
+    "unavailable": "Not available",
+    "not_evaluated": "Not evaluated",
+}
 
 CONCEPT_LABEL = {
     "revenue": "Revenue",
@@ -179,7 +192,9 @@ def value_rows(result: AnalysisResult) -> list[dict[str, Any]]:
                 "concept": CONCEPT_LABEL.get(v.concept.value, v.concept.value),
                 "period": v.period.end_year,
                 "value": value_text(v),
-                "page": v.source_page if v.cell else "",
+                # A column must hold one type: a derived value has no page, and
+                # a blank int is not a thing. Text keeps the table renderable.
+                "page": str(v.source_page) if v.cell else "",
                 "source_row": v.source_label
                 if v.cell
                 else "derived from "
@@ -238,7 +253,7 @@ def trend_rows(result: AnalysisResult) -> list[dict[str, Any]]:
 def reconciliation_rows(result: AnalysisResult) -> list[dict[str, Any]]:
     return [
         {
-            "check": c.name.replace("_", " "),
+            "check": check_label(c.name),
             "period": c.period.end_year,
             "status": c.status.value,
             "detail": c.detail,

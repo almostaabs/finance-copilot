@@ -10,6 +10,8 @@ import pipeline
 import pytest
 
 from fincopilot import views
+from fincopilot.types import CanonicalConcept as C
+from fincopilot.types import Period
 
 GOLDEN_US = Path("tests/fixtures/golden_us.pdf")
 HOSTILE = Path("tests/fixtures/hostile.pdf")
@@ -43,11 +45,15 @@ def test_kpi_unavailable_is_marked_na_with_reason(hostile):
     assert all(c.value == "N/A" and c.note for c in na)
 
 
+P24 = Period(2024, "2024")
+
+
 def test_value_rows_carry_provenance_and_status(golden):
     rows = views.value_rows(golden)
     assert len(rows) == len(golden.values)
     r = next(r for r in rows if r["concept"] == "Revenue")
-    assert r["page"] and r["source_row"] and r["status"] in {"ok", "low"}
+    assert r["page"] == str(golden.metric_set.value(C.REVENUE, P24).source_page)
+    assert r["source_row"] and r["status"] in {"ok", "low"}
     derived = [r for r in rows if r["concept"] == "Free cash flow"]
     assert derived and derived[0]["page"] == "" and "derived" in derived[0]["source_row"]
 

@@ -15,7 +15,7 @@ import pandas as pd
 import pipeline
 import streamlit as st
 
-from fincopilot import __version__, views
+from fincopilot import __version__, charts, views
 from fincopilot.ai.client import OllamaClient
 from fincopilot.extract.pdf import IngestionError
 from fincopilot.store import Store
@@ -25,15 +25,15 @@ DB_PATH = Path(os.environ.get("FINCOPILOT_DB", "data/fincopilot.sqlite"))
 SAMPLE_PDF = Path(__file__).parent / "tests" / "fixtures" / "golden_us.pdf"
 
 STATUS_PILL = {
-    "ok": ("Verified", "#e6f4ea", "#1e6b3a"),
-    "passed": ("Passed", "#e6f4ea", "#1e6b3a"),
-    "clear": ("Clear", "#e6f4ea", "#1e6b3a"),
-    "low": ("Lower confidence", "#fff4d6", "#8a5a00"),
-    "warning": ("Warning", "#fff4d6", "#8a5a00"),
-    "fired": ("Fired", "#fde8e6", "#9b2c20"),
-    "na": ("Not available", "#eef0f3", "#5b6675"),
-    "unavailable": ("Not available", "#eef0f3", "#5b6675"),
-    "not_evaluated": ("Not evaluated", "#eef0f3", "#5b6675"),
+    "ok": ("#e6f4ea", "#1e6b3a"),
+    "passed": ("#e6f4ea", "#1e6b3a"),
+    "clear": ("#e6f4ea", "#1e6b3a"),
+    "low": ("#fff4d6", "#8a5a00"),
+    "warning": ("#fff4d6", "#8a5a00"),
+    "fired": ("#fde8e6", "#9b2c20"),
+    "na": ("#eef0f3", "#5b6675"),
+    "unavailable": ("#eef0f3", "#5b6675"),
+    "not_evaluated": ("#eef0f3", "#5b6675"),
 }
 ROW_TINT = {
     "ok": "#f4faf6",
@@ -110,6 +110,25 @@ section[data-testid="stSidebar"] {border-right: 1px solid #e6e9ee;}
 .card h4 {margin:0 0 .5rem; font-size:1rem;}
 .cite {display:inline-block; font-family:ui-monospace, Menlo, monospace; font-size:.7rem;
   background:#f0f3f7; color:#3a4656; border-radius:4px; padding:1px 6px; margin:0 2px;}
+.eyebrow {font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:#8a94a3; margin-bottom:2px;}
+.section {margin: 1.8rem 0 .4rem;}
+.section h3 {margin:0 0 .25rem; font-size:1.12rem; letter-spacing:-.01em;}
+.section p {margin:0; font-size:.86rem; color:#5b6675; max-width:760px; line-height:1.45;}
+.flags {display:grid; grid-template-columns:repeat(auto-fill, minmax(215px,1fr)); gap:10px;
+  margin:.4rem 0 .2rem;}
+.flag {border:1px solid #e6e9ee; border-radius:10px; padding:11px 13px; background:#fff;}
+.flag .name {font-size:.83rem; font-weight:600; color:#1c2430;}
+.flag .state {font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  margin-bottom:5px;}
+.flag .why {font-size:.75rem; color:#7a8594; margin-top:5px; line-height:1.35;}
+.flag.fired {border-color:#f0c4bd; background:#fdf5f4;}
+.flag.fired .state {color:#9b2c20;}
+.flag.clear .state {color:#1e6b3a;}
+.flag.not_evaluated {background:#f7f8fa;}
+.flag.not_evaluated .name, .flag.not_evaluated .state {color:#8a94a3;}
+.missing {font-size:.78rem; color:#8a5a00; background:#fffaf0; border:1px solid #ffe9b8;
+  border-radius:8px; padding:7px 11px; margin:.2rem 0 0;}
 .hero {padding: 2.5rem 0 1rem;}
 .hero h1 {font-size:2.4rem; letter-spacing:-.03em; margin:0 0 .4rem;}
 .hero p {font-size:1.05rem; color:#3a4656; max-width:720px; margin:0 0 1.4rem;}
@@ -140,11 +159,6 @@ def _store() -> Store | None:
         return None
 
 
-def _pill(status: str) -> str:
-    _, bg, fg = STATUS_PILL.get(status, (status, "#eef0f3", "#5b6675"))
-    return f"background:{bg};color:{fg};font-weight:600;border-radius:999px;padding:2px 10px;"
-
-
 def _table(rows: list[dict], *, hide: tuple[str, ...] = ()) -> None:
     if not rows:
         st.caption("Nothing to show.")
@@ -152,7 +166,7 @@ def _table(rows: list[dict], *, hide: tuple[str, ...] = ()) -> None:
     df = pd.DataFrame(rows).drop(columns=list(hide), errors="ignore")
     has_status = "status" in df.columns
     if has_status:
-        df["status"] = df["status"].map(lambda s: STATUS_PILL.get(s, (s,))[0])
+        df["status"] = df["status"].map(lambda s: views.STATUS_WORD.get(s, s))
         raw = pd.DataFrame(rows)["status"].tolist()
 
     def tint(row):
@@ -406,33 +420,83 @@ def _provenance(result) -> None:
         st.json(p)
 
 
+def _section(eyebrow: str, title: str, body: str) -> None:
+    st.markdown(
+        f'<div class="section"><div class="eyebrow">{html.escape(eyebrow)}</div>'
+        f"<h3>{html.escape(title)}</h3><p>{html.escape(body)}</p></div>",
+        unsafe_allow_html=True,
+    )
+
+
+def _chart(c: charts.Chart, eyebrow: str) -> None:
+    """A chart, what it cannot show, and the exact numbers one click away."""
+    _section(eyebrow, c.title, c.subtitle)
+    st.vega_lite_chart(c.spec, width="stretch", theme=None)
+    if c.missing:
+        st.markdown(
+            '<div class="missing">Not shown, because the report did not give it: '
+            + html.escape("; ".join(c.missing[:6]))
+            + ("; and more" if len(c.missing) > 6 else "")
+            + "</div>",
+            unsafe_allow_html=True,
+        )
+    with st.expander("Show the numbers behind this chart"):
+        st.dataframe(
+            pd.DataFrame([{k: str(v) for k, v in r.items()} for r in c.rows]),
+            width="stretch",
+            hide_index=True,
+        )
+
+
+def _flag_grid(result) -> None:
+    rows = views.red_flag_rows(result)
+    fired = sum(1 for r in rows if r["status"] == "fired")
+    order = {"fired": 0, "not_evaluated": 1, "clear": 2}
+    body = (
+        f"{fired} of {len(rows)} rules fired. A rule that could not be evaluated is not a pass."
+        if fired
+        else f"No rule fired. {sum(1 for r in rows if r['status'] == 'clear')} rules were checked "
+        "and came back clean."
+    )
+    _section("Verdict", "Red flags", body)
+    cards = "".join(
+        f'<div class="flag {r["status"]}"><div class="state">'
+        f"{html.escape(views.STATUS_WORD[r['status']])}</div>"
+        f'<div class="name">{html.escape(r["rule"])}</div>'
+        f'<div class="why">{html.escape(r["message"])}</div></div>'
+        for r in sorted(rows, key=lambda r: (order[r["status"]], r["rule"]))
+    )
+    st.markdown(f'<div class="flags">{cards}</div>', unsafe_allow_html=True)
+
+
+def _results(result, use_ai: bool, host: str, model: str) -> None:
+    _flag_grid(result)
+    if w := views.warning_count(result):
+        st.warning(f"{w} cross-check did not tie out. The chart below shows by how much.")
+    _narrative(result, use_ai, host, model)
+    eyebrows = {
+        "performance": "Scale",
+        "margins": "Profitability",
+        "balance": "Balance sheet",
+        "cash": "Cash",
+        "reconciliation": "Does it add up",
+    }
+    drawn = charts.charts(result)
+    if not drawn:
+        st.info("No chart can be drawn: the periods in this document could not be determined.")
+        return
+    for c in drawn:
+        _chart(c, eyebrows.get(c.key, "Result"))
+
+
 def _document(current: dict, use_ai: bool, host: str, model: str) -> None:
     result = current["result"]
     _header(current, result)
     _kpis(result)
-    names = [
-        "Overview",
-        "Values",
-        "Metrics & changes",
-        "Reconciliation",
-        "Red flags",
-        "Provenance",
-        "History",
-    ]
+    names = ["Results", "Values", "Metrics & changes", "Red flags", "Provenance", "History"]
     tabs = st.tabs(names)
     with tabs[0]:
-        flags = views.red_flag_rows(result)
-        fired = [r for r in flags if r["status"] == "fired"]
-        st.markdown(f"#### Red flags fired: {len(fired)}")
-        if fired:
-            _table(fired, hide=("refs",))
-        else:
-            clear = sum(1 for r in flags if r["status"] == "clear")
-            st.caption(f"None of the {clear} rules that could be evaluated fired.")
-        if w := views.warning_count(result):
-            st.warning(f"{w} reconciliation check(s) did not tie out. See the Reconciliation tab.")
-        st.markdown("")
-        _narrative(result, use_ai, host, model)
+        _results(result, use_ai, host, model)
     with tabs[1]:
         st.caption("Every figure the pipeline used, in the report's own units, with its source.")
         _table(views.value_rows(result), hide=("ref_id",))
@@ -442,13 +506,13 @@ def _document(current: dict, use_ai: bool, host: str, model: str) -> None:
         st.markdown("#### Year-over-year change")
         st.caption("'Reads as' says whether the movement is good or bad for the business.")
         _table(views.trend_rows(result))
-    with tabs[3]:
+        st.markdown("#### Cross-checks")
         _table(views.reconciliation_rows(result))
-    with tabs[4]:
+    with tabs[3]:
         _table(views.red_flag_rows(result))
-    with tabs[5]:
+    with tabs[4]:
         _provenance(result)
-    with tabs[6]:
+    with tabs[5]:
         _history()
 
 

@@ -548,6 +548,21 @@ class ReconciliationCheck:
     refs: tuple[str, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class ReconciliationReport:
+    checks: tuple[ReconciliationCheck, ...]
+
+    def get(self, name: str, period: Period) -> ReconciliationCheck | None:
+        for c in self.checks:
+            if c.name == name and c.period == period:
+                return c
+        return None
+
+    @property
+    def warnings(self) -> tuple[ReconciliationCheck, ...]:
+        return tuple(c for c in self.checks if c.status is ReconciliationStatus.WARNING)
+
+
 class Severity(Enum):
     INFO = "info"
     WARNING = "warning"

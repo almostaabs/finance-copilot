@@ -257,10 +257,12 @@ def evaluate_red_flags(
     reconciliations: ReconciliationReport,
     mapping: MappingReport,
     periods: tuple[Period, ...],
+    *,
+    reason: Unavailable | None = None,
 ) -> tuple[RedFlag, ...]:
     """Every rule for the latest period. Outcome is fired, clear, or not_evaluated."""
     if not periods:
-        reason = Unavailable(UnavailableReason.MISSING_INPUT, "no periods detected")
+        reason = reason or Unavailable(UnavailableReason.MISSING_INPUT, "no periods detected")
         return tuple(
             RedFlag(r.rule_id, RuleOutcome.NOT_EVALUATED, r.severity, "No periods.", (), reason)
             for r in RULES

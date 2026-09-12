@@ -213,7 +213,10 @@ def calculate_metrics(report: MappingReport, periods: tuple[Period, ...]) -> Met
     ordered = tuple(sorted(set(periods), reverse=True))
     values: list[FinancialValue] = list(report.values)
     metrics: list[Metric] = []
-    unavailable: dict[tuple[str, Period], Unavailable] = {}
+    # Mapping-level reasons (unparseable cell, blank, conflict) travel with the set.
+    unavailable: dict[tuple[str, Period], Unavailable] = {
+        (concept.value, period): why for (concept, period), why in report.unavailable.items()
+    }
 
     def keep(name: str, period: Period, result):
         if isinstance(result, Unavailable):

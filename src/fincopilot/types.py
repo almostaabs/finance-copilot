@@ -593,9 +593,18 @@ class AnalysisResult:
 
     document_id: str
     statements: StatementSet
-    periods: PeriodMap
-    values: tuple[FinancialValue, ...]
+    periods: Maybe[PeriodMap]  # Unavailable(AMBIGUOUS) for the whole document is a valid result
+    values: tuple[FinancialValue, ...]  # mapped and derived
     metrics: tuple[Metric, ...]
     trends: tuple[Trend, ...]
     reconciliations: tuple[ReconciliationCheck, ...]
     red_flags: tuple[RedFlag, ...]
+    mapping: MappingReport
+    metric_set: MetricSet
+    trend_set: TrendSet
+    reconciliation_report: ReconciliationReport
+
+    @property
+    def basis(self) -> StatementBasis:
+        """Surfaced at the top level so a standalone fallback is never quiet."""
+        return self.statements.basis

@@ -175,6 +175,7 @@ class ExtractedTable:
     header: tuple[str, ...]
     rows: tuple[TableRow, ...]
     caption: str | None
+    col_x: tuple[float, ...] = ()  # left edge of each column in PDF points; stitching input
 
 
 @dataclass(frozen=True, slots=True)

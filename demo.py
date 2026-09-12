@@ -27,16 +27,19 @@ def main() -> int:
 
     print("\n== values")
     for v in result.values:
+        # Name the inputs; never invent an operator here. FCF subtracts capex,
+        # total_debt adds its parts, and the demo must not imply otherwise.
         origin = (
             f"page {v.source_page} {v.source_label!r}"
             if v.cell
-            else f"= {' + '.join(v.derived_from)}"
+            else f"derived from {', '.join(v.derived_from)}"
         )
-        print(f"{v.concept.value:22} {v.period.end_year}  {v.value:>24}  {origin}")
+        print(f"{v.concept.value:22} {v.period.end_year}  {v.value:>24,.2f}  {origin}")
 
     print("\n== metrics")
     for m in result.metrics:
-        print(f"{m.name:22} {m.period.end_year}  {m.value}")
+        # Full precision is kept internally; rounding here is presentation only.
+        print(f"{m.name:22} {m.period.end_year}  {m.value:.4f}")
 
     print("\n== reconciliations")
     for c in result.reconciliations:

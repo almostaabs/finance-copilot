@@ -32,7 +32,8 @@ def _run_with(path: Path | None) -> AppTest:
 
 def test_empty_state_renders():
     at = _run_with(None)
-    assert at.title[0].value == "Finance Copilot"
+    body = " ".join(m.value for m in at.markdown)
+    assert "<h1>Finance Copilot</h1>" in body and "Recent analyses" in body
 
 
 def test_golden_renders_kpis_and_tabs():

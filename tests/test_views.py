@@ -46,9 +46,9 @@ def test_kpi_unavailable_is_marked_na_with_reason(hostile):
 def test_value_rows_carry_provenance_and_status(golden):
     rows = views.value_rows(golden)
     assert len(rows) == len(golden.values)
-    r = next(r for r in rows if r["concept"] == "revenue")
+    r = next(r for r in rows if r["concept"] == "Revenue")
     assert r["page"] and r["source_row"] and r["status"] in {"ok", "low"}
-    derived = [r for r in rows if r["concept"] == "free_cash_flow"]
+    derived = [r for r in rows if r["concept"] == "Free cash flow"]
     assert derived and derived[0]["page"] == "" and "derived" in derived[0]["source_row"]
 
 
@@ -99,3 +99,33 @@ def test_kpi_delta_reads_by_economic_sense_not_sign(golden):
     if d2e.delta.startswith("-"):
         assert d2e.delta_reads == "positive"  # less leverage is good news
     assert cards["roe"].value.endswith("%")
+
+
+def test_history_metric_rows_format_like_live_metrics(golden, tmp_path):
+    from fincopilot.store import Store
+
+    store = Store(tmp_path / "h.sqlite")
+    store.save(golden, name="g.pdf", data=b"%PDF")
+    rows = views.history_metric_rows(store.load_metrics(golden.document_id))
+    live = {(r["metric"], r["period"]): r["value"] for r in views.metric_rows(golden)}
+    assert rows and all(live[(r["metric"], r["period"])] == r["value"] for r in rows)
+    assert {r["status"] for r in rows} <= {"ok", "low"}
+
+
+def test_concept_labels_are_human_readable(golden):
+    from fincopilot.types import CanonicalConcept
+
+    assert set(views.CONCEPT_LABEL) == {c.value for c in CanonicalConcept}
+    rows = views.value_rows(golden)
+    assert all("_" not in r["concept"] for r in rows)
+    fcf = next(r for r in rows if r["concept"] == "Free cash flow")
+    assert fcf["source_row"] == "derived from operating cash flow, capital expenditure"
+
+
+def test_kpi_note_drops_what_the_card_already_says(hostile):
+    na = [c for c in views.kpi_cards(hostile) if c.status == "na"]
+    assert na
+    for c in na:
+        assert not c.note.startswith("N/A")
+        assert f"{c.name} {c.period}:" not in c.note
+        assert c.note

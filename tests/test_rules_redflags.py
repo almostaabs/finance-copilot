@@ -158,3 +158,13 @@ def test_low_confidence_kpi_fires_on_llm_mapped_or_unmapped_headline():
     assert _flags(_fv(C.NET_INCOME, P24, "1", 1))["low_confidence_kpi"].outcome is RuleOutcome.FIRED
     flags = _flags(_fv(C.REVENUE, P24, "1", 0), _fv(C.NET_INCOME, P24, "1", 1))
     assert flags["low_confidence_kpi"].outcome is RuleOutcome.CLEAR
+
+
+def test_rule_messages_round_numbers_for_reading():
+    """Presentation only: the rule still compares the full-precision value."""
+    from fincopilot.rules.redflags import _num
+
+    assert _num(Decimal("0.5616438356164383561643835616438356")) == "0.5616"
+    assert _num(Decimal("-7273000000")) == "-7,273,000,000"
+    assert _num(Decimal("2.0")) == "2"
+    assert _num(Decimal("0.02")) == "0.02"

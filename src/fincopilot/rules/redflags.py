@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import ROUND_HALF_EVEN, Decimal
 
 from fincopilot.types import CanonicalConcept as C
 from fincopilot.types import (
@@ -106,7 +106,7 @@ def _margin_compression(i: Inputs) -> Maybe[Verdict]:
         return causes[0]
     hits = [(n, t) for n, t in found if t.absolute_change < -MARGIN_COMPRESSION_BPS]
     refs = _refs(*(i.metrics.metric(n, i.period) for n, _ in found))
-    detail = ", ".join(f"{n} {t.absolute_change}" for n, t in found)
+    detail = ", ".join(f"{n} {_num(t.absolute_change)}" for n, t in found)
     return Verdict(bool(hits), refs, detail)
 
 
@@ -116,7 +116,16 @@ def _leverage_increase(i: Inputs) -> Maybe[Verdict]:
     if (u := _need(t, m)) is not None:
         return u
     fired = t.absolute_change > LEVERAGE_INCREASE_DELTA and m.value > LEVERAGE_INCREASE_FLOOR
-    return Verdict(fired, _refs(m), f"D/E {m.value}, change {t.absolute_change}")
+    return Verdict(fired, _refs(m), f"D/E {_num(m.value)}, change {_num(t.absolute_change)}")
+
+
+def _num(value: Decimal) -> str:
+    """A Decimal for a human-readable rule message. Rounding here is presentation
+    only; the rule itself compares the full-precision value."""
+    if abs(value) >= 1000:
+        return f"{value.quantize(Decimal(1), rounding=ROUND_HALF_EVEN):,}"
+    shown = value.quantize(Decimal("0.0001"), rounding=ROUND_HALF_EVEN).normalize()
+    return f"{shown:f}"
 
 
 def _threshold(name: str, op: Callable[[Decimal], bool]) -> Callable[[Inputs], Maybe[Verdict]]:
@@ -124,7 +133,7 @@ def _threshold(name: str, op: Callable[[Decimal], bool]) -> Callable[[Inputs], M
         m = i.metrics.metric(name, i.period)
         if isinstance(m, Unavailable):
             return m
-        return Verdict(op(m.value), _refs(m), f"{name} {m.value}")
+        return Verdict(op(m.value), _refs(m), f"{name} {_num(m.value)}")
 
     return predicate
 
@@ -134,7 +143,7 @@ def _negative_value(concept: C) -> Callable[[Inputs], Maybe[Verdict]]:
         v = i.metrics.value(concept, i.period)
         if isinstance(v, Unavailable):
             return v
-        return Verdict(v.value < 0, _refs(v), f"{concept.value} {v.value}")
+        return Verdict(v.value < 0, _refs(v), f"{concept.value} {_num(v.value)}")
 
     return predicate
 
@@ -147,7 +156,7 @@ def _earnings_quality(i: Inputs) -> Maybe[Verdict]:
         return u
     both_positive = ocf.value > 0 and ni.value > 0
     fired = both_positive and ratio.value < EARNINGS_QUALITY
-    return Verdict(fired, _refs(ratio), f"OCF/NI {ratio.value}")
+    return Verdict(fired, _refs(ratio), f"OCF/NI {_num(ratio.value)}")
 
 
 def _reconciliation_warning(i: Inputs) -> Maybe[Verdict]:

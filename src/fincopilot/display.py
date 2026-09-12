@@ -47,13 +47,17 @@ def value_text(v: FinancialValue, *, ascii_only: bool = False) -> str:
     return money(v.value, v.currency, scale, ascii_only=ascii_only)
 
 
-def metric_text(m: Metric) -> str:
-    if m.unit is MetricUnit.PERCENT:
-        pct = (m.value * 100).quantize(Decimal("0.1"), rounding=ROUND_HALF_EVEN)
+def format_metric(value: Decimal, unit: MetricUnit) -> str:
+    if unit is MetricUnit.PERCENT:
+        pct = (value * 100).quantize(Decimal("0.1"), rounding=ROUND_HALF_EVEN)
         return f"{pct}%"
-    if m.unit is MetricUnit.RATIO:
-        return f"{m.value.quantize(Decimal('0.01'), rounding=ROUND_HALF_EVEN)}x"
-    return f"{m.value.quantize(Decimal('0.01'), rounding=ROUND_HALF_EVEN):,}"
+    if unit is MetricUnit.RATIO:
+        return f"{value.quantize(Decimal('0.01'), rounding=ROUND_HALF_EVEN)}x"
+    return f"{value.quantize(Decimal('0.01'), rounding=ROUND_HALF_EVEN):,}"
+
+
+def metric_text(m: Metric) -> str:
+    return format_metric(m.value, m.unit)
 
 
 def relative_text(value: Decimal | Unavailable) -> str:

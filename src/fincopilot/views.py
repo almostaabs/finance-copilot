@@ -9,10 +9,12 @@ distinctly; the rule lives here so the UI cannot forget it.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from fincopilot.display import (
     confidence_text,
+    format_metric,
     metric_text,
     relative_text,
     unavailable_text,
@@ -22,6 +24,7 @@ from fincopilot.types import (
     AnalysisResult,
     AnalyticalConfidence,
     ExtractionConfidence,
+    MetricUnit,
     ReconciliationStatus,
     StatementBasis,
     Unavailable,
@@ -48,6 +51,29 @@ KPI_LABEL = {
 }
 
 
+CONCEPT_LABEL = {
+    "revenue": "Revenue",
+    "cogs": "Cost of sales",
+    "gross_profit": "Gross profit",
+    "operating_income": "Operating income",
+    "d_and_a": "Depreciation and amortisation",
+    "ebitda": "EBITDA",
+    "net_income": "Net income",
+    "total_assets": "Total assets",
+    "current_assets": "Current assets",
+    "cash": "Cash and equivalents",
+    "total_liabilities": "Total liabilities",
+    "current_liabilities": "Current liabilities",
+    "short_term_borrowings": "Short-term borrowings",
+    "long_term_borrowings": "Long-term borrowings",
+    "total_debt": "Total debt",
+    "equity": "Equity",
+    "operating_cash_flow": "Operating cash flow",
+    "capex": "Capital expenditure",
+    "free_cash_flow": "Free cash flow",
+}
+
+
 @dataclass(frozen=True, slots=True)
 class Kpi:
     name: str
@@ -68,6 +94,13 @@ class Notice:
 
 def _status(conf: AnalyticalConfidence) -> str:
     return "ok" if conf is AnalyticalConfidence.HIGH else "low"
+
+
+def _card_note(u: Unavailable, name: str, period: int) -> str:
+    """The reason, trimmed of what the card already says: the N/A marker and
+    the metric's own name and year."""
+    text = unavailable_text(u).removeprefix("N/A - ")
+    return text.replace(f"{name} {period}: ", "")
 
 
 def basis_notice(result: AnalysisResult) -> Notice:
@@ -110,7 +143,7 @@ def kpi_cards(result: AnalysisResult) -> list[Kpi]:
                     "",
                     "neutral",
                     "na",
-                    unavailable_text(m),
+                    _card_note(m, name, latest.end_year),
                 )
             )
             continue
@@ -143,13 +176,14 @@ def value_rows(result: AnalysisResult) -> list[dict[str, Any]]:
     for v in result.values:
         rows.append(
             {
-                "concept": v.concept.value,
+                "concept": CONCEPT_LABEL.get(v.concept.value, v.concept.value),
                 "period": v.period.end_year,
                 "value": value_text(v),
                 "page": v.source_page if v.cell else "",
                 "source_row": v.source_label
                 if v.cell
-                else f"derived from {', '.join(v.derived_from or ())}",
+                else "derived from "
+                + ", ".join(CONCEPT_LABEL.get(d, d).lower() for d in (v.derived_from or ())),
                 "how_found": confidence_text(v),
                 "ref_id": v.cell.ref.ref_id if v.cell else "",
                 "status": "low"
@@ -189,7 +223,7 @@ def metric_rows(result: AnalysisResult) -> list[dict[str, Any]]:
 def trend_rows(result: AnalysisResult) -> list[dict[str, Any]]:
     return [
         {
-            "subject": KPI_LABEL.get(t.subject, t.subject),
+            "subject": KPI_LABEL.get(t.subject) or CONCEPT_LABEL.get(t.subject, t.subject),
             "from": t.from_period.end_year,
             "to": t.to_period.end_year,
             "change": relative_text(t.relative_change),
@@ -244,10 +278,29 @@ def provenance(result: AnalysisResult, ref_id: str) -> dict[str, Any] | None:
                 "currency": v.cell.currency,
                 "value_in_base_units": str(v.value),
                 "dash_zero": v.cell.dash_zero,
-                "concept": v.concept.value,
+                "concept": CONCEPT_LABEL.get(v.concept.value, v.concept.value),
                 "period": v.period.end_year,
             }
     return None
+
+
+def history_metric_rows(rows) -> list[dict[str, Any]]:
+    """Stored metrics (store.MetricRow) formatted like live ones. Decimal text in, display out."""
+    out = []
+    for r in rows:
+        try:
+            shown = format_metric(Decimal(r.value), MetricUnit(r.unit))
+        except (InvalidOperation, ValueError):
+            shown = r.value
+        out.append(
+            {
+                "metric": KPI_LABEL.get(r.name, r.name),
+                "period": r.period,
+                "value": shown,
+                "status": "ok" if r.analytical_confidence == "high" else "low",
+            }
+        )
+    return out
 
 
 def warning_count(result: AnalysisResult) -> int:

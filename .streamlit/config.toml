@@ -2,7 +2,7 @@
 base = "light"
 primaryColor = "#1f4e79"
 backgroundColor = "#ffffff"
-secondaryBackgroundColor = "#f4f6f9"
+secondaryBackgroundColor = "#f5f7fa"
 textColor = "#1c2430"
 font = "sans serif"
 
@@ -12,3 +12,6 @@ headless = true
 
 [browser]
 gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"

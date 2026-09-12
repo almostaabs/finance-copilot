@@ -38,15 +38,24 @@ uv run ruff check . && uv run ruff format --check .
 
 ## What the dashboard shows
 
+The **Results** tab leads with the verdict, then draws the evidence.
+
 | Panel | What it is |
 |---|---|
-| KPI cards | Latest-year net margin, operating margin, current ratio, debt to equity, return on equity, cash backing of profit. Green border = verified; amber = usable but lower confidence; grey dashed = not available, with the reason printed. Change vs prior year is coloured by whether it is good news, not by its sign. |
-| Values | Every figure found, in the report's own units, with the page and row label it came from and how it was matched. |
-| Metrics and changes | All ratios and year-over-year changes, including the ones that could not be computed and why. |
-| Reconciliation | Do assets equal liabilities plus equity, does gross profit equal revenue minus cost of sales, does free cash flow tie out. Passed, warning, or unavailable. |
-| Red flags | Ten rules. Fired, clear, or not evaluated with the reason, so "checked and fine" is never confused with "could not check". |
-| Provenance | Pick any cell and see the page, table, row, column, raw printed text, scale, and currency behind it. |
-| History | Past analyses from a local SQLite file. The PDF itself is never stored, only its fingerprint and the results. |
+| KPI cards | Latest-year net margin, operating margin, current ratio, debt to equity, return on equity, cash backing of profit. Green = verified; amber = usable but lower confidence; grey dashed = not available, with the reason printed. The change against the prior year is coloured by whether it is good news, not by its sign. |
+| Red flag grid | Ten rules, each a card: fired, clear, or not evaluated with the reason. "Checked and fine" is never confused with "could not check". |
+| Revenue and profit | Revenue down to net income, per year, in the report's own units. |
+| Margins | Gross, operating and net margin per year. |
+| Balance sheet | Assets beside liabilities plus equity. The two bars must reach the same height; a visible gap is the accounting identity failing. |
+| Cash | A waterfall from operating cash flow, less capital expenditure, to free cash flow. |
+| Cross-checks | Each check's difference drawn inside the tolerance it is allowed. No visible bar means the statement tied out exactly. |
+| Values, Metrics, Provenance, History | The same results as tables, plus the page, table, row, column, raw text, scale and currency behind any figure, and past analyses from a local SQLite file. |
+
+Every chart has **Show the numbers behind this chart** beneath it, and states in words
+anything it could not draw. A value that is unavailable is absent from the chart, never
+plotted as a zero bar.
+
+![Balance sheet and cash charts](docs/screenshots/balance.png)
 
 ![Values tab](docs/screenshots/values.png)
 

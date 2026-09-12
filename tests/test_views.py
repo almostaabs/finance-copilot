@@ -135,3 +135,12 @@ def test_kpi_note_drops_what_the_card_already_says(hostile):
         assert not c.note.startswith("N/A")
         assert f"{c.name} {c.period}:" not in c.note
         assert c.note
+
+
+def test_rule_names_are_written_for_people(golden):
+    from fincopilot.rules.redflags import RULES
+
+    assert set(views.RULE_LABEL) == {r.rule_id for r in RULES}
+    rows = views.red_flag_rows(golden)
+    assert {"Earnings quality", "Low-confidence KPI"} <= {r["rule"] for r in rows}
+    assert all("_" not in r["rule"] for r in rows)

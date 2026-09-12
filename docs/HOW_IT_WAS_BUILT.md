@@ -19,7 +19,7 @@ system accurately to engineers. Short on purpose.
    code happened to produce.
 3. **Tests before code, every time.** For each feature the failing test was
    written first, then the smallest code that makes it pass. 297 automated
-   tests existed at Phase 8; 394 exist now. All pass. A lint tool (Ruff) enforces style.
+   tests existed at Phase 8; 431 exist now. All pass. A lint tool (Ruff) enforces style.
 4. **One phase, one commit.** Fourteen phases (0-13), each committed with its tests.
 
 ### Phases 0-8: the deterministic engine
@@ -45,6 +45,7 @@ system accurately to engineers. Short on purpose.
 | 11 | Local SQLite history: five thin tables, results only, never the PDF, values stored as exact decimal text | round-trip, cascade delete, path-stripped names, corrupt file |
 | 12 | Three real annual reports (Apple, Berkshire, Wipro) went from zero values to a coherent set each. Statements printed without ruling lines are now rebuilt from word positions; text with no spaces is re-read; page-split statements rejoin; a report that prints two sets of statements yields one coherent set. | `text_aligned.pdf`, a ninth fixture encoding every real-report case; `docs/PHASE12_VALIDATION.md` |
 | 13 | README, screenshots, security review, a stress pass over the new code with every finding fixed | this document, `docs/SECURITY_REVIEW.md`, `docs/KNOWN_ISSUES.md` |
+| 13b | Visual results: five charts drawn from the analysis (revenue and profit, margins, the balance-sheet identity, a cash waterfall, cross-checks against their tolerance) plus a design pass on the whole page | `src/fincopilot/charts.py` is pure and tested; a chart can only draw a value the analysis produced, and anything unavailable is absent from the picture and named in words |
 
 ### The test reports
 
@@ -175,4 +176,4 @@ and a chain back to the first thing that went wrong, so the answer to "why is
 ROE blank?" is "because equity was not matched, because the balance sheet was
 not found on any page", not a shrug. And every figure that *is* shown can be
 walked back to a printed cell on a numbered page. Those two properties are
-what the 394 tests exist to protect.
+what the 431 tests exist to protect.

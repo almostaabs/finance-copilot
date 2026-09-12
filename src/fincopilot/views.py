@@ -64,6 +64,19 @@ STATUS_WORD = {
     "not_evaluated": "Not evaluated",
 }
 
+RULE_LABEL = {
+    "revenue_decline": "Revenue decline",
+    "margin_compression": "Margin compression",
+    "leverage_increase": "Leverage increase",
+    "high_leverage": "High leverage",
+    "negative_fcf": "Negative free cash flow",
+    "negative_ocf": "Negative operating cash flow",
+    "weak_liquidity": "Weak liquidity",
+    "earnings_quality": "Earnings quality",
+    "reconciliation_warning": "Cross-check warning",
+    "low_confidence_kpi": "Low-confidence KPI",
+}
+
 CONCEPT_LABEL = {
     "revenue": "Revenue",
     "cogs": "Cost of sales",
@@ -266,7 +279,7 @@ def reconciliation_rows(result: AnalysisResult) -> list[dict[str, Any]]:
 def red_flag_rows(result: AnalysisResult) -> list[dict[str, Any]]:
     return [
         {
-            "rule": f.rule_id.replace("_", " "),
+            "rule": RULE_LABEL.get(f.rule_id, f.rule_id.replace("_", " ")),
             "status": f.outcome.value,
             "severity": f.severity.value,
             "message": f.message,

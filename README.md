@@ -50,6 +50,11 @@ uv run ruff check . && uv run ruff format --check .
 
 ![Values tab](docs/screenshots/values.png)
 
+Values that could not be determined are never blank or zero. They are greyed out and
+carry the reason:
+
+![Unavailable values](docs/screenshots/unavailable.png)
+
 ## Optional local AI
 
 Switch on **Local AI (Ollama)** in the sidebar (needs [Ollama](https://ollama.com)

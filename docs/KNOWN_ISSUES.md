@@ -4,14 +4,39 @@ Everything found during the Phase 0-8 build, the first manual runs, and two
 deliberate stress-test passes. Ordered by severity. Each item says what it
 is, how to reproduce it, why it happens, and what a fix costs.
 
-Status as of 2026-09-12, commit `dd3e8a8`. 319 tests pass, Ruff clean.
-The first stress pass found six defects; all six are fixed, each with a
-regression test in `tests/test_stress_findings.py`. The second pass, run
-against the fixed code, found nothing.
+Status as of 2026-09-12, Phase 13. 394 tests pass, Ruff clean.
+The Phase 0-8 stress passes found six defects, all fixed with regression
+tests in `tests/test_stress_findings.py`. The Phase 9-13 stress pass found
+four more (section H below), all fixed with regression tests in
+`tests/test_ai_narrative.py`, `tests/test_extract_textgrid.py`, and
+`tests/test_app.py`.
 
 ---
 
 ## Open - needs a decision
+
+### 0. Large reports are slow (MEDIUM)
+
+Wipro's 481-page report takes about 88 s; Berkshire's 152 pages about 40 s;
+Apple's 80 pages 14 s. The time is pdfplumber reading every page's text plus
+word extraction on every candidate page. The dashboard shows a spinner and
+caches the result by file bytes, so a repeat is instant. **Options.** (a)
+Accept. (b) Extract text lazily and stop scanning once a coherent statement
+cluster is found. (b) changes the extraction contract and needs a design pass.
+
+### 0b. Real-report gaps that are correct but visible (LOW)
+
+Berkshire's total assets row has no label; its cash appears in two segments;
+its capex label is not an alias. Apple's debt is split across two "Term debt"
+rows. Each is reported as unmapped or conflicting with the reason, which is the
+designed behaviour. Widening the alias tables from more real reports is the
+only safe fix; fuzzy matching stays out.
+
+### 0c. A narrative cite containing a comma would split on reload (LOW)
+
+`store.py` joins cites with commas. Evidence IDs never contain one
+(`metric@year`, `rule_id`, `subject@from->to`), so this cannot happen today.
+Noted so that a future ID format keeps the rule.
 
 ### 1. No plausibility check on any extracted number (MEDIUM)
 
@@ -34,11 +59,9 @@ statement. (b) is new scope for a Phase 9+ brainstorming cycle, not a patch.
 
 ### 2. `types.py` is past its own review threshold (LOW)
 
-610 lines against the ~600 line the plan set for revisiting the decision to
-keep every contract in one file. Still coherent - the types reference each
-other constantly - but worth reconsidering before Phase 9 adds narrative
-types. A natural split is provenance/document types, analysis output types,
-and the `Maybe`/`Unavailable` core.
+Now 630 lines after Phase 9 added `Insight` and `Narrative`. Still coherent,
+still one file. A natural split is provenance/document types, analysis output
+types, and the `Maybe`/`Unavailable` core. Purely organisational.
 
 ### 3. Two verification gaps (LOW)
 
@@ -190,3 +213,26 @@ uv run python demo.py tests/fixtures/golden_indian.pdf
 uv run python demo.py tests/fixtures/golden_us.pdf
 uv run pytest tests/test_stress_findings.py -v
 ```
+
+---
+
+## Resolved in Phase 13 - stress pass over Phases 9-12
+
+### H. Four findings, all fixed in `b329f04`
+
+- **Markup in narrative text was accepted.** A model could return
+  `[click](http://evil)` and the dashboard would render a link. The gate now
+  restricts text to a plain-prose character set. Regression:
+  `test_markup_in_text_is_rejected` (seven markup forms).
+- **Non-finite word coordinates crashed the text-grid parser.** pdfplumber
+  does not produce them, but an untrusted input path should not depend on
+  that. Filtered. Regression: `test_non_finite_and_empty_words_are_ignored`.
+- **Any URL scheme was accepted as the Ollama host.** Now http(s) only.
+  Regression: `test_ollama_host_must_be_http`.
+- **Cites per insight were bounded only by the 64 KB cap.** Now 12.
+  Regression: `test_too_many_cites_rejected`.
+
+Held under attack, no change needed: duplicate JSON keys, a `None` response,
+a client raising `TimeoutError`, prompt-injection text inside labels, 40,000
+words on one page (0.2 s), null bytes and path separators in an upload name,
+saving a document whose periods are ambiguous, two open store connections.

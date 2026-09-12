@@ -19,10 +19,10 @@ system accurately to engineers. Short on purpose.
    code happened to produce.
 3. **Tests before code, every time.** For each feature the failing test was
    written first, then the smallest code that makes it pass. 297 automated
-   tests exist; all pass. A lint tool (Ruff) enforces style.
-4. **One phase, one commit.** Eight phases, each committed with its tests.
+   tests existed at Phase 8; 394 exist now. All pass. A lint tool (Ruff) enforces style.
+4. **One phase, one commit.** Fourteen phases (0-13), each committed with its tests.
 
-### The eight phases
+### Phases 0-8: the deterministic engine
 
 | Phase | Built | Proven by |
 |---|---|---|
@@ -36,6 +36,16 @@ system accurately to engineers. Short on purpose.
 | 7 | Cross-checks between statements; ten red-flag rules | each rule fires and stays quiet on constructed inputs |
 | 8 | Wiring it all together; golden end-to-end tests | every expected number reproduced exactly; full provenance chain verified; runs with no AI installed |
 
+### Phases 9-13: narrative, dashboard, history, real reports, polish
+
+| Phase | Built | Proven by |
+|---|---|---|
+| 9 | Plain-English reading written by the optional local model from a structured summary of the results, never the PDF. Every sentence must cite result IDs that exist and every number must be one the model was shown; one fabricated figure rejects the whole thing. Markdown and HTML refused. | 24 gate tests: bad JSON, unknown cites, invented numbers, markup, nesting bombs, a dead model |
+| 10 | The dashboard (`app.py`): upload, KPI cards, seven tabs, provenance viewer, optional narrative. Verified, low-confidence, and unavailable values render distinctly. `app.py` only formats and lays out; every row it shows is built by `views.py`, which is pure and tested. | rendered headless on the golden, hostile, and ambiguous-period fixtures |
+| 11 | Local SQLite history: five thin tables, results only, never the PDF, values stored as exact decimal text | round-trip, cascade delete, path-stripped names, corrupt file |
+| 12 | Three real annual reports (Apple, Berkshire, Wipro) went from zero values to a coherent set each. Statements printed without ruling lines are now rebuilt from word positions; text with no spaces is re-read; page-split statements rejoin; a report that prints two sets of statements yields one coherent set. | `text_aligned.pdf`, a ninth fixture encoding every real-report case; `docs/PHASE12_VALIDATION.md` |
+| 13 | README, screenshots, security review, a stress pass over the new code with every finding fixed | this document, `docs/SECURITY_REVIEW.md`, `docs/KNOWN_ISSUES.md` |
+
 ### The test reports
 
 | PDF | Why it exists |
@@ -48,6 +58,7 @@ system accurately to engineers. Short on purpose.
 | `no_scale.pdf` | never says crore or millions; a bare number is meaningless |
 | `scanned.pdf` | picture only, no text; must be rejected |
 | `hostile.pdf` | prompt-injection text, an 18-digit value, dashes vs blanks, unparseable cells, negative equity, a 500-row table |
+| `text_aligned.pdf` | no ruling lines anywhere, `$` signs, a Notes column, a continuation page that repeats the heading, a year-less convenience column |
 
 The PDFs are committed and their fingerprints pinned. Tests never regenerate
 them, so the ground truth cannot drift.
@@ -56,7 +67,7 @@ them, so the ground truth cannot drift.
 
 ## Part 2 - How it works
 
-Think of a factory line with eleven stations. Each station takes one
+Think of a factory line with eleven stations, then a display window and a filing cabinet. Each station takes one
 well-defined thing in and hands one well-defined thing out. No station keeps
 secrets, and after station 2 none of them touches the outside world (except
 station 6, only when the optional AI is switched on).
@@ -152,6 +163,11 @@ Never a hard failure. A warning names any dash-zero cells as suspects.
 reports fired, clear, or not evaluated with the reason. The rule decides;
 an AI may later explain a fired rule but never decide one.
 
+**After the line.** The dashboard (`app.py`) only formats what the line produced. The
+history file (`store.py`) keeps the results, not the PDF. The optional narrative
+(`ai/narrative.py`) is written last, from the finished results, and is thrown away
+whole if it cites anything that does not exist or states a number it was not shown.
+
 ### The one idea to remember
 
 "Unavailable" is a type, not a blank. Every missing figure carries a reason
@@ -159,4 +175,4 @@ and a chain back to the first thing that went wrong, so the answer to "why is
 ROE blank?" is "because equity was not matched, because the balance sheet was
 not found on any page", not a shrug. And every figure that *is* shown can be
 walked back to a printed cell on a numbered page. Those two properties are
-what the 297 tests exist to protect.
+what the 394 tests exist to protect.

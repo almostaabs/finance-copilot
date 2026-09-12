@@ -608,3 +608,25 @@ class AnalysisResult:
     def basis(self) -> StatementBasis:
         """Surfaced at the top level so a standalone fallback is never quiet."""
         return self.statements.basis
+
+
+# ---------------------------------------------------------------------------
+# Phase 9: grounded narrative. Extends the provenance chain past RedFlag.
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class Insight:
+    """One narrative point. `cites` are evidence IDs the validator confirmed exist
+    (metric@year, rule ids, reconciliation@year, concept@year). Every number in
+    `text` was checked against the numbers the model was shown."""
+
+    text: str
+    cites: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class Narrative:
+    summary: str
+    insights: tuple[Insight, ...]
+    model: str  # which model produced it, for the UI label

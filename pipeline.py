@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from fincopilot.ai.client import LLMClient
 from fincopilot.ai.llm_map import fill_unmapped
+from fincopilot.ai.narrative import generate_narrative
 from fincopilot.calc.ratios import calculate_metrics
 from fincopilot.calc.reconcile import run_reconciliations
 from fincopilot.calc.trends import calculate_trends
@@ -22,6 +23,7 @@ from fincopilot.mapping.validate import validate_mappings
 from fincopilot.rules.redflags import evaluate_red_flags
 from fincopilot.types import (
     AnalysisResult,
+    Narrative,
     NormalizedCell,
     NormalizedTable,
     NormalizedTables,
@@ -91,3 +93,9 @@ def analyze(
         trend_set=trend_set,
         reconciliation_report=reconciliation,
     )
+
+
+def narrate(result: AnalysisResult, llm: LLMClient) -> Narrative | Unavailable:
+    """Phase 9. Separate from analyze() on purpose: the deterministic result is
+    complete before any model runs, and stays untouched whatever the model does."""
+    return generate_narrative(result, llm)

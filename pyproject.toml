@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Local-first, provenance-preserving annual report analysis"
 requires-python = ">=3.12"
 dependencies = [
+    "pandas>=3.0.5",
     "pdfplumber>=0.11.4",
+    "streamlit>=1.63.0",
 ]
 
 [dependency-groups]

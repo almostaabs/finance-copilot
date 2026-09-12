@@ -1,0 +1,38 @@
+[project]
+name = "fincopilot"
+version = "0.1.0"
+description = "Local-first, provenance-preserving annual report analysis"
+requires-python = ">=3.12"
+dependencies = [
+    "pdfplumber>=0.11.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.2",
+    "ruff>=0.6",
+    "reportlab>=4.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fincopilot"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not ollama'"
+markers = [
+    "ollama: requires a live Ollama server; deselected by default and in CI",
+]

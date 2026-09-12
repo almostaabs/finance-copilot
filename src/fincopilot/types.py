@@ -206,6 +206,37 @@ class StatementSet:
     cash_flow: Maybe[Statement]
 
 
+@dataclass(frozen=True, slots=True)
+class ResolvedScale:
+    """A scale and the level of the hierarchy it was discovered at."""
+
+    scale: Scale
+    source: ScaleSource
+
+
+@dataclass(frozen=True, slots=True)
+class NormalizedTable:
+    """One statement with every period cell parsed to base units.
+
+    `cells` is keyed by (row ref_id, column index). A blank, unparseable, or
+    unscaled cell is an Unavailable, never a number.
+    """
+
+    kind: StatementKind
+    basis: StatementBasis
+    table: ExtractedTable
+    scale: ResolvedScale
+    currency: str
+    cells: Mapping[tuple[str, int], Maybe[NormalizedCell]]
+
+
+@dataclass(frozen=True, slots=True)
+class NormalizedTables:
+    income: Maybe[NormalizedTable]
+    balance: Maybe[NormalizedTable]
+    cash_flow: Maybe[NormalizedTable]
+
+
 @dataclass(frozen=True, slots=True, order=True)
 class Period:
     """A reporting period, identified by the year it ends.

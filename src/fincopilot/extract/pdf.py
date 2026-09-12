@@ -14,7 +14,7 @@ from dataclasses import dataclass
 
 import pdfplumber
 
-from fincopilot.extract.anchors import candidate_table_pages, looks_like_header
+from fincopilot.extract.anchors import candidate_table_pages, find_anchors, looks_like_header
 from fincopilot.types import ExtractedTable, RawDocument, SourceRef, TableRow, make_ref_id
 
 DEFAULT_MAX_BYTES = 50 * 1024 * 1024
@@ -91,9 +91,27 @@ def _clean(cell: str | None) -> str:
     return " ".join((cell or "").split())
 
 
+def _caption(page_text: str, header: tuple[str, ...], body: list[list[str]]) -> str | None:
+    """Text printed directly above the table, minus any statement heading.
+
+    pdfplumber attaches no caption to a table; the scale phrase sits in the
+    page text between the heading and the first table line.
+    """
+    target = " ".join(c for c in header if c) if header else (body[0][0] if body else "")
+    if not target:
+        return None
+    lines = page_text.splitlines()
+    idx = next((i for i, line in enumerate(lines) if line.startswith(target[:24])), None)
+    if idx is None:
+        return None
+    above = [line for line in lines[max(0, idx - 2) : idx] if not find_anchors(line)]
+    return " ".join(above).strip() or None
+
+
 def _build_table(
     document_id: str,
     page_no: int,
+    page_text: str,
     table_idx: int,
     rows: list[list[str | None]],
     col_x: tuple[float, ...],
@@ -106,6 +124,7 @@ def _build_table(
     if looks_like_header(cleaned[0]):
         header = tuple(cleaned[0])
         body = cleaned[1:]
+    caption = _caption(page_text, header, body)
     table_rows = []
     for row_idx, cells in enumerate(body):
         label = cells[0]
@@ -126,7 +145,7 @@ def _build_table(
         pages=(page_no,),
         header=header,
         rows=tuple(table_rows),
-        caption=None,
+        caption=caption,
         col_x=col_x,
     )
 
@@ -160,7 +179,14 @@ def extract_pdf(
                 col_x = (
                     tuple(round(c[0], 1) for c in found.rows[0].cells if c) if found.rows else ()
                 )
-                built = _build_table(ref.document_id, page_no, table_idx, found.extract(), col_x)
+                built = _build_table(
+                    ref.document_id,
+                    page_no,
+                    page_texts[page_no - 1],
+                    table_idx,
+                    found.extract(),
+                    col_x,
+                )
                 if built is not None:
                     tables.append(built)
 

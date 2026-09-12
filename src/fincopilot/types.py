@@ -452,6 +452,37 @@ class Metric:
     analytical_confidence: AnalyticalConfidence
 
 
+@dataclass(frozen=True, slots=True)
+class MetricSet:
+    """Mapped plus derived values, every metric, and a reason for every absent one."""
+
+    values: tuple[FinancialValue, ...]
+    metrics: tuple[Metric, ...]
+    unavailable: Mapping[tuple[str, Period], Unavailable]
+
+    def value(self, concept: CanonicalConcept, period: Period) -> Maybe[FinancialValue]:
+        for v in self.values:
+            if v.concept is concept and v.period == period:
+                return v
+        found = self.unavailable.get((concept.value, period))
+        if found is not None:
+            return found
+        return Unavailable(
+            UnavailableReason.MISSING_INPUT, f"{concept.value} unavailable for {period.end_year}"
+        )
+
+    def metric(self, name: str, period: Period) -> Maybe[Metric]:
+        for m in self.metrics:
+            if m.name == name and m.period == period:
+                return m
+        found = self.unavailable.get((name, period))
+        if found is not None:
+            return found
+        return Unavailable(
+            UnavailableReason.MISSING_INPUT, f"{name} not computed for {period.end_year}"
+        )
+
+
 class Direction(Enum):
     UP = "up"
     DOWN = "down"
@@ -477,6 +508,23 @@ class Trend:
     relative_change: Maybe[Decimal]
     direction: Direction
     economic: EconomicSense
+
+
+@dataclass(frozen=True, slots=True)
+class TrendSet:
+    trends: tuple[Trend, ...]
+    unavailable: Mapping[tuple[str, Period], Unavailable]  # (subject, to_period)
+
+    def get(self, subject: str, to_period: Period) -> Maybe[Trend]:
+        for t in self.trends:
+            if t.subject == subject and t.to_period == to_period:
+                return t
+        found = self.unavailable.get((subject, to_period))
+        if found is not None:
+            return found
+        return Unavailable(
+            UnavailableReason.MISSING_INPUT, f"no {subject} change into {to_period.end_year}"
+        )
 
 
 class ReconciliationStatus(Enum):

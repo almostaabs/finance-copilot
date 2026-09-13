@@ -80,6 +80,10 @@ def _probe_text_layer(page_texts: list[str]) -> None:
     image-only with an OCR cover page, not as text-bearing.
     """
     n = len(page_texts)
+    if n == 0:
+        # A truncated download can parse as a valid PDF with no pages at all.
+        # Nothing downstream can work from that, so it is refused at the gate.
+        raise UnreadablePDF("PDF contains no pages")
     sample_idx = sorted({round(i * (n - 1) / 11) for i in range(12)}) if n > 1 else [0]
     sampled = [page_texts[i] for i in sample_idx]
 

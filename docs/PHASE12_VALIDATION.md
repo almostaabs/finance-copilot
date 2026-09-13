@@ -10,6 +10,44 @@ Three public annual reports were run through the pipeline on 2026-09-12. The PDF
 | Berkshire Hathaway 10-K 2023 | 152 | US GAAP, glyphs so tight that text had no spaces | periods unavailable, 0 values | 3 periods, 5 concepts, 1 red flag fired |
 | Wipro Integrated Annual Report FY24 | 481 | Ind AS + IFRS sets, Notes column | wrong tables (a deferred-tax note), periods unavailable | 2 periods, 10 concepts, balance sheet ties out |
 
+## Second pass, 2026-09-13: five reports
+
+Two more were added from company-hosted PDFs (aggregator sites rate-limit automated
+downloads). None are committed. Run any of them with `uv run python demo.py <path>`.
+
+| Report | Time | Basis found | Concepts | Notable |
+|---|---|---|---|---|
+| Apple 10-K FY2023 | 12s | consolidated | 13/19 | revenue decline and weak liquidity both fire, and both are true |
+| Berkshire 10-K 2023 | 44s | consolidated | 5/19 | cash claimed by two segment rows, reported as a conflict |
+| Microsoft 10-K FY2024 | 16s | **standalone fallback** | 14/19 | see the open question below |
+| Merchants Bancorp 10-K 2024 | 27s | consolidated | 5/19 | a bank: no classified balance sheet exists |
+| Wipro FY24 | 98s | consolidated | 10/19 | Ind AS and IFRS sets, one coherent group chosen |
+
+### One bug, found and fixed
+
+A truncated download parses as a valid PDF carrying **zero pages**. `_probe_text_layer`
+indexed into the empty page list and raised `IndexError`, escaping the ingestion gate as an
+unhandled crash. It now raises `UnreadablePDF`. Regression:
+`test_a_pdf_with_no_pages_is_refused_not_a_crash`. A separate truncated file was already
+handled correctly as `UnreadablePDF`.
+
+### Correct behaviour that looks like low coverage
+
+Banks (Merchants Bancorp, and Berkshire's insurance operations) do not publish a classified
+balance sheet, so current assets, current liabilities and therefore the current ratio do not
+exist in the document. Reporting them unavailable is right; inventing them would not be. The
+same applies to gross profit at a bank. Coverage numbers for financial institutions should be
+read against what the statement actually contains, not against all 19 concepts.
+
+### Open question: unprefixed statements in a 10-K
+
+Microsoft titles its primary statements "INCOME STATEMENTS" and "BALANCE SHEETS" with no
+"Consolidated" prefix, so the unprefixed rule labels the whole analysis **standalone
+fallback**. For a 10-K this is misleading: the primary statements in a 10-K are consolidated
+by law. The rule is doing what spec 4.3 says and is labelling loudly rather than guessing, so
+this is flagged, not silently changed. A fix would treat a US filing's unprefixed primary
+statements as consolidated, which needs a spec amendment.
+
 ## What broke, and what was changed
 
 Every item below is deterministic, covered by `tests/test_extract_textgrid.py` and

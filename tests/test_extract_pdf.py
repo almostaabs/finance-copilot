@@ -130,3 +130,12 @@ def test_hostile_pdf_extracts_without_crashing_and_keeps_raw_tokens():
     cogs = next(r for r in income.rows if r.label == "Cost of materials consumed")
     assert cogs.cells[1] == "\u2014"
     assert cogs.cells[2] == ""
+
+
+def test_a_pdf_with_no_pages_is_refused_not_a_crash():
+    """Found on a truncated download of a real annual report: the file parses
+    as a PDF but carries zero pages."""
+    from fincopilot.extract.pdf import UnreadablePDF, _probe_text_layer
+
+    with pytest.raises(UnreadablePDF):
+        _probe_text_layer([])

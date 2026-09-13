@@ -16,6 +16,12 @@ dev = [
     "reportlab>=4.2",
 ]
 
+[tool.uv]
+# A deploy host that runs `uv sync` against uv.lock would otherwise install the
+# dev group too, putting pytest, ruff and reportlab in a 1 GB container that
+# only needs to serve the app. Local work uses `uv sync --dev`, CI likewise.
+default-groups = []
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

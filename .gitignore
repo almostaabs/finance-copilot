@@ -12,6 +12,8 @@ build/
 data/
 .streamlit/secrets.toml
 
-# Real annual reports used for Phase 12 validation. Third-party copyrighted
-# documents, so they are kept locally and never committed.
-tests/fixtures/real/
+# The real annual reports used for Phase 12 validation. They are the
+# publishers' documents, so the bytes stay local; the folder's README records
+# where to get each one, and run_all.py stays tracked so anyone can reproduce
+# the validation once they have downloaded them.
+tests/fixtures/real/*.pdf

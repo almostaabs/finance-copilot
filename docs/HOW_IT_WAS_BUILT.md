@@ -19,7 +19,8 @@ system accurately to engineers. Short on purpose.
    code happened to produce.
 3. **Tests before code, every time.** For each feature the failing test was
    written first, then the smallest code that makes it pass. 297 automated
-   tests existed at Phase 8; 431 exist now. All pass. A lint tool (Ruff) enforces style.
+   tests existed at Phase 8; 442 exist now (441 run by default; one is skipped
+   unless a local Ollama is actually installed). A lint tool (Ruff) enforces style.
 4. **One phase, one commit.** Fourteen phases (0-13), each committed with its tests.
 
 ### Phases 0-8: the deterministic engine
@@ -44,8 +45,10 @@ system accurately to engineers. Short on purpose.
 | 10 | The dashboard (`app.py`): upload, KPI cards, seven tabs, provenance viewer, optional narrative. Verified, low-confidence, and unavailable values render distinctly. `app.py` only formats and lays out; every row it shows is built by `views.py`, which is pure and tested. | rendered headless on the golden, hostile, and ambiguous-period fixtures |
 | 11 | Local SQLite history: five thin tables, results only, never the PDF, values stored as exact decimal text | round-trip, cascade delete, path-stripped names, corrupt file |
 | 12 | Three real annual reports (Apple, Berkshire, Wipro) went from zero values to a coherent set each. Statements printed without ruling lines are now rebuilt from word positions; text with no spaces is re-read; page-split statements rejoin; a report that prints two sets of statements yields one coherent set. | `text_aligned.pdf`, a ninth fixture encoding every real-report case; `docs/PHASE12_VALIDATION.md` |
+| 12b | A second pass over five real reports (the three above plus Microsoft FY24 and a small US bank's 2024 report). One genuine ingestion bug surfaced: a truncated download parses as a valid PDF with zero pages and crashed with `IndexError`; it is now refused at the gate as unreadable. | `docs/PHASE12_VALIDATION.md`, "Second pass, 2026-09-13" |
 | 13 | README, screenshots, security review, a stress pass over the new code with every finding fixed | this document, `docs/SECURITY_REVIEW.md`, `docs/KNOWN_ISSUES.md` |
 | 13b | Visual results: five charts drawn from the analysis (revenue and profit, margins, the balance-sheet identity, a cash waterfall, cross-checks against their tolerance) plus a design pass on the whole page | `src/fincopilot/charts.py` is pure and tested; a chart can only draw a value the analysis produced, and anything unavailable is absent from the picture and named in words |
+| 13c | A dark data-terminal redesign, and charts that respond to the pointer: click a legend entry to isolate a series, hover a mark to bring it forward and dim the rest. The interactivity is declared inside the chart specification itself, so it can only hide or highlight marks that already exist, never change a value. KPI cards and the red-flag grid became hand-written HTML so they could be laid out and animated properly, with the animation dropped entirely when the operating system asks for reduced motion. | `src/fincopilot/panel.py` escapes every string it renders and opens no network connection; the chart tests assert the selection parameters and the palette's contrast choices |
 
 ### The test reports
 
@@ -164,10 +167,28 @@ Never a hard failure. A warning names any dash-zero cells as suspects.
 reports fired, clear, or not evaluated with the reason. The rule decides;
 an AI may later explain a fired rule but never decide one.
 
-**After the line.** The dashboard (`app.py`) only formats what the line produced. The
-history file (`store.py`) keeps the results, not the PDF. The optional narrative
+**After the line.** Four small modules turn the finished result into a page, and
+none of them can change a number:
+
+| Module | What it does | Why it is separate |
+|---|---|---|
+| `display.py` | Turns an exact decimal into the text a person reads: thousands separators, the currency, the scale, the sign. | It is the only place in the system where a number is rounded, so rounding can be reasoned about in one file. |
+| `views.py` | Builds every row and card the page shows, as plain data. | Pure and tested, so what the dashboard shows is checked without a browser. |
+| `charts.py` | Builds the five chart specifications. | It owns the single conversion from exact decimal to floating point in the whole codebase, because charts are JSON and JSON has no exact decimals. Nothing downstream of a chart feeds back into the analysis. |
+| `panel.py` | Writes the HTML for the KPI cards and the red-flag grid. | Every string it inserts is escaped, and it loads nothing over the network. |
+
+`app.py` only wires those together and lays them out. The history file
+(`store.py`) keeps the results, not the PDF. The optional narrative
 (`ai/narrative.py`) is written last, from the finished results, and is thrown away
 whole if it cites anything that does not exist or states a number it was not shown.
+
+### What it looks like
+
+The dashboard is dark on purpose: a report is read for a long time in one
+sitting, and the numbers should be the brightest thing on the screen. Screenshots
+of every part of it, with captions, are in the
+[README](../README.md#what-the-dashboard-shows), and the image files themselves
+are in `docs/screenshots/`.
 
 ### The one idea to remember
 
@@ -176,4 +197,4 @@ and a chain back to the first thing that went wrong, so the answer to "why is
 ROE blank?" is "because equity was not matched, because the balance sheet was
 not found on any page", not a shrug. And every figure that *is* shown can be
 walked back to a printed cell on a numbered page. Those two properties are
-what the 431 tests exist to protect.
+what the 442 tests exist to protect.

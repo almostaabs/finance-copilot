@@ -8,8 +8,9 @@ and no AI ever supplies a number.
 
 ![Dashboard overview](docs/screenshots/overview.png)
 
-**Status:** Phases 0-13 complete. Runs entirely on your machine; no data leaves it.
-Validated on three real annual reports (Apple, Berkshire Hathaway, Wipro), see
+**Status:** Phases 0-13 complete. 442 tests, all passing. Runs entirely on your
+machine; no data leaves it. Validated on five real annual reports (Apple,
+Berkshire Hathaway, Wipro, Microsoft, and a small US bank), see
 [docs/PHASE12_VALIDATION.md](docs/PHASE12_VALIDATION.md).
 
 ---
@@ -22,6 +23,8 @@ uv run streamlit run app.py
 ```
 
 Then open http://localhost:8501, upload a PDF, or press **Load sample report**.
+
+![Landing page](docs/screenshots/landing.png)
 
 Command line, no browser:
 
@@ -55,14 +58,33 @@ Every chart has **Show the numbers behind this chart** beneath it, and states in
 anything it could not draw. A value that is unavailable is absent from the chart, never
 plotted as a zero bar.
 
+Charts respond to the pointer: click a legend entry to isolate one series, hover a bar
+to bring it forward and dim the rest. That behaviour is declared inside the chart
+specification, so it can only hide or highlight marks that already exist. It can never
+change a number.
+
+![Revenue, profit and margin charts](docs/screenshots/charts.png)
+
+Here the balance-sheet chart draws 2023 and 2024 and says plainly that 2022 is missing,
+rather than drawing a zero bar for it:
+
 ![Balance sheet and cash charts](docs/screenshots/balance.png)
+
+The Values tab is the same figures as a table, each with the page and row it was read
+from and how it was matched:
 
 ![Values tab](docs/screenshots/values.png)
 
-Values that could not be determined are never blank or zero. They are greyed out and
-carry the reason:
+The Provenance tab walks a single figure back to the printed cell: page, table, row,
+column, the raw text, the scale that was applied, and the value in base units.
 
-![Unavailable values](docs/screenshots/unavailable.png)
+![Provenance tab](docs/screenshots/provenance.png)
+
+Values that could not be determined are never blank or zero. They carry the reason, and
+a rule that could not be evaluated says so instead of passing. This is `hostile.pdf`, the
+fixture built out of everything that can go wrong in a report:
+
+![Unavailable values and a fired red flag](docs/screenshots/unavailable.png)
 
 ## Optional local AI
 
@@ -119,8 +141,12 @@ src/fincopilot/ai/           Ollama client, row picker, grounded narrative
 src/fincopilot/calc/         derived values, ratios, changes, reconciliation
 src/fincopilot/rules/        red-flag rules and thresholds
 src/fincopilot/views.py      dashboard rows and cards (pure, tested)
+src/fincopilot/display.py    the only place a number is rounded for reading
+src/fincopilot/charts.py     the five chart specifications (pure, tested)
+src/fincopilot/panel.py      HTML for the KPI cards and red-flag grid (escaped, offline)
 src/fincopilot/store.py      SQLite history
 tests/fixtures/              nine generated PDFs with hand-computed answers
+docs/screenshots/            the images used in this README
 docs/                        design spec, build notes, validation, security review
 ```
 

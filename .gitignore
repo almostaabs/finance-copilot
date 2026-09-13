@@ -11,3 +11,7 @@ build/
 *.egg-info/
 data/
 .streamlit/secrets.toml
+
+# Real annual reports used for Phase 12 validation. Third-party copyrighted
+# documents, so they are kept locally and never committed.
+tests/fixtures/real/

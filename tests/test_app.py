@@ -1,5 +1,6 @@
 """Phase 10: the dashboard renders, with and without a document, and never raises."""
 
+import os
 from pathlib import Path
 
 import pipeline
@@ -28,6 +29,23 @@ def _run_with(path: Path | None) -> AppTest:
     at.run()
     assert not at.exception, at.exception
     return at
+
+
+def test_history_off_keeps_a_visitors_report_out_of_the_next_visitors_page(monkeypatch):
+    """A shared deployment serves every visitor from one machine, so history is
+    switched off there. Nothing may be written, and nothing may be listed."""
+    monkeypatch.setenv("FINCOPILOT_HISTORY", "off")
+    at = _run_with(GOLDEN_US)
+    body = " ".join(c.value for c in at.caption)
+    assert "History is switched off on this deployment" in body
+    db = Path(os.environ["FINCOPILOT_DB"])
+    assert not db.exists(), "an analysis was persisted with history switched off"
+
+
+def test_history_on_by_default_records_the_analysis():
+    at = _run_with(GOLDEN_US)
+    assert Path(os.environ["FINCOPILOT_DB"]).exists()
+    assert "History is switched off" not in " ".join(c.value for c in at.caption)
 
 
 def test_empty_state_renders():

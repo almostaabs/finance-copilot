@@ -1,0 +1,8 @@
+# For hosts that install with pip rather than uv (Hugging Face Spaces,
+# Streamlit Community Cloud). pyproject.toml and uv.lock remain the source of
+# truth for local development.
+#
+# Installing the project itself is what puts `fincopilot` on the import path:
+# the package lives under src/, so without this line app.py cannot import it.
+# Its runtime dependencies (pandas, pdfplumber, streamlit) are installed with it.
+.

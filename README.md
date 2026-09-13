@@ -1,3 +1,14 @@
+---
+title: Finance Copilot
+emoji: "\U0001F4CA"
+colorFrom: blue
+colorTo: gray
+sdk: streamlit
+app_file: app.py
+pinned: false
+short_description: Reads an annual report and refuses to guess a number
+---
+
 # Finance Copilot
 
 A local tool that reads a company's annual report (PDF) and shows a trustworthy

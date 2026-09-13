@@ -22,6 +22,15 @@ from fincopilot.store import Store
 from fincopilot.types import Narrative, Unavailable
 
 DB_PATH = Path(os.environ.get("FINCOPILOT_DB", "data/fincopilot.sqlite"))
+# History is per-machine, and on a shared deployment one machine serves every
+# visitor: without this, one person's uploaded report is listed for the next.
+# Hosted demos set FINCOPILOT_HISTORY=off. Local runs keep it on.
+HISTORY_ON = os.environ.get("FINCOPILOT_HISTORY", "on").strip().lower() not in {
+    "off",
+    "0",
+    "false",
+    "no",
+}
 SAMPLE_PDF = Path(__file__).parent / "tests" / "fixtures" / "golden_us.pdf"
 
 STATUS_PILL = {
@@ -143,6 +152,8 @@ def _analyze(data: bytes, use_ai: bool, host: str, model: str):
 
 
 def _store() -> Store | None:
+    if not HISTORY_ON:
+        return None
     try:
         DB_PATH.parent.mkdir(parents=True, exist_ok=True)
         return Store(DB_PATH)
@@ -361,6 +372,13 @@ def _narrative(result, use_ai: bool, host: str, model: str) -> None:
 
 
 def _history() -> None:
+    if not HISTORY_ON:
+        st.caption(
+            "History is switched off on this deployment. Everyone shares one machine "
+            "here, so one visitor's analysis would otherwise be listed for the next. "
+            "Run it locally and your analyses are kept in a SQLite file on your disk."
+        )
+        return
     store = _store()
     if store is None:
         st.caption("History unavailable (database could not be opened).")

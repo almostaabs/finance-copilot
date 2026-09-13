@@ -40,14 +40,14 @@ def test_golden_renders_kpis_and_tabs():
     at = _run_with(GOLDEN_US)
     assert at.title[0].value == "golden_us.pdf"
     assert len(at.tabs) == 6
-    body = " ".join(m.value for m in at.markdown)
-    assert "Net margin" in body and 'class="kpi ok"' in body
+    panel_html = _panel_html(at)
+    assert "Net margin" in panel_html and 'class="card ok"' in panel_html
 
 
 def test_hostile_renders_na_cards_distinctly():
     at = _run_with(HOSTILE)
-    body = " ".join(m.value for m in at.markdown)
-    assert 'class="kpi na"' in body and "N/A" in body
+    panel_html = _panel_html(at)
+    assert 'class="card na"' in panel_html and "N/A" in panel_html
 
 
 def test_ambiguous_periods_renders_error_not_crash():
@@ -71,8 +71,7 @@ def test_history_tab_renders_saved_document(tmp_path):
 
 def test_kpi_cards_use_newest_period():
     at = _run_with(GOLDEN_US)
-    body = " ".join(m.value for m in at.markdown)
-    assert "for 2022" not in body
+    assert "for 2022" not in _panel_html(at)
 
 
 def test_load_rejects_bad_files_without_raising(monkeypatch):
@@ -95,9 +94,18 @@ def test_ollama_host_must_be_http():
         OllamaClient(host="file:///etc/passwd")
 
 
+def _of_type(at, kind: str) -> list:
+    """AppTest has no typed accessor for vega_lite_chart or html; both land as
+    UnknownElement carrying their proto name in `.type`."""
+    return [e for e in at.main if type(e).__name__ == "UnknownElement" and e.type == kind]
+
+
 def _chart_count(at) -> int:
-    """AppTest has no typed accessor for vega_lite_chart; it lands as UnknownElement."""
-    return sum(1 for e in at.main if type(e).__name__ == "UnknownElement")
+    return len(_of_type(at, "vega_lite_chart"))
+
+
+def _panel_html(at) -> str:
+    return " ".join(e.proto.body for e in _of_type(at, "html"))
 
 
 def test_results_tab_draws_a_chart_per_result_and_a_flag_grid():
@@ -105,8 +113,8 @@ def test_results_tab_draws_a_chart_per_result_and_a_flag_grid():
 
     result = pipeline.analyze(GOLDEN_US.read_bytes())
     at = _run_with(GOLDEN_US)
-    body = " ".join(m.value for m in at.markdown)
-    assert 'class="flags"' in body and 'class="flag clear"' in body
+    panel_html = _panel_html(at)
+    assert 'class="grid flags"' in panel_html and 'class="card clear"' in panel_html
     assert _chart_count(at) == len(charts.charts(result)) == 5
 
 

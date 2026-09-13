@@ -34,14 +34,26 @@ from fincopilot.types import (
     CanonicalConcept as C,
 )
 
-INK = "#1c2430"
-PRIMARY = "#1f4e79"
-POSITIVE = "#2e8b57"
-NEGATIVE = "#9b2c20"
-WARNING = "#e0a100"
-MUTED = "#8a94a3"
-GRID = "#e6e9ee"
-FONT = "sans-serif"
+# --- dark data-terminal palette ------------------------------------------------
+# One family of blues carries the money series, green marks what the business
+# wants more of, red what it wants less of, amber the caution. Chosen for
+# contrast on a near-black surface: every ink colour clears 4.5:1 on BG.
+BG = "#0b0e14"
+SURFACE = "#151b26"
+INK = "#e6ebf2"
+MUTED = "#8b96a8"
+GRID = "#212a38"
+PRIMARY = "#4da3ff"
+# A hue ramp, not a lightness ramp. Darkening a blue to separate series drops
+# it under the 3:1 contrast floor on a near-black ground; shifting hue keeps
+# every series bright enough to read.
+CYAN = "#5ec8e0"
+VIOLET = "#9b8cff"
+POSITIVE = "#3ddc97"
+NEGATIVE = "#ff6b6b"
+WARNING = "#ffb454"
+FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+DIM_OPACITY = 0.22  # a series switched off in the legend, still faintly present
 
 _SCALE_WORD = {
     Scale.UNIT: "",
@@ -109,23 +121,24 @@ def _metric(result: AnalysisResult, name: str, period: Period) -> Metric | None:
 def _base(height: int = 260) -> dict[str, Any]:
     """House style, applied to every chart so they read as one family."""
     return {
-        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
         "height": height,
         "autosize": {"type": "fit", "contains": "padding"},
         "background": "transparent",
         "config": {
             "font": FONT,
-            "view": {"stroke": None},
+            "view": {"stroke": None, "cursor": "pointer"},
             "axis": {
                 "labelColor": MUTED,
                 "titleColor": MUTED,
-                "titleFontSize": 11,
                 "labelFontSize": 11,
-                "titleFontWeight": "normal",
+                "labelFontWeight": 500,
                 "grid": True,
                 "gridColor": GRID,
+                "gridDash": [2, 4],
                 "domain": False,
-                "tickColor": GRID,
+                "ticks": False,
+                "labelPadding": 8,
             },
             # No axis titles anywhere: a rotated title is hard to read, and a
             # horizontal one collides with the legend. Each chart's subtitle
@@ -134,15 +147,50 @@ def _base(height: int = 260) -> dict[str, Any]:
             "axisX": {"grid": False, "title": None},
             "legend": {
                 "labelColor": INK,
-                "titleColor": MUTED,
                 "labelFontSize": 11,
-                "titleFontSize": 11,
+                "labelFontWeight": 500,
                 "orient": "top",
                 "direction": "horizontal",
                 "title": None,
                 "symbolType": "square",
+                "symbolSize": 90,
+                "offset": 12,
+                "labelLimit": 220,
             },
         },
+    }
+
+
+def _interactive(field: str) -> list[dict[str, Any]]:
+    """Click a legend swatch to isolate a series; hover to pick out one mark.
+
+    Both are Vega-Lite selection params, so the interaction ships inside the
+    spec and needs no callback into Python. The data cannot change from here:
+    a selection only ever hides or highlights marks that are already drawn.
+    """
+    return [
+        {"name": "legend_pick", "select": {"type": "point", "fields": [field]}, "bind": "legend"},
+        {
+            "name": "hovered",
+            "select": {"type": "point", "on": "pointerover", "clear": "pointerout"},
+        },
+    ]
+
+
+def _emphasis() -> dict[str, Any]:
+    """Dim what the legend switched off, lift what the pointer is over.
+
+    Opacity carries both states on purpose. A stroke would also work, but
+    Vega-Lite rejects a null default for it, and one channel is easier to read
+    than two competing ones."""
+    return {
+        "opacity": {
+            "condition": [
+                {"param": "hovered", "empty": False, "value": 1},
+                {"param": "legend_pick", "value": 0.9},
+            ],
+            "value": DIM_OPACITY,
+        }
     }
 
 
@@ -162,8 +210,8 @@ def _year_axis() -> dict[str, Any]:
 
 PERFORMANCE_SERIES = (
     (C.REVENUE, "Revenue", PRIMARY),
-    (C.GROSS_PROFIT, "Gross profit", "#4a7fb5"),
-    (C.OPERATING_INCOME, "Operating income", "#7aa6d0"),
+    (C.GROSS_PROFIT, "Gross profit", CYAN),
+    (C.OPERATING_INCOME, "Operating income", VIOLET),
     (C.NET_INCOME, "Net income", POSITIVE),
 )
 
@@ -184,8 +232,10 @@ def performance_chart(result: AnalysisResult) -> Chart | None:
         return None
     order = [label for _, label, _ in PERFORMANCE_SERIES]
     colours = [colour for _, _, colour in PERFORMANCE_SERIES]
+    unit = unit_label(result)
     spec = _base() | {
         "data": {"values": [{**r, "amount": _f(r["amount"])} for r in rows]},
+        "params": _interactive("series"),
         "mark": {"type": "bar", "cornerRadiusEnd": 3},
         "encoding": {
             "x": _year_axis(),
@@ -200,10 +250,11 @@ def performance_chart(result: AnalysisResult) -> Chart | None:
                 "type": "nominal",
                 "scale": {"domain": order, "range": colours},
             },
+            **_emphasis(),
             "tooltip": [
                 {"field": "series", "title": "Item"},
                 {"field": "period", "title": "Year"},
-                {"field": "amount", "type": "quantitative", "format": ",.2f"},
+                {"field": "amount", "type": "quantitative", "title": unit, "format": ",.2f"},
             ],
         },
     }
@@ -220,8 +271,8 @@ def performance_chart(result: AnalysisResult) -> Chart | None:
 # --- margins --------------------------------------------------------------
 
 MARGIN_SERIES = (
-    ("gross_margin", "Gross margin", "#4a7fb5"),
-    ("operating_margin", "Operating margin", PRIMARY),
+    ("gross_margin", "Gross margin", CYAN),
+    ("operating_margin", "Operating margin", VIOLET),
     ("net_margin", "Net margin", POSITIVE),
 )
 
@@ -244,6 +295,7 @@ def margin_chart(result: AnalysisResult) -> Chart | None:
     colours = [colour for _, _, colour in MARGIN_SERIES]
     spec = _base(220) | {
         "data": {"values": [{**r, "amount": _f(r["amount"])} for r in rows]},
+        "params": _interactive("series"),
         "mark": {"type": "bar", "cornerRadiusEnd": 3},
         "encoding": {
             "x": _year_axis(),
@@ -258,10 +310,11 @@ def margin_chart(result: AnalysisResult) -> Chart | None:
                 "type": "nominal",
                 "scale": {"domain": order, "range": colours},
             },
+            **_emphasis(),
             "tooltip": [
                 {"field": "series", "title": "Margin"},
                 {"field": "period", "title": "Year"},
-                {"field": "amount", "type": "quantitative", "format": ".1f"},
+                {"field": "amount", "type": "quantitative", "title": "percent", "format": ".1f"},
             ],
         },
     }
@@ -313,8 +366,10 @@ def balance_chart(result: AnalysisResult) -> Chart | None:
     if not rows:
         return None
     order = ["Total assets", "Liabilities", "Equity"]
+    unit = unit_label(result)
     spec = _base(280) | {
         "data": {"values": [{**r, "amount": _f(r["amount"])} for r in rows]},
+        "params": _interactive("part"),
         "mark": {"type": "bar", "cornerRadiusEnd": 3},
         "encoding": {
             "x": _year_axis(),
@@ -332,12 +387,14 @@ def balance_chart(result: AnalysisResult) -> Chart | None:
             "color": {
                 "field": "part",
                 "type": "nominal",
-                "scale": {"domain": order, "range": [PRIMARY, "#c2694f", POSITIVE]},
+                "scale": {"domain": order, "range": [PRIMARY, WARNING, POSITIVE]},
             },
+            **_emphasis(),
             "tooltip": [
                 {"field": "part", "title": "Part"},
+                {"field": "side", "title": "Side"},
                 {"field": "period", "title": "Year"},
-                {"field": "amount", "type": "quantitative", "format": ",.2f"},
+                {"field": "amount", "type": "quantitative", "title": unit, "format": ",.2f"},
             ],
         },
     }
@@ -393,6 +450,7 @@ def cash_chart(result: AnalysisResult) -> Chart | None:
             "kind": "total",
         },
     )
+    unit = unit_label(result)
     spec = _base(240) | {
         "data": {
             "values": [
@@ -400,6 +458,12 @@ def cash_chart(result: AnalysisResult) -> Chart | None:
                 for r in rows
             ]
         },
+        "params": [
+            {
+                "name": "hovered",
+                "select": {"type": "point", "on": "pointerover", "clear": "pointerout"},
+            }
+        ],
         "mark": {"type": "bar", "cornerRadius": 3, "size": 58},
         "encoding": {
             "x": {
@@ -424,9 +488,13 @@ def cash_chart(result: AnalysisResult) -> Chart | None:
                     "range": [POSITIVE, NEGATIVE, PRIMARY],
                 },
             },
+            "opacity": {
+                "condition": {"param": "hovered", "empty": False, "value": 1},
+                "value": 0.88,
+            },
             "tooltip": [
                 {"field": "series", "title": "Step"},
-                {"field": "amount", "type": "quantitative", "format": ",.2f"},
+                {"field": "amount", "type": "quantitative", "title": unit, "format": ",.2f"},
             ],
         },
     }
@@ -480,18 +548,24 @@ def reconciliation_chart(result: AnalysisResult) -> Chart | None:
                 {**r, "amount": _f(r["amount"]), "tolerance": _f(r["tolerance"])} for r in rows
             ]
         },
+        "params": [
+            {
+                "name": "hovered",
+                "select": {"type": "point", "on": "pointerover", "clear": "pointerout"},
+            }
+        ],
         "encoding": {
             "y": {
                 "field": "check",
                 "type": "nominal",
-                "axis": {"title": None, "labelLimit": 300, "labelFontSize": 12},
+                "axis": {"title": None, "labelLimit": 300, "labelFontSize": 12, "labelColor": INK},
                 "sort": [r["check"] for r in rows],
             }
         },
         "layer": [
             {
                 # The allowance, drawn first: the coloured bar is read against it.
-                "mark": {"type": "bar", "color": "#eceff3", "cornerRadiusEnd": 3, "size": 26},
+                "mark": {"type": "bar", "color": SURFACE, "cornerRadiusEnd": 3, "size": 26},
                 "encoding": {
                     "x": {
                         "field": "tolerance",

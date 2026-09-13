@@ -213,3 +213,31 @@ def test_no_float_anywhere_on_the_money_path(name):
 def test_charts_is_the_only_place_money_becomes_a_float():
     source = Path("src/fincopilot/charts.py").read_text(encoding="utf-8")
     assert source.count("float(") == 1  # the single _f helper
+
+
+def test_charts_are_interactive_not_pictures(golden):
+    """A legend swatch isolates a series; hovering a mark lifts it. Both are
+    spec-level selections, so no interaction can alter a value."""
+    for c in charts.charts(golden):
+        params = {p["name"] for p in c.spec.get("params", [])}
+        assert "hovered" in params, c.key
+    for key in ("performance", "margins", "balance"):
+        c = next(x for x in charts.charts(golden) if x.key == key)
+        legend = next(p for p in c.spec["params"] if p["name"] == "legend_pick")
+        assert legend["bind"] == "legend"
+        assert c.spec["encoding"]["opacity"]["value"] == charts.DIM_OPACITY
+
+
+def test_every_chart_carries_a_tooltip(golden):
+    for c in charts.charts(golden):
+        enc = c.spec.get("encoding", {})
+        layers = c.spec.get("layer", [])
+        has = "tooltip" in enc or any("tooltip" in x.get("encoding", {}) for x in layers)
+        assert has, c.key
+
+
+def test_palette_is_dark_and_legible(golden):
+    assert charts.BG == "#0b0e14"
+    for c in charts.charts(golden):
+        assert c.spec["background"] == "transparent"
+        assert c.spec["config"]["axis"]["labelColor"] == charts.MUTED

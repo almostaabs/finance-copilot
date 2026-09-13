@@ -15,7 +15,7 @@ import pandas as pd
 import pipeline
 import streamlit as st
 
-from fincopilot import __version__, charts, views
+from fincopilot import __version__, charts, panel, views
 from fincopilot.ai.client import OllamaClient
 from fincopilot.extract.pdf import IngestionError
 from fincopilot.store import Store
@@ -25,26 +25,26 @@ DB_PATH = Path(os.environ.get("FINCOPILOT_DB", "data/fincopilot.sqlite"))
 SAMPLE_PDF = Path(__file__).parent / "tests" / "fixtures" / "golden_us.pdf"
 
 STATUS_PILL = {
-    "ok": ("#e6f4ea", "#1e6b3a"),
-    "passed": ("#e6f4ea", "#1e6b3a"),
-    "clear": ("#e6f4ea", "#1e6b3a"),
-    "low": ("#fff4d6", "#8a5a00"),
-    "warning": ("#fff4d6", "#8a5a00"),
-    "fired": ("#fde8e6", "#9b2c20"),
-    "na": ("#eef0f3", "#5b6675"),
-    "unavailable": ("#eef0f3", "#5b6675"),
-    "not_evaluated": ("#eef0f3", "#5b6675"),
+    "ok": ("#10301f", "#3ddc97"),
+    "passed": ("#10301f", "#3ddc97"),
+    "clear": ("#10301f", "#3ddc97"),
+    "low": ("#33260c", "#ffb454"),
+    "warning": ("#33260c", "#ffb454"),
+    "fired": ("#3a1517", "#ff6b6b"),
+    "na": ("#1b222e", "#8b96a8"),
+    "unavailable": ("#1b222e", "#8b96a8"),
+    "not_evaluated": ("#1b222e", "#8b96a8"),
 }
 ROW_TINT = {
-    "ok": "#f4faf6",
-    "passed": "#f4faf6",
-    "clear": "#f4faf6",
-    "low": "#fffaf0",
-    "warning": "#fffaf0",
-    "fired": "#fdf3f2",
-    "na": "#f7f8fa",
-    "unavailable": "#f7f8fa",
-    "not_evaluated": "#f7f8fa",
+    "ok": "#0f1a16",
+    "passed": "#0f1a16",
+    "clear": "#0f1a16",
+    "low": "#1c1810",
+    "warning": "#1c1810",
+    "fired": "#1e1214",
+    "na": "#11151d",
+    "unavailable": "#11151d",
+    "not_evaluated": "#11151d",
 }
 COLUMN_TITLES = {
     "concept": "Concept",
@@ -73,71 +73,62 @@ COLUMN_TITLES = {
 
 CSS = """
 <style>
-#MainMenu, footer, header[data-testid="stHeader"] {visibility: hidden; height: 0;}
-.block-container {padding-top: 1.6rem; padding-bottom: 3rem; max-width: 1280px;}
-section[data-testid="stSidebar"] {border-right: 1px solid #e6e9ee;}
-.brand {font-size: 1.35rem; font-weight: 700; letter-spacing: -.01em; color: #1f4e79;}
-.brand small {display:block; font-size:.78rem; font-weight:400; color:#5b6675; margin-top:2px}
-.doc-title {font-size: 1.9rem; font-weight: 700; letter-spacing: -.02em; margin: 0 0 .2rem 0;}
-.facts {display:flex; gap:10px; flex-wrap:wrap; margin: 0 0 1.2rem 0;}
-.fact {background:#f5f7fa; border:1px solid #e6e9ee; border-radius:8px; padding:6px 12px;
-  font-size:.82rem; color:#3a4656;}
-.fact b {color:#1c2430; font-weight:600;}
-.badge {display:inline-block; padding:3px 10px; border-radius:999px; font-size:.78rem;
-  font-weight:600; letter-spacing:.02em; text-transform:uppercase;}
-.badge.info {background:#e3eefa; color:#1f4e79}
-.badge.warning {background:#fff1cc; color:#8a5a00}
-.badge.error {background:#fde8e6; color:#9b2c20}
-.kpi {border:1px solid #e6e9ee; border-radius:12px; padding:16px 18px; background:#fff;
-  min-height:132px; box-shadow:0 1px 2px rgba(16,24,40,.04);}
-.kpi.ok {border-top:4px solid #2e8b57}
-.kpi.low {border-top:4px solid #e0a100; background:#fffdf7}
-.kpi.na {border:1px dashed #c4c9d1; border-top:4px dashed #c4c9d1; background:#f7f8fa;
-  color:#5b6675}
-.kpi {display:flex; flex-direction:column;}
-.kpi .label {font-size:.72rem; color:#5b6675; text-transform:uppercase; letter-spacing:.06em;
-  font-weight:600; min-height:2.2em; line-height:1.1;}
-.kpi .value {font-size:1.85rem; font-weight:700; margin:6px 0 2px; letter-spacing:-.02em;}
-.kpi.na .value {font-size:1.25rem; font-style:italic; font-weight:500;}
-.kpi .delta {font-size:.82rem; font-weight:600;}
-.kpi .note {font-size:.74rem; color:#7a8594; margin-top:auto; padding-top:6px; line-height:1.3;}
-.up {color:#1e6b3a} .down {color:#9b2c20} .flat {color:#5b6675}
-.legend {font-size:.78rem; color:#7a8594; margin:.6rem 0 1.2rem;}
-.legend span {display:inline-block; width:10px; height:10px; border-radius:3px;
-  margin:0 4px 0 12px; vertical-align:middle;}
-.card {border:1px solid #e6e9ee; border-radius:12px; padding:18px 20px; background:#fff;
-  margin-bottom:12px;}
-.card h4 {margin:0 0 .5rem; font-size:1rem;}
-.cite {display:inline-block; font-family:ui-monospace, Menlo, monospace; font-size:.7rem;
-  background:#f0f3f7; color:#3a4656; border-radius:4px; padding:1px 6px; margin:0 2px;}
-.eyebrow {font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
-  color:#8a94a3; margin-bottom:2px;}
-.section {margin: 1.8rem 0 .4rem;}
-.section h3 {margin:0 0 .25rem; font-size:1.12rem; letter-spacing:-.01em;}
-.section p {margin:0; font-size:.86rem; color:#5b6675; max-width:760px; line-height:1.45;}
-.flags {display:grid; grid-template-columns:repeat(auto-fill, minmax(215px,1fr)); gap:10px;
-  margin:.4rem 0 .2rem;}
-.flag {border:1px solid #e6e9ee; border-radius:10px; padding:11px 13px; background:#fff;}
-.flag .name {font-size:.83rem; font-weight:600; color:#1c2430;}
-.flag .state {font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
-  margin-bottom:5px;}
-.flag .why {font-size:.75rem; color:#7a8594; margin-top:5px; line-height:1.35;}
-.flag.fired {border-color:#f0c4bd; background:#fdf5f4;}
-.flag.fired .state {color:#9b2c20;}
-.flag.clear .state {color:#1e6b3a;}
-.flag.not_evaluated {background:#f7f8fa;}
-.flag.not_evaluated .name, .flag.not_evaluated .state {color:#8a94a3;}
-.missing {font-size:.78rem; color:#8a5a00; background:#fffaf0; border:1px solid #ffe9b8;
-  border-radius:8px; padding:7px 11px; margin:.2rem 0 0;}
-.hero {padding: 2.5rem 0 1rem;}
-.hero h1 {font-size:2.4rem; letter-spacing:-.03em; margin:0 0 .4rem;}
-.hero p {font-size:1.05rem; color:#3a4656; max-width:720px; margin:0 0 1.4rem;}
-.feature {border:1px solid #e6e9ee; border-radius:12px; padding:16px 18px; background:#fff;
-  min-height:150px;}
-.feature h4 {margin:0 0 .4rem; font-size:.95rem; color:#1f4e79;}
-.feature p {margin:0; font-size:.85rem; color:#3a4656; line-height:1.45;}
-.foot {margin-top:3rem; padding-top:1rem; border-top:1px solid #e6e9ee; font-size:.76rem;
-  color:#7a8594;}
+:root {
+  --bg:#0b0e14; --surface:#151b26; --surface-2:#1b2331; --line:#232c3b;
+  --ink:#e6ebf2; --muted:#8b96a8; --faint:#5d6878;
+  --accent:#4da3ff; --pos:#3ddc97; --neg:#ff6b6b; --warn:#ffb454;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", monospace;
+}
+#MainMenu, footer, header[data-testid="stHeader"] {visibility:hidden; height:0;}
+.stApp {background:var(--bg);}
+.block-container {padding-top:1.4rem; padding-bottom:4rem; max-width:1320px;}
+section[data-testid="stSidebar"] {background:var(--surface); border-right:1px solid var(--line);}
+h1,h2,h3,h4 {letter-spacing:-.02em;}
+/* Every figure in the product is monospaced and tabular, so digits line up
+   column to column and a value never jitters as it changes. */
+.num, .kpi .value, .fact b, .cite {font-variant-numeric:tabular-nums; font-family:var(--mono);}
+
+.brand {font-size:1.3rem; font-weight:700; letter-spacing:-.02em; color:var(--ink);}
+.brand small {display:block; font-size:.74rem; font-weight:400; color:var(--muted); margin-top:3px;
+  letter-spacing:0;}
+.doc-title {font-size:1.9rem; font-weight:700; letter-spacing:-.03em; margin:0 0 .2rem;}
+.facts {display:flex; gap:8px; flex-wrap:wrap; margin:0 0 1.1rem;}
+.fact {background:var(--surface); border:1px solid var(--line); border-radius:7px;
+  padding:5px 11px; font-size:.79rem; color:var(--muted);}
+.fact b {color:var(--ink); font-weight:600;}
+.badge {display:inline-block; padding:4px 11px; border-radius:999px; font-size:.7rem;
+  font-weight:700; letter-spacing:.09em; text-transform:uppercase;}
+.badge.info {background:#10243a; color:#7ab8ff}
+.badge.warning {background:#33260c; color:var(--warn)}
+.badge.error {background:#3a1517; color:var(--neg)}
+
+.eyebrow {font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--faint); margin-bottom:3px;}
+.section {margin:2rem 0 .5rem;}
+.section h3 {margin:0 0 .3rem; font-size:1.1rem; color:var(--ink);}
+.section p {margin:0; font-size:.85rem; color:var(--muted); max-width:780px; line-height:1.5;}
+.missing {font-size:.78rem; color:var(--warn); background:#1c1810; border:1px solid #3a2f14;
+  border-radius:8px; padding:8px 12px; margin:.3rem 0 0;}
+.legend {font-size:.77rem; color:var(--faint); margin:.5rem 0 1rem;}
+.legend span {display:inline-block; width:9px; height:9px; border-radius:2px; margin:0 5px 0 14px;
+  vertical-align:middle;}
+.card {border:1px solid var(--line); border-radius:12px; padding:18px 20px;
+  background:var(--surface); margin-bottom:12px;}
+.card p {color:var(--ink);}
+.cite {display:inline-block; font-size:.68rem; background:var(--surface-2); color:var(--muted);
+  border:1px solid var(--line); border-radius:4px; padding:1px 6px; margin:2px 3px 0 0;}
+.hero {padding:3rem 0 1.4rem;}
+.hero h1 {font-size:2.6rem; letter-spacing:-.035em; margin:0 0 .5rem; color:var(--ink);}
+.hero p {font-size:1.02rem; color:var(--muted); max-width:700px; margin:0 0 1.6rem;
+  line-height:1.6;}
+.feature {border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+  background:var(--surface); min-height:152px;}
+.feature h4 {margin:0 0 .45rem; font-size:.92rem; color:var(--accent);}
+.feature p {margin:0; font-size:.84rem; color:var(--muted); line-height:1.5;}
+.foot {margin-top:2.5rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.74rem;
+  color:var(--faint);}
+[data-testid="stDataFrame"] {border:1px solid var(--line); border-radius:10px;}
+.stTabs [data-baseweb="tab"] {font-size:.9rem;}
 </style>
 """
 
@@ -325,13 +316,11 @@ def _kpis(result) -> None:
     cards = views.kpi_cards(result)
     if not cards:
         return
-    cols = st.columns(len(cards))
-    for col, c in zip(cols, cards, strict=True):
-        col.markdown(_kpi_html(c), unsafe_allow_html=True)
+    st.html(panel.kpi_html(cards))
     st.markdown(
-        '<div class="legend">Latest year. <span style="background:#2e8b57"></span>verified '
-        '<span style="background:#e0a100"></span>lower confidence '
-        '<span style="background:#c4c9d1"></span>not available, reason shown</div>',
+        '<div class="legend">Latest year. <span style="background:#3ddc97"></span>verified '
+        '<span style="background:#ffb454"></span>lower confidence '
+        '<span style="background:#232c3b"></span>not available, reason shown</div>',
         unsafe_allow_html=True,
     )
 
@@ -451,22 +440,14 @@ def _chart(c: charts.Chart, eyebrow: str) -> None:
 def _flag_grid(result) -> None:
     rows = views.red_flag_rows(result)
     fired = sum(1 for r in rows if r["status"] == "fired")
-    order = {"fired": 0, "not_evaluated": 1, "clear": 2}
+    clear = sum(1 for r in rows if r["status"] == "clear")
     body = (
         f"{fired} of {len(rows)} rules fired. A rule that could not be evaluated is not a pass."
         if fired
-        else f"No rule fired. {sum(1 for r in rows if r['status'] == 'clear')} rules were checked "
-        "and came back clean."
+        else f"No rule fired. {clear} rules were checked and came back clean."
     )
     _section("Verdict", "Red flags", body)
-    cards = "".join(
-        f'<div class="flag {r["status"]}"><div class="state">'
-        f"{html.escape(views.STATUS_WORD[r['status']])}</div>"
-        f'<div class="name">{html.escape(r["rule"])}</div>'
-        f'<div class="why">{html.escape(r["message"])}</div></div>'
-        for r in sorted(rows, key=lambda r: (order[r["status"]], r["rule"]))
-    )
-    st.markdown(f'<div class="flags">{cards}</div>', unsafe_allow_html=True)
+    st.html(panel.flag_html(rows))
 
 
 def _results(result, use_ai: bool, host: str, model: str) -> None:

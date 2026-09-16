@@ -19,9 +19,9 @@ system accurately to engineers. Short on purpose.
    code happened to produce.
 3. **Tests before code, every time.** For each feature the failing test was
    written first, then the smallest code that makes it pass. 297 automated
-   tests existed at Phase 8; 444 exist now (443 run by default; one is skipped
-   unless a local Ollama is actually installed). A lint tool (Ruff) enforces style.
-4. **One phase, one commit.** Fifteen phases (0-14), each committed with its tests.
+   tests existed at Phase 8; 452 exist now (450 run by default; two are skipped
+   unless a live Ollama or a Gemini key is present). A lint tool (Ruff) enforces style.
+4. **One phase, one commit.** Sixteen phases (0-15), each committed with its tests.
 
 ### Phases 0-8: the deterministic engine
 
@@ -60,9 +60,20 @@ The engine did not change for any of this. The deployment is a different way of
 starting the same program, and it produces the same numbers to the digit,
 because every stage after reading the PDF is a pure function.
 
-What the hosted version cannot do: there is no Ollama server on a free
-container, so the two optional AI features are unavailable there. Everything
-that produces a number works identically.
+### Phase 15: a model the host can actually reach
+
+| Phase | Built | Proven by |
+|---|---|---|
+| 15 | A Gemini client, so the two optional AI features work on a host with no model server. It was written against the `LLMClient` Protocol the pipeline already took, which meant no stage, no gate, and no test of the analysis itself had to change: the row picker's six rejection paths and the narrative's grounding gate run against a Gemini answer exactly as they ran against an Ollama one, because neither can tell which client replied. The only real work was translating the request schema into the OpenAPI subset the API accepts, and threading the sidebar's choice through the app as one value instead of three loose arguments. The key is read from Streamlit secrets or the environment at call time and sent as a header, never a URL parameter, and the provider choice is shown only when a key exists, so the hosted page stops offering a control that cannot work. | `tests/test_ai_gemini.py` asserts the schema rewrite, temperature zero, the key in the header and not the URL, and that every failure path — transport, timeout, HTTP error, a reply with no text — becomes the `LLMError` that callers already treat as a decline; the live contract is deselected by default like the Ollama one |
+
+The Protocol earned itself here. A seam that looked like ceremony at Phase 8 —
+one method, one argument, a null implementation that always declines — turned a
+whole new provider into one file and no change to the engine.
+
+What the hosted version cannot do: it cannot use Ollama, because a free
+container runs no model server. With a Gemini key in the host's secrets, both
+AI features work there. Everything that produces a number works identically
+either way, and with AI switched off.
 
 ### The test reports
 
@@ -211,4 +222,4 @@ and a chain back to the first thing that went wrong, so the answer to "why is
 ROE blank?" is "because equity was not matched, because the balance sheet was
 not found on any page", not a shrug. And every figure that *is* shown can be
 walked back to a printed cell on a numbered page. Those two properties are
-what the 443 tests exist to protect.
+what the 450 tests exist to protect.

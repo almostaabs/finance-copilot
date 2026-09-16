@@ -10,13 +10,19 @@ import hashlib
 import html
 import os
 from pathlib import Path
+from typing import NamedTuple
 
 import pandas as pd
 import pipeline
 import streamlit as st
 
 from fincopilot import __version__, charts, panel, views
-from fincopilot.ai.client import OllamaClient
+from fincopilot.ai.client import (
+    DEFAULT_TIMEOUT_S,
+    GEMINI_DEFAULT_MODEL,
+    GeminiClient,
+    OllamaClient,
+)
 from fincopilot.extract.pdf import IngestionError
 from fincopilot.store import Store
 from fincopilot.types import Narrative, Unavailable
@@ -145,10 +151,35 @@ h1,h2,h3,h4 {letter-spacing:-.02em;}
 # --- helpers (formatting and wiring only) ------------------------------------
 
 
+class AiSettings(NamedTuple):
+    """What the sidebar chose. Hashable, so it can key the analysis cache."""
+
+    on: bool
+    provider: str
+    host: str
+    model: str
+
+
+def _gemini_key() -> str:
+    """Streamlit secrets first, then the environment. Never written to disk."""
+    try:
+        key = st.secrets.get("GEMINI_API_KEY", "")
+    except Exception:
+        key = ""
+    return str(key or os.environ.get("GEMINI_API_KEY", "")).strip()
+
+
+def _client(ai: AiSettings, timeout_s: float):
+    if not ai.on:
+        return None
+    if ai.provider == "gemini":
+        return GeminiClient(api_key=_gemini_key(), model=ai.model, timeout_s=timeout_s)
+    return OllamaClient(host=ai.host, model=ai.model, timeout_s=timeout_s)
+
+
 @st.cache_data(show_spinner=False)
-def _analyze(data: bytes, use_ai: bool, host: str, model: str):
-    llm = OllamaClient(host=host, model=model) if use_ai else None
-    return pipeline.analyze(data, llm=llm)
+def _analyze(data: bytes, ai: AiSettings):
+    return pipeline.analyze(data, llm=_client(ai, DEFAULT_TIMEOUT_S))
 
 
 def _store() -> Store | None:
@@ -206,13 +237,13 @@ def _notice(n: views.Notice) -> None:
     {"info": st.info, "warning": st.warning, "error": st.error}[n.level](n.text)
 
 
-def _load(name: str, data: bytes, use_ai: bool, host: str, model: str) -> None:
+def _load(name: str, data: bytes, ai: AiSettings) -> None:
     sha = hashlib.sha256(data).hexdigest()
     if st.session_state.get("current", {}).get("sha256") == sha:
         return
     try:
         with st.spinner("Reading the statements. Large reports take a minute or two."):
-            result = _analyze(data, use_ai, host, model)
+            result = _analyze(data, ai)
     except IngestionError as exc:
         st.sidebar.error(f"Cannot analyse this file: {exc}")
         return
@@ -229,7 +260,7 @@ def _load(name: str, data: bytes, use_ai: bool, host: str, model: str) -> None:
 # --- sidebar -----------------------------------------------------------------
 
 
-def _sidebar() -> tuple[bool, str, str]:
+def _sidebar() -> AiSettings:
     sb = st.sidebar
     sb.markdown(
         '<div class="brand">Finance Copilot'
@@ -238,24 +269,44 @@ def _sidebar() -> tuple[bool, str, str]:
     )
     sb.markdown("")
     upload = sb.file_uploader("Annual report (PDF, up to 50 MB)", type=["pdf"])
-    sb.markdown("**Local AI**")
+    # Gemini needs only a key, so it works on a host with no model server.
+    # Ollama needs a running daemon, which a hosted container does not have.
+    has_gemini = bool(_gemini_key())
+    providers = (["gemini"] if has_gemini else []) + ["ollama"]
+    sb.markdown("**AI assist**")
     use_ai = sb.toggle(
-        "Local AI (Ollama)",
+        "AI assist",
         value=False,
         help="Optional. Picks rows the exact-match tables could not name and writes a "
         "cited narrative. It never supplies a number.",
         label_visibility="collapsed",
     )
     with sb.expander("AI settings", expanded=False):
-        host = st.text_input(
-            "Ollama host", os.environ.get("FINCOPILOT_OLLAMA_HOST", "http://localhost:11434")
+        provider = st.radio(
+            "Provider",
+            providers,
+            format_func=lambda p: "Gemini (cloud)" if p == "gemini" else "Ollama (this machine)",
+            horizontal=True,
         )
-        model = st.text_input("Model", os.environ.get("FINCOPILOT_OLLAMA_MODEL", "qwen2.5:3b"))
+        if provider == "gemini":
+            host = ""
+            model = st.text_input(
+                "Model", os.environ.get("FINCOPILOT_GEMINI_MODEL", GEMINI_DEFAULT_MODEL)
+            )
+            st.caption("Your PDF text is sent to Google for the rows it is asked about.")
+        else:
+            host = st.text_input(
+                "Ollama host", os.environ.get("FINCOPILOT_OLLAMA_HOST", "http://localhost:11434")
+            )
+            model = st.text_input("Model", os.environ.get("FINCOPILOT_OLLAMA_MODEL", "qwen2.5:3b"))
+            if not has_gemini:
+                st.caption("Needs Ollama running on the machine serving this page.")
+    ai = AiSettings(on=use_ai, provider=provider, host=host, model=model)
     if upload is not None:
-        _load(upload.name, upload.getvalue(), use_ai, host, model)
+        _load(upload.name, upload.getvalue(), ai)
     elif sb.button("Load sample report", help="A synthetic US-style report used in tests."):
         if SAMPLE_PDF.is_file():
-            _load(SAMPLE_PDF.name, SAMPLE_PDF.read_bytes(), use_ai, host, model)
+            _load(SAMPLE_PDF.name, SAMPLE_PDF.read_bytes(), ai)
         else:
             sb.error("Sample not found. Run: uv run python -m tests.fixtures.build_fixtures")
     sb.markdown(
@@ -263,7 +314,7 @@ def _sidebar() -> tuple[bool, str, str]:
         f"No AI ever supplies a number.<br>v{__version__}</div>",
         unsafe_allow_html=True,
     )
-    return use_ai, host, model
+    return ai
 
 
 # --- sections ----------------------------------------------------------------
@@ -336,16 +387,14 @@ def _kpis(result) -> None:
     )
 
 
-def _narrative(result, use_ai: bool, host: str, model: str) -> None:
+def _narrative(result, ai: AiSettings) -> None:
     st.markdown("#### Plain-English reading")
-    if not use_ai:
-        st.caption("Switch on Local AI in the sidebar to generate a cited narrative. Optional.")
+    if not ai.on:
+        st.caption("Switch on AI assist in the sidebar to generate a cited narrative. Optional.")
         return
     if "narrative" not in st.session_state and st.button("Generate narrative", type="primary"):
-        with st.spinner("Asking the local model. About a minute."):
-            st.session_state["narrative"] = pipeline.narrate(
-                result, OllamaClient(host=host, model=model, timeout_s=240)
-            )
+        with st.spinner("Asking the model. This can take a minute."):
+            st.session_state["narrative"] = pipeline.narrate(result, _client(ai, 240))
         n = st.session_state["narrative"]
         if isinstance(n, Narrative) and (store := _store()) is not None:
             store.save_narrative(result.document_id, n)
@@ -468,11 +517,11 @@ def _flag_grid(result) -> None:
     st.html(panel.flag_html(rows))
 
 
-def _results(result, use_ai: bool, host: str, model: str) -> None:
+def _results(result, ai: AiSettings) -> None:
     _flag_grid(result)
     if w := views.warning_count(result):
         st.warning(f"{w} cross-check did not tie out. The chart below shows by how much.")
-    _narrative(result, use_ai, host, model)
+    _narrative(result, ai)
     eyebrows = {
         "performance": "Scale",
         "margins": "Profitability",
@@ -488,14 +537,14 @@ def _results(result, use_ai: bool, host: str, model: str) -> None:
         _chart(c, eyebrows.get(c.key, "Result"))
 
 
-def _document(current: dict, use_ai: bool, host: str, model: str) -> None:
+def _document(current: dict, ai: AiSettings) -> None:
     result = current["result"]
     _header(current, result)
     _kpis(result)
     names = ["Results", "Values", "Metrics & changes", "Red flags", "Provenance", "History"]
     tabs = st.tabs(names)
     with tabs[0]:
-        _results(result, use_ai, host, model)
+        _results(result, ai)
     with tabs[1]:
         st.caption("Every figure the pipeline used, in the report's own units, with its source.")
         _table(views.value_rows(result), hide=("ref_id",))
@@ -518,12 +567,12 @@ def _document(current: dict, use_ai: bool, host: str, model: str) -> None:
 def main() -> None:
     st.set_page_config(page_title="Finance Copilot", page_icon="📊", layout="wide")
     st.markdown(CSS, unsafe_allow_html=True)
-    use_ai, host, model = _sidebar()
+    ai = _sidebar()
     current = st.session_state.get("current")
     if current is None:
         _landing()
     else:
-        _document(current, use_ai, host, model)
+        _document(current, ai)
 
 
 if __name__ == "__main__":

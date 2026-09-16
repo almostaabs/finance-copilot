@@ -98,10 +98,9 @@ def test_load_rejects_bad_files_without_raising(monkeypatch):
     calls = []
     monkeypatch.setattr(app.st.sidebar, "error", lambda msg: calls.append(msg))
     monkeypatch.setattr(app.st, "session_state", {})
-    app._load(
-        "scanned.pdf", Path("tests/fixtures/scanned.pdf").read_bytes(), False, "http://x", "m"
-    )
-    app._load("junk.pdf", b"not a pdf at all", False, "http://x", "m")
+    off = app.AiSettings(on=False, provider="ollama", host="http://x", model="m")
+    app._load("scanned.pdf", Path("tests/fixtures/scanned.pdf").read_bytes(), off)
+    app._load("junk.pdf", b"not a pdf at all", off)
     assert len(calls) == 2 and "current" not in app.st.session_state
 
 

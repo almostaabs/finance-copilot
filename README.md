@@ -12,7 +12,7 @@ zero.
 
 ![Dashboard overview](docs/screenshots/overview.png)
 
-**Status:** Phases 0-14 complete. 443 tests, all passing. Deployed on Streamlit
+**Status:** Phases 0-15 complete. 450 tests, all passing. Deployed on Streamlit
 Community Cloud; also runs entirely on your own machine, where no data leaves it.
 Validated on five real annual reports (Apple, Berkshire Hathaway, Wipro,
 Microsoft, and a small US bank), see
@@ -95,10 +95,20 @@ fixture built out of everything that can go wrong in a report:
 
 ![Unavailable values and a fired red flag](docs/screenshots/unavailable.png)
 
-## Optional local AI
+## Optional AI
 
-Switch on **Local AI (Ollama)** in the sidebar (needs [Ollama](https://ollama.com)
-with `qwen2.5:3b` or any model you name). It is used for exactly two things:
+Switch on **AI assist** in the sidebar. Two providers sit behind the same
+one-method interface, and the pipeline cannot tell them apart:
+
+- **Gemini (cloud)** — needs only an API key, so it works on a host with no
+  model server. Put the key in `.streamlit/secrets.toml` (gitignored; copy
+  `.streamlit/secrets.toml.example`), in a `GEMINI_API_KEY` environment
+  variable, or, on Streamlit Community Cloud, in **Settings > Secrets**. The
+  provider choice only appears when a key is present.
+- **Ollama (this machine)** — needs [Ollama](https://ollama.com) running with
+  `qwen2.5:3b` or any model you name. Nothing leaves your machine.
+
+Either way the model is used for exactly two things:
 
 1. **Picking a row** the exact-match tables could not name. It sees row labels and
    IDs only, never numbers, and its answer is checked six ways before use.
@@ -109,10 +119,13 @@ with `qwen2.5:3b` or any model you name). It is used for exactly two things:
 
 Switch it off and nothing else changes.
 
-On the hosted demo there is no Ollama server, so the toggle has nothing to talk
-to and the two AI features stay unavailable. Everything else — extraction,
-ratios, red flags, provenance, charts — is deterministic and works identically
-there and locally, to the digit.
+With Gemini, the row labels it is asked about and the structured result summary
+go to Google. Numbers still never come from the model, and the checks are the
+same. Choose Ollama if you would rather nothing left the machine at all.
+
+Everything else — extraction, ratios, red flags, provenance, charts — is
+deterministic and works identically on either provider, and with AI off, to the
+digit.
 
 ## The hosted demo vs running it yourself
 
@@ -121,9 +134,8 @@ there and locally, to the digit.
 | Analysis | identical, same code, same numbers | identical |
 | Your PDF | uploaded to a container Streamlit runs, analysed in memory, never written to disk | never leaves your machine |
 | History | **off** (`FINCOPILOT_HISTORY=off`) — one container serves every visitor, so one person's analysis must not be listed for the next | on, in a local SQLite file |
-| Optional AI | unavailable, no model server | works with Ollama installed |
+| Optional AI | Gemini, once a key is in Streamlit secrets | Gemini with a key, or Ollama with nothing leaving the machine |
 | First load | up to ~30s if the free container has gone to sleep | instant |
-
 
 ## The rules the system is built on
 

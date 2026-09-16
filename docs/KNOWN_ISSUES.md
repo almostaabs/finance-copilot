@@ -4,8 +4,8 @@ Everything found during the Phase 0-8 build, the first manual runs, and two
 deliberate stress-test passes. Ordered by severity. Each item says what it
 is, how to reproduce it, why it happens, and what a fix costs.
 
-Status as of 2026-09-17, Phase 14. 443 tests pass (1 deselected: the live
-Ollama contract), Ruff clean, CI green on GitHub Actions.
+Status as of 2026-09-17, Phase 15. 450 tests pass (2 deselected: the live
+Ollama and Gemini contracts), Ruff clean, CI green on GitHub Actions.
 The Phase 0-8 stress passes found six defects, all fixed with regression
 tests in `tests/test_stress_findings.py`. The Phase 9-13 stress pass found
 four more (section H below), all fixed with regression tests in
@@ -85,10 +85,13 @@ Streamlit Community Cloud. Four consequences, all accepted rather than fixed:
   README (chosen), or move to a paid host (~$5/month). A keep-alive pinger is
   not an option: it is synthetic traffic against a free service's fair-use
   terms.
-- **No Ollama on the host, so both AI features are unavailable there.** The
-  sidebar toggle is still rendered and will simply fail to reach a model. Fix is
-  either a hosted client behind the existing `LLMClient` Protocol, or hiding the
-  toggle when no client is reachable. Not yet done.
+- ~~**No Ollama on the host, so both AI features are unavailable there.**~~
+  Resolved in Phase 15: `GeminiClient` plugs into the existing `LLMClient`
+  Protocol, so it needs only a key rather than a model server. The provider
+  choice appears in the sidebar only when a key is present, so the hosted demo
+  no longer offers a control that cannot work. The key must be pasted into the
+  Streamlit Cloud secrets by hand; until that is done, the hosted toggle still
+  has nothing to talk to.
 - **History is switched off on the deployment.** One container serves every
   visitor, so persisting an analysis would list one person's uploaded report on
   the next person's page. `FINCOPILOT_HISTORY=off` in the host's secrets; the

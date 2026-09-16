@@ -40,7 +40,8 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-m 'not ollama'"
+addopts = "-m 'not ollama and not gemini'"
 markers = [
     "ollama: requires a live Ollama server; deselected by default and in CI",
+    "gemini: requires a live Gemini API key; deselected by default and in CI",
 ]

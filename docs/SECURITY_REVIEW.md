@@ -126,3 +126,40 @@ the history. The five real annual reports used for validation were committed onc
 mistake and then removed from the history entirely, before the repository was published,
 because they are the publishers' documents; `tests/fixtures/real/README.md` records where
 to download each one instead.
+
+## Phase 15: the cloud model provider
+
+The deployment has no model server, so both AI features were unreachable on the public
+instance. `GeminiClient` closes that gap through the same one-method Protocol the
+pipeline already took, which is why nothing downstream changed: the six rejection paths
+for the row picker and the grounding gate for the narrative run against a Gemini response
+exactly as they ran against an Ollama one, because neither knows which client answered.
+
+**The key never reaches the repository.** It is read at call time from Streamlit secrets
+or the `GEMINI_API_KEY` environment variable, and is sent as the `x-goog-api-key` header
+rather than a query parameter, so it cannot leak through a URL in a log or a referrer.
+`.streamlit/secrets.toml` stays gitignored; `.streamlit/secrets.toml.example` carries the
+name and no value. `test_sends_temperature_zero_json_schema_and_the_key_as_a_header`
+asserts both the header and the absence of the key from the URL.
+
+**What now leaves the machine, and only when the toggle is on.** The row picker sends
+row labels and their IDs — no numbers — for the concepts the exact-match tables could not
+name. The narrative sends the structured result summary, never the PDF. This is a real
+change to the local-first property, so the provider is a visible choice rather than a
+default: the sidebar names it "Gemini (cloud)", says the text is sent to Google, and
+offers Ollama beside it for anyone who would rather nothing left the machine. With AI
+off, nothing is sent at all, which remains the default.
+
+**The response is still not trusted.** A Gemini reply is model output from a remote
+service, which is a strictly worse position than a model the user runs. It buys no
+credit: an unknown ref, a ref outside the statement's scope, an already-mapped ref, a
+numeric field, a schema violation, an uncited number, or any markup rejects the response
+the same way. `gemini_schema` rewrites the request schema into the OpenAPI subset the API
+accepts, which is a convenience for the request and never a guarantee about the reply.
+
+**Failures are declines.** Transport errors, timeouts, non-2xx responses, and a response
+carrying no text all raise `LLMError`, which every caller already treats as the model
+declining. A missing or wrong key therefore degrades to the deterministic result rather
+than to an error page. The API's own message is included in the `LLMError` because it
+names the replacement model when one retires — which is how `gemini-2.5-flash` was found
+to be closed to new keys during this phase.

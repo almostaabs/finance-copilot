@@ -4,7 +4,8 @@ Everything found during the Phase 0-8 build, the first manual runs, and two
 deliberate stress-test passes. Ordered by severity. Each item says what it
 is, how to reproduce it, why it happens, and what a fix costs.
 
-Status as of 2026-09-12, Phase 13. 394 tests pass, Ruff clean.
+Status as of 2026-09-17, Phase 14. 443 tests pass (1 deselected: the live
+Ollama contract), Ruff clean, CI green on GitHub Actions.
 The Phase 0-8 stress passes found six defects, all fixed with regression
 tests in `tests/test_stress_findings.py`. The Phase 9-13 stress pass found
 four more (section H below), all fixed with regression tests in
@@ -70,9 +71,43 @@ types, and the `Maybe`/`Unavailable` core. Purely organisational.
   Ollama with `qwen2.5:3b`. The six rejection paths *are* tested against a
   scripted fake; what is untested is whether a real `qwen2.5:3b` returns
   schema-valid JSON in practice. Run with `uv run pytest -m ollama`.
-- **CI has never executed.** `.github/workflows/ci.yml` is committed but the
-  repository has no remote, so GitHub Actions has never run it. The same
-  sequence passes locally.
+- ~~**CI has never executed.**~~ Resolved in Phase 14: the repository now has
+  a remote and Actions runs the same sequence on every push to `master`. Green.
+
+### 4. Deployment limits of the free hosted demo (LOW, by choice)
+
+The app is live at <https://finance-copilot-almostaabs.streamlit.app> on
+Streamlit Community Cloud. Four consequences, all accepted rather than fixed:
+
+- **The container sleeps after roughly twelve hours with no traffic.** The
+  first visit then shows a wake button and takes about thirty seconds. There is
+  no setting to disable this on the free tier. Options: accept and say so in the
+  README (chosen), or move to a paid host (~$5/month). A keep-alive pinger is
+  not an option: it is synthetic traffic against a free service's fair-use
+  terms.
+- **No Ollama on the host, so both AI features are unavailable there.** The
+  sidebar toggle is still rendered and will simply fail to reach a model. Fix is
+  either a hosted client behind the existing `LLMClient` Protocol, or hiding the
+  toggle when no client is reachable. Not yet done.
+- **History is switched off on the deployment.** One container serves every
+  visitor, so persisting an analysis would list one person's uploaded report on
+  the next person's page. `FINCOPILOT_HISTORY=off` in the host's secrets; the
+  page says so in words rather than showing a silently empty list. Covered by
+  tests in both directions in `tests/test_app.py`.
+- **No real annual report has been run on the hosted container.** Only
+  `golden_us.pdf` (27 KB) has been exercised live. A 480-page report takes ~90 s
+  and unknown memory locally; whether the free 1 GB container survives one is
+  untested. Worth measuring before anyone is pointed at it with a big PDF.
+
+### 5. `requirements.txt` is ignored by the current host (LOW)
+
+It was added so a pip-based host could install the project (the package lives
+under `src/`, so without installing it `app.py` cannot import `fincopilot`).
+Streamlit Community Cloud detected `uv.lock` first and used `uv sync` instead,
+which works for the same reason. The file is kept because it is what makes the
+project installable on any other host; it is simply not the path in use today.
+
+---
 
 ---
 

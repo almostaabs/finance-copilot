@@ -1,17 +1,26 @@
 # Finance Copilot
 
-A local tool that reads a company's annual report (PDF) and shows a trustworthy
-financial analysis: the key numbers, the ratios, how they changed year over year,
-whether the statements add up, and a list of warning signs. Every number on screen
-can be traced to the exact row on the exact page it came from. Nothing is guessed,
-and no AI ever supplies a number.
+**[Try it live](https://finance-copilot-almostaabs.streamlit.app)** &middot;
+reads a company's annual report (PDF) and shows a financial analysis you can
+check: the key numbers, the ratios, how they changed year over year, whether the
+statements add up, and a list of warning signs.
+
+Every number on screen traces back to the exact row on the exact page it came
+from. Nothing is guessed, and no AI ever supplies a number. When the system
+cannot determine something it says so, with the reason, instead of printing a
+zero.
 
 ![Dashboard overview](docs/screenshots/overview.png)
 
-**Status:** Phases 0-13 complete. 442 tests, all passing. Runs entirely on your
-machine; no data leaves it. Validated on five real annual reports (Apple,
-Berkshire Hathaway, Wipro, Microsoft, and a small US bank), see
+**Status:** Phases 0-14 complete. 443 tests, all passing. Deployed on Streamlit
+Community Cloud; also runs entirely on your own machine, where no data leaves it.
+Validated on five real annual reports (Apple, Berkshire Hathaway, Wipro,
+Microsoft, and a small US bank), see
 [docs/PHASE12_VALIDATION.md](docs/PHASE12_VALIDATION.md).
+
+The hosted demo is on a free tier: if nobody has used it for a while the first
+visit takes about thirty seconds to wake the container. Press **Load sample
+report** to see a full analysis without finding a PDF first.
 
 ---
 
@@ -100,6 +109,22 @@ with `qwen2.5:3b` or any model you name). It is used for exactly two things:
 
 Switch it off and nothing else changes.
 
+On the hosted demo there is no Ollama server, so the toggle has nothing to talk
+to and the two AI features stay unavailable. Everything else — extraction,
+ratios, red flags, provenance, charts — is deterministic and works identically
+there and locally, to the digit.
+
+## The hosted demo vs running it yourself
+
+| | Hosted demo | Your machine |
+|---|---|---|
+| Analysis | identical, same code, same numbers | identical |
+| Your PDF | uploaded to a container Streamlit runs, analysed in memory, never written to disk | never leaves your machine |
+| History | **off** (`FINCOPILOT_HISTORY=off`) — one container serves every visitor, so one person's analysis must not be listed for the next | on, in a local SQLite file |
+| Optional AI | unavailable, no model server | works with Ollama installed |
+| First load | up to ~30s if the free container has gone to sleep | instant |
+
+
 ## The rules the system is built on
 
 1. **Numbers come only from the document.** A financial value cannot be constructed
@@ -132,6 +157,7 @@ are rejected; there is no OCR. No currency conversion, ever.
 
 ```
 app.py                       the dashboard (UI wiring only)
+requirements.txt             installs the project for pip-based deploy hosts
 pipeline.py                  the stages, in order, and nothing else
 demo.py                      run an analysis and print it
 src/fincopilot/types.py      every data contract

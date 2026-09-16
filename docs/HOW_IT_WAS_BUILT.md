@@ -19,9 +19,9 @@ system accurately to engineers. Short on purpose.
    code happened to produce.
 3. **Tests before code, every time.** For each feature the failing test was
    written first, then the smallest code that makes it pass. 297 automated
-   tests existed at Phase 8; 442 exist now (441 run by default; one is skipped
+   tests existed at Phase 8; 444 exist now (443 run by default; one is skipped
    unless a local Ollama is actually installed). A lint tool (Ruff) enforces style.
-4. **One phase, one commit.** Fourteen phases (0-13), each committed with its tests.
+4. **One phase, one commit.** Fifteen phases (0-14), each committed with its tests.
 
 ### Phases 0-8: the deterministic engine
 
@@ -49,6 +49,20 @@ system accurately to engineers. Short on purpose.
 | 13 | README, screenshots, security review, a stress pass over the new code with every finding fixed | this document, `docs/SECURITY_REVIEW.md`, `docs/KNOWN_ISSUES.md` |
 | 13b | Visual results: five charts drawn from the analysis (revenue and profit, margins, the balance-sheet identity, a cash waterfall, cross-checks against their tolerance) plus a design pass on the whole page | `src/fincopilot/charts.py` is pure and tested; a chart can only draw a value the analysis produced, and anything unavailable is absent from the picture and named in words |
 | 13c | A dark data-terminal redesign, and charts that respond to the pointer: click a legend entry to isolate a series, hover a mark to bring it forward and dim the rest. The interactivity is declared inside the chart specification itself, so it can only hide or highlight marks that already exist, never change a value. KPI cards and the red-flag grid became hand-written HTML so they could be laid out and animated properly, with the animation dropped entirely when the operating system asks for reduced motion. | `src/fincopilot/panel.py` escapes every string it renders and opens no network connection; the chart tests assert the selection parameters and the palette's contrast choices |
+
+### Phase 14: putting it on the internet
+
+| Phase | Built | Proven by |
+|---|---|---|
+| 14 | A public deployment on Streamlit Community Cloud, at <https://finance-copilot-almostaabs.streamlit.app>. Two real blockers were found by reading the code rather than by trial and error. First, the package lives under `src/`, so any host that installs with pip could not import `fincopilot` at all; a one-line `requirements.txt` that installs the project itself fixes it. Second, a shared container serves every visitor from one machine, so the local history feature would have listed one person's uploaded report on the next person's page; history is now switched off by an environment variable on shared deployments, and the page says so in words instead of showing an empty list. | a clean virtual environment installs the project from `requirements.txt` and runs the pipeline end to end on `golden_us.pdf`; `tests/test_app.py` covers history off and history on in both directions; the live site analyses the sample report with numbers identical to the local run |
+
+The engine did not change for any of this. The deployment is a different way of
+starting the same program, and it produces the same numbers to the digit,
+because every stage after reading the PDF is a pure function.
+
+What the hosted version cannot do: there is no Ollama server on a free
+container, so the two optional AI features are unavailable there. Everything
+that produces a number works identically.
 
 ### The test reports
 
@@ -197,4 +211,4 @@ and a chain back to the first thing that went wrong, so the answer to "why is
 ROE blank?" is "because equity was not matched, because the balance sheet was
 not found on any page", not a shrug. And every figure that *is* shown can be
 walked back to a printed cell on a numbered page. Those two properties are
-what the 442 tests exist to protect.
+what the 443 tests exist to protect.

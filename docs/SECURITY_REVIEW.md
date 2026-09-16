@@ -1,8 +1,17 @@
-# Security Review (Phase 13)
+# Security Review (Phases 13 and 14)
 
-Reviewed against spec section 13 plus the surfaces Phases 9-11 added. Date 2026-09-12.
-Threat model: a hostile PDF, a hostile or broken local model, a careless local user.
-The app is local-first and single-user; it is not hardened for exposure on a network.
+Reviewed against spec section 13 plus the surfaces Phases 9-11 added. Date 2026-09-12,
+extended 2026-09-17 for the public deployment.
+
+**Original threat model (Phase 13):** a hostile PDF, a hostile or broken local model, a
+careless local user. The app was local-first and single-user.
+
+**Revised threat model (Phase 14):** the app is now also reachable by anyone at
+<https://finance-copilot-almostaabs.streamlit.app>, with no authentication, where a
+single container serves every visitor. That adds two classes of concern the original
+review did not cover: one visitor's data reaching another, and an anonymous stranger
+being able to spend the container's resources. The section at the end covers both. The
+local posture below is unchanged and still applies.
 
 ## Spec 13 posture, verified
 
@@ -54,3 +63,66 @@ settings; a different file cannot receive another file's results.
   That is the feature; protect the file as you would the PDFs.
 - A 480-page PDF takes about 90 seconds to analyse. There is no worker queue; a second
   upload during that time waits. Page and size caps bound the work.
+
+
+## Phase 14: the public deployment
+
+### Found and fixed before going public
+
+**One visitor's analysis was listed on the next visitor's page.** The history feature
+writes every analysis to a SQLite file on the machine running the app. Locally that is
+the feature; on a shared container it means an anonymous stranger's uploaded report —
+its filename, its financial values, its red flags — appears in the sidebar for whoever
+loads the page next. Fixed before the first public link existed: `FINCOPILOT_HISTORY=off`
+is set in the host's secrets, `_store()` returns `None` under it so nothing is ever
+written, and `_history()` prints a plain explanation rather than an empty list. Both
+directions are covered by tests, including an assertion that the database file is never
+even created. See `tests/test_app.py`.
+
+**The package could not be imported by a pip-based host.** Not a security issue, but it
+is why `requirements.txt` exists; noted so nobody deletes it as redundant.
+
+### Accepted on the public deployment
+
+**Anyone can upload anything.** There is no authentication, no rate limit, and no
+account. The mitigations are the ones already in the ingestion gate — 50 MB cap,
+1000-page cap, magic-byte check, no execution of uploaded content, no `subprocess` and no
+`eval` anywhere in `src/` or `app.py` — plus whatever Streamlit Community Cloud applies
+in front of it. A determined visitor can still occupy the container by repeatedly
+uploading large reports: there is no worker queue, so a second analysis waits behind the
+first. Accepted, because the container holds no credentials, no persistent user data, and
+nothing whose loss would matter; the worst outcome is that the demo is slow or restarts.
+
+**Uploaded PDFs are held in memory on a machine the user does not control.** They are
+never written to disk and never persisted (history is off), but they are processed on
+Streamlit's infrastructure rather than the visitor's laptop. That is stated in the README
+so nobody uploads a confidential draft report under the impression it stays local. Anyone
+who needs the original local-only guarantee runs it locally, which is unchanged and is
+still the primary mode.
+
+**The analysis cache is process-wide, not per-visitor.** `_analyze` is wrapped in
+`st.cache_data`, keyed on the exact uploaded bytes plus the AI settings. On a shared
+container that cache spans visitors: if two people upload byte-identical files, the
+second gets the first's cached result. This is not a disclosure — the key *is* the file,
+so a visitor can only reach a cached entry for a document they already hold in full — and
+it cannot be enumerated or listed from the UI. Recorded because the property changes
+meaning between the local and hosted cases, and a future cache key that is not the whole
+document would break the argument.
+
+**No model server is reachable from the deployment.** Both AI features therefore stay
+unavailable there, which removes the hostile-model surface entirely on the public
+instance. If a hosted LLM client is added later, its key belongs in the host's secrets
+and the existing response gates — six rejection paths for the row picker, the grounding
+gate for the narrative — apply unchanged, because the pipeline receives a client through
+a Protocol and does not care who implements it.
+
+### Secrets audit before publishing
+
+The repository was checked before it was made public. It contains `.env.example`
+(localhost defaults and upload limits, no values that are secret) and
+`.streamlit/config.toml` (theme, `maxUploadSize`, `headless`). `.streamlit/secrets.toml`
+is gitignored and has never been committed. No API keys, tokens, or credentials exist in
+the history. The five real annual reports used for validation were committed once by
+mistake and then removed from the history entirely, before the repository was published,
+because they are the publishers' documents; `tests/fixtures/real/README.md` records where
+to download each one instead.

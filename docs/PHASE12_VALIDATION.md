@@ -1,8 +1,10 @@
 # Phase 12: real annual-report validation
 
 Three public annual reports were run through the pipeline on 2026-09-12. The PDFs are
-**not** committed (copyright, size); they were downloaded to a scratch directory and run with
-`uv run python demo.py <path>`. Anyone can repeat this with the same files.
+**not** committed (they are the publishers' documents, and they are large); they were
+downloaded to a scratch directory and run with `uv run python demo.py <path>`. Anyone can
+repeat this with the same files: `tests/fixtures/real/README.md` lists where to download
+each one, and `tests/fixtures/real/run_all.py` is the harness that runs the set.
 
 | Report | Pages | Format | Before rework | After rework |
 |---|---|---|---|---|

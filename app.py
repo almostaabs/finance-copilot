@@ -339,7 +339,7 @@ def _landing() -> None:
             "Checks that add up",
             "Assets against liabilities and equity, gross profit, free cash flow.",
         ),
-        ("Optional local AI", "Picks unmatched rows and writes a cited narrative. Never a number."),
+        ("Optional AI", "Picks unmatched rows and writes a cited narrative. Never a number."),
     )
     for col, (h, p) in zip(cols, features, strict=True):
         col.markdown(f'<div class="feature"><h4>{h}</h4><p>{p}</p></div>', unsafe_allow_html=True)

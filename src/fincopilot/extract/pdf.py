@@ -100,6 +100,7 @@ def _probe_text_layer(page_texts: list[str]) -> None:
 _YEAR_RE = re.compile(r"(?<![0-9])(?:19|20|21)[0-9]{2}(?![0-9])")
 DEFAULT_X_TOLERANCE = 3.0
 TIGHT_X_TOLERANCE = 1.5
+Y_TOLERANCE = 1.5  # points; pdfplumber's default of 3.0 merges adjacent rows
 MIN_SPACE_RATIO = 0.08  # ordinary prose is ~0.12-0.18 spaces per character
 
 
@@ -245,7 +246,7 @@ def extract_pdf(
                     page_no,
                     page_texts[page_no - 1],
                     table_idx,
-                    found.extract(x_tolerance=x_tol),
+                    found.extract(x_tolerance=x_tol, y_tolerance=Y_TOLERANCE),
                     col_x,
                 )
                 if built is not None:
@@ -254,7 +255,14 @@ def extract_pdf(
                 # No ruled table worth reading: rebuild the grid from word positions.
                 words = [
                     Word(w["text"], float(w["x0"]), float(w["x1"]), float(w["top"]))
-                    for w in page.extract_words(x_tolerance=x_tol)
+                    # A statement printed with tight leading puts two rows inside
+                    # pdfplumber's default 3.0pt line tolerance. The rows then merge
+                    # into one cluster, sort by x0, and a neighbour's glyph lands in
+                    # the middle of a number: '245,122' comes out as '245,' + '122'.
+                    # The fragment is not a valid amount, so the whole row collapses
+                    # into its label and every figure on it is lost. text_grid does
+                    # its own line assembly, so reading words row-tight costs nothing.
+                    for w in page.extract_words(x_tolerance=x_tol, y_tolerance=Y_TOLERANCE)
                 ]
                 grid = text_grid(words)
                 if grid is not None:

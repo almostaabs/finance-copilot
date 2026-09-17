@@ -25,6 +25,13 @@ _KIND_PATTERNS: dict[StatementKind, tuple[str, ...]] = {
         r"statements? of income",
         r"income statements?",
         r"statements? of comprehensive income",
+        # Microsoft heads its statements noun-first: "COMPREHENSIVE INCOME
+        # STATEMENTS", "CASH FLOWS STATEMENTS". Without these the pages carry
+        # no heading at all, and a headingless page is taken for a continuation
+        # of the one before it -- which silently glues the comprehensive income
+        # statement onto the income statement, where its own "Net income" row
+        # then collides with the real one and both are dropped as a conflict.
+        r"comprehensive income statements?",
         r"statements? of earnings",
     ),
     StatementKind.BALANCE: (
@@ -33,7 +40,7 @@ _KIND_PATTERNS: dict[StatementKind, tuple[str, ...]] = {
     ),
     StatementKind.CASH_FLOW: (
         r"statements? of cash flows?",
-        r"cash flow statements?",
+        r"cash flows? statements?",
     ),
 }
 
@@ -49,6 +56,21 @@ _NUMERIC_TOKEN = re.compile(r"\(?\d[\d,]*(?:\.\d+)?\)?")
 MIN_NUMERIC_TOKENS = 8
 MIN_NUMERIC_FRACTION = 0.25
 
+# A statement heading is a title, not a sentence. Reports discuss their own
+# statements in prose, and a paragraph that happens to begin "Consolidated
+# income statements in a separate note to the financial statements at each..."
+# otherwise reads as a consolidated anchor -- which is enough to make a note
+# page outrank the real statement and, in a report whose true headings carry no
+# "consolidated" prefix, to discard every genuine statement in the document.
+# Real headings run 2-6 words across the reference reports; prose runs 13+.
+# A genuine heading longer than this only loses its anchor: the scored fallback
+# can still find its table.
+MAX_HEADING_WORDS = 8
+
+
+def _is_heading(line: str) -> bool:
+    return len(line.split()) <= MAX_HEADING_WORDS
+
 
 def anchor_lines(text: str) -> tuple[str, ...]:
     """The heading lines themselves, whitespace-normalised. Used by stitching:
@@ -56,7 +78,7 @@ def anchor_lines(text: str) -> tuple[str, ...]:
     return tuple(
         " ".join(line.split()).lower()
         for line in text.splitlines()
-        if any(rx.match(line) for rx in _ANCHOR_RE.values())
+        if _is_heading(line) and any(rx.match(line) for rx in _ANCHOR_RE.values())
     )
 
 
@@ -64,6 +86,8 @@ def find_anchors(text: str) -> list[tuple[StatementKind, Scope]]:
     """Heading lines that name a financial statement, with their scope."""
     hits: list[tuple[StatementKind, Scope]] = []
     for line in text.splitlines():
+        if not _is_heading(line):
+            continue
         for kind, rx in _ANCHOR_RE.items():
             m = rx.match(line)
             if not m:

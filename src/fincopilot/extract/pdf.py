@@ -187,6 +187,23 @@ def _build_table(
     )
 
 
+def _page_texts(pdf: pdfplumber.PDF, page_count: int, x_tol: float) -> list[str]:
+    """Text for every page, releasing each page as soon as it is read.
+
+    pdfplumber keeps every char, line and rect it parsed on the Page object for
+    the lifetime of the PDF. Over a 481-page annual report that is hundreds of
+    megabytes held for text already copied out, which is enough to get the
+    process killed outright on a small container -- no traceback, just a dead
+    app. close() drops the cache; the page re-parses if asked again.
+    """
+    texts = []
+    for i in range(page_count):
+        page = pdf.pages[i]
+        texts.append(page.extract_text(x_tolerance=x_tol) or "")
+        page.close()
+    return texts
+
+
 def extract_pdf(
     data: bytes, ref: DocumentRef, *, max_pages: int = DEFAULT_MAX_PAGES
 ) -> RawDocument:
@@ -206,16 +223,14 @@ def extract_pdf(
         if page_count > max_pages:
             raise TooManyPages(f"{page_count} pages; limit is {max_pages}")
 
-        page_texts = [pdf.pages[i].extract_text() or "" for i in range(page_count)]
         x_tol = DEFAULT_X_TOLERANCE
+        page_texts = _page_texts(pdf, page_count, x_tol)
         if _space_ratio(page_texts) < MIN_SPACE_RATIO:
             # Some fonts (Berkshire's 10-K, for one) pack glyphs so tightly that
             # pdfplumber's default tolerance swallows every space. Re-read once,
             # document-wide, with a tighter tolerance. Deterministic.
             x_tol = TIGHT_X_TOLERANCE
-            page_texts = [
-                pdf.pages[i].extract_text(x_tolerance=x_tol) or "" for i in range(page_count)
-            ]
+            page_texts = _page_texts(pdf, page_count, x_tol)
         _probe_text_layer(page_texts)
 
         tables: list[ExtractedTable] = []
@@ -250,6 +265,9 @@ def extract_pdf(
                     )
                     if built is not None:
                         tables.append(built)
+            # find_tables and extract_words repopulate the same cache _page_texts
+            # frees, so a long run of candidate pages rebuilds it page by page.
+            page.close()
 
     refs = {row.ref.ref_id: row.ref for t in tables for row in t.rows}
     return RawDocument(

@@ -19,7 +19,7 @@ system accurately to engineers. Short on purpose.
    code happened to produce.
 3. **Tests before code, every time.** For each feature the failing test was
    written first, then the smallest code that makes it pass. 297 automated
-   tests existed at Phase 8; 452 exist now (450 run by default; two are skipped
+   tests existed at Phase 8; 453 exist now (451 run by default; two are skipped
    unless a live Ollama or a Gemini key is present). A lint tool (Ruff) enforces style.
 4. **One phase, one commit.** Sixteen phases (0-15), each committed with its tests.
 
@@ -222,4 +222,4 @@ and a chain back to the first thing that went wrong, so the answer to "why is
 ROE blank?" is "because equity was not matched, because the balance sheet was
 not found on any page", not a shrug. And every figure that *is* shown can be
 walked back to a printed cell on a numbered page. Those two properties are
-what the 450 tests exist to protect.
+what the 451 tests exist to protect.

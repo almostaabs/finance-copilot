@@ -5,4 +5,8 @@
 # Installing the project itself is what puts `fincopilot` on the import path:
 # the package lives under src/, so without this line app.py cannot import it.
 # Its runtime dependencies (pandas, pdfplumber, streamlit) are installed with it.
-.
+#
+# Editable, because a plain `.` builds a wheel that pip then caches by version:
+# a redeploy of changed source under the same version reinstalls the old wheel
+# and the app runs code that is no longer in the repository.
+-e .

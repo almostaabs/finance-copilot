@@ -4,7 +4,7 @@ Everything found during the Phase 0-8 build, the first manual runs, and two
 deliberate stress-test passes. Ordered by severity. Each item says what it
 is, how to reproduce it, why it happens, and what a fix costs.
 
-Status as of 2026-09-17, Phase 15. 450 tests pass (2 deselected: the live
+Status as of 2026-09-17, Phase 15. 451 tests pass (2 deselected: the live
 Ollama and Gemini contracts), Ruff clean, CI green on GitHub Actions.
 The Phase 0-8 stress passes found six defects, all fixed with regression
 tests in `tests/test_stress_findings.py`. The Phase 9-13 stress pass found
@@ -109,6 +109,24 @@ under `src/`, so without installing it `app.py` cannot import `fincopilot`).
 Streamlit Community Cloud detected `uv.lock` first and used `uv sync` instead,
 which works for the same reason. The file is kept because it is what makes the
 project installable on any other host; it is simply not the path in use today.
+
+### 6. A deploy can run code that is no longer in the repository (was HIGH)
+
+Phase 15 pushed a new `app.py` and a new `client.py` together, and the live site
+answered with an `ImportError` on the very import that had just been added. The
+source on the remote was correct. What was stale was the *install*: the host
+builds the project once and caches it under its version, and the version had sat
+at `0.1.0` since Phase 0, so a redeploy of changed source reinstalled the old
+build. The app was running a `client.py` that had no `GeminiClient` in it.
+
+Fixed two ways. The version is now bumped with the release (`0.2.0`), and
+`requirements.txt` installs with `-e .` so a pip host tracks the working tree
+instead of a cached wheel. `test_version_matches_pyproject` fails if
+`__version__` and the pyproject version ever drift apart again.
+
+The lesson is not about one host: any deploy that installs a package rather than
+running from a checkout will do this, and an unchanged version number is what
+makes it silent.
 
 ---
 

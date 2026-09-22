@@ -1,4 +1,4 @@
-https://github.com/user-attachments/assets/ce2ec153-31ea-4316-955e-a0be4a490a6a
+https://github.com/user-attachments/assets/50fdb8fe-4c3e-4059-8fd5-4571faa9cf8c
 
 # Finance Copilot
 

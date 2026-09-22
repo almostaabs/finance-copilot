@@ -1,4 +1,4 @@
-[![Watch the demo](docs/demo-poster.jpg)](https://github.com/almostaabs/finance-copilot/raw/master/docs/demo.mp4)
+https://github.com/user-attachments/assets/ce2ec153-31ea-4316-955e-a0be4a490a6a
 
 # Finance Copilot
 

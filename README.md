@@ -1,4 +1,6 @@
-![demo.mp4](docs/demo.mp4)
+<video src="https://github.com/almostaabs/finance-copilot/raw/master/docs/demo.mp4" controls muted playsinline width="100%">
+  <a href="https://github.com/almostaabs/finance-copilot/raw/master/docs/demo.mp4">Watch the demo</a>
+</video>
 
 # Finance Copilot
 

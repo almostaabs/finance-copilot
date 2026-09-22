@@ -1,3 +1,5 @@
+![demo.mp4](docs/demo.mp4)
+
 # Finance Copilot
 
 **[Try it live](https://finance-copilot-almostaabs.streamlit.app)** &middot;

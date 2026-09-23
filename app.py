@@ -94,7 +94,9 @@ CSS = """
   --accent:#4da3ff; --pos:#3ddc97; --neg:#ff6b6b; --warn:#ffb454;
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", monospace;
 }
-#MainMenu, footer, header[data-testid="stHeader"] {visibility:hidden; height:0;}
+#MainMenu, footer {visibility:hidden; height:0;}
+/* The header holds the expand-sidebar button: hiding it strands a collapsed sidebar. */
+header[data-testid="stHeader"] {background:transparent;}
 .stApp {background:var(--bg);}
 .block-container {padding-top:1.4rem; padding-bottom:4rem; max-width:1320px;}
 section[data-testid="stSidebar"] {background:var(--surface); border-right:1px solid var(--line);}

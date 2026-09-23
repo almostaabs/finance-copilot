@@ -35,3 +35,20 @@ the audit trail: it is how a later reader can tell what each phase changed and w
   `result.basis`. A full `--check` takes ~5 min with the 6 local real reports (fixtures alone: seconds).
   Real reports present: 2025_AnnualReport, apple_10k_2023, berkshire_2023, merchants_bank_2024,
   microsoft_fy24, wipro_fy24. Default branch is `master`; roadmap "main" means `master`.
+
+## fix/gemini-unicode: Gemini "UnicodeEncodeError". Out-of-band fix, PASS, 2026-09-24
+
+- Branch / merge commit: `fix/gemini-unicode` / `d8f513e` (fix `d3db674`, docs `813dddb`)
+- Cause: `GeminiClient` put the model name into the URL and the key into a header unchecked; a
+  non-ASCII character there (non-breaking hyphen, NBSP, zero-width space) makes `http.client` raise
+  `UnicodeEncodeError`, reported as "gemini request failed: UnicodeEncodeError". Not PDF- or OS-specific:
+  the Apple prompt is pure ASCII and goes in the UTF-8 body.
+- Exact trigger not confirmed: a live Apple run got HTTP 503 then a timeout, and the human did not know
+  whether the model box was pasted ("Don't know; fix both"). Both mechanisms reproduced offline and covered.
+- Fix: `complete_json` refuses a model or key with any character outside printable ASCII before any
+  request, raising `LLMError` that names the field and code point (never the key), so callers decline as usual.
+- Tests: 454 → 457 passed; `test_unsendable_model_or_key_is_named_before_any_request` fails 3/3 on the
+  pre-fix client, passes after
+- Lint/format: pass. Snapshot: no diff (fixtures 599, real 585). Eval: n/a. App smoke: pass
+- Invariant spot-check: 1-5 ✔ (no new values, rounding, HTML or network calls; change is inside `ai/`)
+- Known issues added: 0d, "-0.0% vs prior year" coloured red for a sub-rounding change

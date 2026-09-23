@@ -45,6 +45,8 @@ the audit trail: it is how a later reader can tell what each phase changed and w
   the Apple prompt is pure ASCII and goes in the UTF-8 body.
 - Exact trigger not confirmed: a live Apple run got HTTP 503 then a timeout, and the human did not know
   whether the model box was pasted ("Don't know; fix both"). Both mechanisms reproduced offline and covered.
+  Follow-up check 2026-09-24: the key in `.streamlit/secrets.toml` is printable ASCII (39 chars) and
+  `GEMINI_API_KEY` is unset, so the key is ruled out; a pasted model name remains the likely trigger.
 - Fix: `complete_json` refuses a model or key with any character outside printable ASCII before any
   request, raising `LLMError` that names the field and code point (never the key), so callers decline as usual.
 - Tests: 454 → 457 passed; `test_unsendable_model_or_key_is_named_before_any_request` fails 3/3 on the

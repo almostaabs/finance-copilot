@@ -49,6 +49,13 @@ the colour comes from the trend's economic reading of the unrounded change
 rounds away. **Options.** (a) Render a rounded zero as "0.0%" and read it as
 neutral. (b) Accept. (a) changes display text only, not any number.
 
+### 0e. Gemini 503 and timeouts are not retried (LOW)
+
+Gemini 503 (model overloaded) and request timeouts are not retried; the
+narrative fails intermittently on the free tier. `GeminiClient.complete_json`
+makes one request and turns any failure into `LLMError`, so the narrative
+declines. **Option.** One retry with exponential backoff for 503/timeout only.
+
 ### 1. No plausibility check on any extracted number (MEDIUM)
 
 `hostile.pdf` reports revenue of 999,999,999,999,999,999.00 crore. The system

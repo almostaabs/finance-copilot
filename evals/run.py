@@ -36,6 +36,7 @@ ROOT = Path(__file__).resolve().parents[1]
 EVALS = ROOT / "evals"
 CORPUS = EVALS / "corpus.csv"
 LOCK = EVALS / "corpus.lock.json"
+EXPOSED = EVALS / "exposed.json"  # holdout tickers whose results were viewed
 TRUTH_DIR = EVALS / "truth"
 RESULTS_DIR = EVALS / "results"
 CACHE_DIR = EVALS / ".cache"
@@ -207,14 +208,32 @@ def _as_records(dicts: list[dict]) -> list[OutcomeRecord]:
     ]
 
 
+def read_exposed(path: Path = EXPOSED) -> dict[str, str]:
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+
 def build_report(
-    companies: list[dict], records: list[dict], *, split: str, bucket: str, only: list[str]
+    companies: list[dict],
+    records: list[dict],
+    *,
+    split: str,
+    bucket: str,
+    only: list[str],
+    exposed: dict[str, str],
 ) -> dict:
-    """Totals overall and per bucket: financials are reported separately, never blended."""
-    by_bucket = {
-        b: summarize(_as_records([r for r in records if r["bucket"] == b]))
-        for b in sorted({c["bucket"] for c in companies})
-    }
+    """Totals overall and per bucket: financials are reported separately, never blended.
+
+    A holdout company whose results were looked at is `exposed`: it is kept out of the
+    headline totals and summarised on its own, so the holdout number stays unseen."""
+    hidden = {c["ticker"] for c in companies if c["split"] == "holdout" and c["ticker"] in exposed}
+    for c in companies:
+        c["exposed"] = exposed[c["ticker"]] if c["ticker"] in hidden else None
+    headline = [r for r in records if r["ticker"] not in hidden]
+    summary = {"all": summarize(_as_records(headline))}
+    for b in sorted({c["bucket"] for c in companies}):
+        summary[b] = summarize(_as_records([r for r in headline if r["bucket"] == b]))
+    if hidden:
+        summary["exposed"] = summarize(_as_records([r for r in records if r["ticker"] in hidden]))
     return {
         "split": split,
         "bucket": bucket,
@@ -222,8 +241,9 @@ def build_report(
         "git_sha": _git_sha(),
         "timestamp": datetime.now(UTC).isoformat(timespec="seconds"),
         "errors": sum(c["status"] == "error" for c in companies),
+        "exposed": sorted(hidden),
         "companies": companies,
-        "summary": {"all": summarize(_as_records(records)), **by_bucket},
+        "summary": summary,
         "records": records,
     }
 
@@ -249,6 +269,12 @@ def markdown(report: dict) -> str:
     lines = [f"# XBRL eval: split={report['split']} bucket={report['bucket']}", ""]
     lines += [f"git {report['git_sha']} at {report['timestamp']}", "", "## Totals", ""]
     lines += [*_table("scope", {k: v["totals"] for k, v in s.items()}), ""]
+    if report["exposed"]:
+        lines += [
+            f"exposed (holdout, results already viewed; not in all/general/financial): "
+            f"{', '.join(report['exposed'])}",
+            "",
+        ]
     lines += ["## Per concept (all buckets), by wrong desc", ""]
     per_concept = sorted(s["all"]["per_concept"].items(), key=lambda kv: -kv[1]["wrong"])
     lines += [*_table("concept", dict(per_concept)), ""]
@@ -320,7 +346,14 @@ def main(argv: list[str] | None = None) -> int:
 
     client = EdgarClient.from_env(CACHE_DIR / "http")
     companies, records = run(rows, args.workers, client)
-    report = build_report(companies, records, split=args.split, bucket=args.bucket, only=args.only)
+    report = build_report(
+        companies,
+        records,
+        split=args.split,
+        bucket=args.bucket,
+        only=args.only,
+        exposed=read_exposed(),
+    )
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     out = RESULTS_DIR / f"latest_{args.split}.json"
     out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

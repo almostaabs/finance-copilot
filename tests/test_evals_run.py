@@ -146,11 +146,49 @@ def test_main_exits_1_only_when_compare_regresses(tmp_path, monkeypatch, old_wro
         "tags": ["Revenues"], "ref_id": "r", "row_label": "Revenue", "page": 1,
         "reason": None, "bucket": "general",
     }  # fmt: skip
-    company = {"ticker": "MSFT", "bucket": "general", "status": "ok", "error": None}
+    company = {"ticker": "MSFT", "bucket": "general", "split": "dev", "status": "ok", "error": None}
     monkeypatch.setattr(R, "RESULTS_DIR", tmp_path)
+    monkeypatch.setattr(R, "EXPOSED", tmp_path / "none.json")
     monkeypatch.setattr(R.EdgarClient, "from_env", staticmethod(lambda *a, **k: None))
     monkeypatch.setattr(R, "run", lambda rows, workers, client: ([company], [record]))
     old = tmp_path / "old.json"
     old.write_text(json.dumps(_report(old_wrong, "0.0000")))
     assert R.main(["--only", "MSFT", "--compare", str(old)]) == code
     assert (tmp_path / "latest_dev.json").exists()
+
+
+def _rec(ticker: str, bucket: str, outcome: str) -> dict:
+    return {
+        "ticker": ticker, "accession": "A", "concept": "revenue", "end_year": 2024,
+        "outcome": outcome, "sub": "value" if outcome == "wrong" else None,
+        "app_value": "1", "truth_values": ["1"], "tags": ["Revenues"], "ref_id": "r",
+        "row_label": "Revenue", "page": 1, "reason": None, "bucket": bucket,
+    }  # fmt: skip
+
+
+def test_exposed_holdout_company_is_kept_out_of_headline_totals_and_reported_alone():
+    companies = [
+        {"ticker": "AAPL", "bucket": "general", "split": "holdout", "status": "ok"},
+        {"ticker": "INTC", "bucket": "general", "split": "holdout", "status": "ok"},
+        {"ticker": "KO", "bucket": "general", "split": "dev", "status": "ok"},
+    ]
+    records = [_rec("AAPL", "general", "wrong"), _rec("INTC", "general", "correct")]
+    records.append(_rec("KO", "general", "correct"))
+    exposed = {"AAPL": "viewed", "KO": "viewed"}  # KO is dev: exposure only matters in holdout
+    report = R.build_report(
+        companies, records, split="holdout", bucket="all", only=[], exposed=exposed
+    )
+    assert report["exposed"] == ["AAPL"]
+    assert report["summary"]["all"]["totals"]["wrong"] == 0
+    assert report["summary"]["all"]["totals"]["correct"] == 2
+    assert report["summary"]["general"]["totals"]["wrong"] == 0
+    assert report["summary"]["exposed"]["totals"]["wrong"] == 1
+    assert report["summary"]["exposed"]["per_filing"].keys() == {"AAPL_A"}
+    assert [c["exposed"] for c in companies] == ["viewed", None, None]
+    assert "exposed (holdout" in R.markdown(report)
+
+
+def test_exposed_file_lists_the_pilot_holdout_companies():
+    exposed = R.read_exposed()
+    pilot = ("AAPL", "MSFT", "KO", "XOM", "JPM")
+    assert set(exposed) == {t for t in pilot if R.split_for(t) == "holdout"} == {"AAPL"}

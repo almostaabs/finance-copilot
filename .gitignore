@@ -25,3 +25,6 @@ tests/fixtures/real/*.pdf
 # JSON, and per-run results. Only baseline_*.json results are committed.
 evals/.cache/
 evals/results/latest_*.json
+
+# Local git worktrees; never part of the repository.
+.claude/worktrees/

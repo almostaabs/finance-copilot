@@ -16,6 +16,20 @@ four more (section H below), all fixed with regression tests in
 
 ## Open - needs a decision
 
+### T1.1-a. A footnote table's totals replace the balance sheet's (HIGH: a wrong number is shown)
+
+Found by the T1.1 XBRL eval pilot. JPMorgan's 10-K (accession
+0001628280-26-008131, rendered page 169) prints the consolidated balance sheet
+with "Total assets(a)" and "Total liabilities(a)" (footnote marker attached),
+then, on the same page, footnote (a)'s table of consolidated-VIE assets and
+liabilities with plain "Total assets" and "Total liabilities" rows. The app
+mapped total_assets and total_liabilities from the footnote table: 43,295 /
+41,076 and 28,642 / 27,777 $M (2025 / 2024) instead of the balance sheet's
+4,424,900 / 4,002,814 and 4,062,462 / 3,658,056 $M, which match the filer's
+XBRL `Assets` and `Liabilities`. All four are `wrong` in the eval. **Not fixed
+in T1.1** (the phase only measures); a dedicated fix phase follows.
+Reproduce: `uv run python -m evals.run --split all --only JPM`.
+
 ### 0. Large reports are slow (MEDIUM)
 
 Wipro's 481-page report takes about 88 s; Berkshire's 152 pages about 40 s;
@@ -55,6 +69,26 @@ Gemini 503 (model overloaded) and request timeouts are not retried; the
 narrative fails intermittently on the free tier. `GeminiClient.complete_json`
 makes one request and turns any failure into `LLMError`, so the narrative
 declines. **Option.** One retry with exponential backoff for 503/timeout only.
+
+### T1.1-b. XOM is hand-locked to its pre-reorganisation CIK (LOW)
+
+On 2026-07-01 Exxon Mobil became a subsidiary of a new holding company,
+ExxonMobil Holdings Corp (CIK 2115436). The SEC ticker map now points `XOM` at
+that CIK, which has no 10-K, so automatic selection fails with "no 10-K filed
+on or before 2026-06-30". By human decision (2026-09-24) `evals/corpus.lock.json`
+pins XOM to CIK 0000034088 and accession 0000034088-26-000045 (FY2025 10-K,
+filed 2026-02-18). `evals/run.py` takes the CIK from the lock whenever an entry
+exists and never re-looks-up the ticker, so the override holds. Revisit once
+the holding company files its own 10-K.
+
+### T1.1-c. Eval PDFs rendered from EDGAR HTML are not company-published PDFs (MEDIUM)
+
+Most of the XBRL eval corpus is the filing's HTML rendered to PDF by headless
+Chromium. Those PDFs have no ruled table lines, so they exercise the
+`textgrid` path and a layout no company designed for print. Accuracy on them
+is not accuracy on the PDFs users upload. Four companies (AAPL, MSFT, BRK-B,
+MBIN) are scored on their published PDFs to cover both; `evals/README.md`
+states the caveat next to every number.
 
 ### 1. No plausibility check on any extracted number (MEDIUM)
 

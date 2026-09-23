@@ -20,3 +20,8 @@ tests/fixtures/real/*.pdf
 
 # Local-only regression snapshot of the real reports above (T1.0).
 .snapshots/
+
+# XBRL eval harness (T1.1): downloaded filings, rendered PDFs, companyfacts
+# JSON, and per-run results. Only baseline_*.json results are committed.
+evals/.cache/
+evals/results/latest_*.json

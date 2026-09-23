@@ -15,6 +15,10 @@ dev = [
     "ruff>=0.6",
     "reportlab>=4.2",
 ]
+# Eval-only: renders EDGAR HTML filings to PDF for the XBRL eval harness (T1.1).
+eval = [
+    "playwright>=1.45",
+]
 
 [tool.uv]
 # A deploy host that runs `uv sync` against uv.lock would otherwise install the
@@ -40,8 +44,9 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-m 'not ollama and not gemini'"
+addopts = "-m 'not ollama and not gemini and not network'"
 markers = [
     "ollama: requires a live Ollama server; deselected by default and in CI",
     "gemini: requires a live Gemini API key; deselected by default and in CI",
+    "network: requires network access (e.g. SEC EDGAR); deselected by default and in CI",
 ]

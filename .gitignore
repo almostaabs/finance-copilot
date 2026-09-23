@@ -17,3 +17,6 @@ data/
 # where to get each one, and run_all.py stays tracked so anyone can reproduce
 # the validation once they have downloaded them.
 tests/fixtures/real/*.pdf
+
+# Local-only regression snapshot of the real reports above (T1.0).
+.snapshots/

@@ -39,6 +39,16 @@ only safe fix; fuzzy matching stays out.
 (`metric@year`, `rule_id`, `subject@from->to`), so this cannot happen today.
 Noted so that a future ID format keeps the rule.
 
+### 0d. "-0.0% vs prior year" is coloured red for a sub-rounding change (LOW)
+
+A KPI card whose change is smaller than 0.05% in magnitude but negative, say
+-0.0004, reads "-0.0% vs prior year" in red. `display.relative_text` quantizes
+to one decimal and `Decimal` keeps the sign of zero, so the text says -0.0%;
+the colour comes from the trend's economic reading of the unrounded change
+(`views.py`, `reads = t.economic.value`). The card shows a change it also
+rounds away. **Options.** (a) Render a rounded zero as "0.0%" and read it as
+neutral. (b) Accept. (a) changes display text only, not any number.
+
 ### 1. No plausibility check on any extracted number (MEDIUM)
 
 `hostile.pdf` reports revenue of 999,999,999,999,999,999.00 crore. The system

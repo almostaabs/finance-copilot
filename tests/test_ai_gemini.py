@@ -98,6 +98,28 @@ def test_http_error_carries_the_apis_own_message(monkeypatch):
         GeminiClient(api_key="k").complete_json("p", {})
 
 
+@pytest.mark.parametrize(
+    ("field", "kwargs", "char"),
+    [
+        ("model name", {"api_key": "k", "model": "gemini\u20113.6\u2011flash"}, "U+2011"),
+        ("model name", {"api_key": "k", "model": "gemini-3.6-flash\u00a0"}, "U+00A0"),
+        ("API key", {"api_key": "k\u200b"}, "U+200B"),
+    ],
+)
+def test_unsendable_model_or_key_is_named_before_any_request(monkeypatch, field, kwargs, char):
+    # A pasted model name or key can carry a non-breaking hyphen, NBSP or zero-width
+    # space. http.client cannot put those in a URL or header, and the failure used to
+    # surface as an opaque "gemini request failed: UnicodeEncodeError".
+    def must_not_send(*a, **k):
+        raise AssertionError("request sent with an unsendable model or key")
+
+    monkeypatch.setattr(urllib.request, "urlopen", must_not_send)
+    with pytest.raises(LLMError, match=re.escape(field)) as err:
+        GeminiClient(**kwargs).complete_json("p", {})
+    assert char in str(err.value)
+    assert "k\u200b" not in str(err.value)  # never echo the key
+
+
 def test_response_without_text_is_a_decline_not_a_crash(monkeypatch):
     monkeypatch.setattr(urllib.request, "urlopen", lambda *a, **k: _Resp(b'{"candidates": []}'))
     with pytest.raises(LLMError):

@@ -1,0 +1,304 @@
+{
+  "accession": "0001193125-26-277521",
+  "notes": [],
+  "ticker": "ORCL",
+  "truth": [
+    {
+      "concept": "revenue",
+      "end_year": 2024,
+      "tags": [
+        "Revenues",
+        "RevenueFromContractWithCustomerExcludingAssessedTax"
+      ],
+      "values": [
+        "52961000000"
+      ]
+    },
+    {
+      "concept": "revenue",
+      "end_year": 2025,
+      "tags": [
+        "Revenues",
+        "RevenueFromContractWithCustomerExcludingAssessedTax"
+      ],
+      "values": [
+        "57399000000"
+      ]
+    },
+    {
+      "concept": "revenue",
+      "end_year": 2026,
+      "tags": [
+        "Revenues",
+        "RevenueFromContractWithCustomerExcludingAssessedTax"
+      ],
+      "values": [
+        "67357000000"
+      ]
+    },
+    {
+      "concept": "operating_income",
+      "end_year": 2024,
+      "tags": [
+        "OperatingIncomeLoss"
+      ],
+      "values": [
+        "15353000000"
+      ]
+    },
+    {
+      "concept": "operating_income",
+      "end_year": 2025,
+      "tags": [
+        "OperatingIncomeLoss"
+      ],
+      "values": [
+        "17678000000"
+      ]
+    },
+    {
+      "concept": "operating_income",
+      "end_year": 2026,
+      "tags": [
+        "OperatingIncomeLoss"
+      ],
+      "values": [
+        "20606000000"
+      ]
+    },
+    {
+      "concept": "net_income",
+      "end_year": 2024,
+      "tags": [
+        "NetIncomeLoss"
+      ],
+      "values": [
+        "10467000000"
+      ]
+    },
+    {
+      "concept": "net_income",
+      "end_year": 2025,
+      "tags": [
+        "NetIncomeLoss"
+      ],
+      "values": [
+        "12443000000"
+      ]
+    },
+    {
+      "concept": "net_income",
+      "end_year": 2026,
+      "tags": [
+        "NetIncomeLoss"
+      ],
+      "values": [
+        "17087000000"
+      ]
+    },
+    {
+      "concept": "total_assets",
+      "end_year": 2025,
+      "tags": [
+        "Assets"
+      ],
+      "values": [
+        "168361000000"
+      ]
+    },
+    {
+      "concept": "total_assets",
+      "end_year": 2026,
+      "tags": [
+        "Assets"
+      ],
+      "values": [
+        "261759000000"
+      ]
+    },
+    {
+      "concept": "current_assets",
+      "end_year": 2025,
+      "tags": [
+        "AssetsCurrent"
+      ],
+      "values": [
+        "24579000000"
+      ]
+    },
+    {
+      "concept": "current_assets",
+      "end_year": 2026,
+      "tags": [
+        "AssetsCurrent"
+      ],
+      "values": [
+        "46567000000"
+      ]
+    },
+    {
+      "concept": "cash",
+      "end_year": 2025,
+      "tags": [
+        "CashAndCashEquivalentsAtCarryingValue"
+      ],
+      "values": [
+        "10786000000"
+      ]
+    },
+    {
+      "concept": "cash",
+      "end_year": 2026,
+      "tags": [
+        "CashAndCashEquivalentsAtCarryingValue"
+      ],
+      "values": [
+        "31289000000"
+      ]
+    },
+    {
+      "concept": "current_liabilities",
+      "end_year": 2025,
+      "tags": [
+        "LiabilitiesCurrent"
+      ],
+      "values": [
+        "32643000000"
+      ]
+    },
+    {
+      "concept": "current_liabilities",
+      "end_year": 2026,
+      "tags": [
+        "LiabilitiesCurrent"
+      ],
+      "values": [
+        "41764000000"
+      ]
+    },
+    {
+      "concept": "short_term_borrowings",
+      "end_year": 2025,
+      "tags": [
+        "DebtCurrent"
+      ],
+      "values": [
+        "7271000000"
+      ]
+    },
+    {
+      "concept": "short_term_borrowings",
+      "end_year": 2026,
+      "tags": [
+        "DebtCurrent"
+      ],
+      "values": [
+        "7199000000"
+      ]
+    },
+    {
+      "concept": "equity",
+      "end_year": 2023,
+      "tags": [
+        "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"
+      ],
+      "values": [
+        "1556000000"
+      ]
+    },
+    {
+      "concept": "equity",
+      "end_year": 2024,
+      "tags": [
+        "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"
+      ],
+      "values": [
+        "9239000000"
+      ]
+    },
+    {
+      "concept": "equity",
+      "end_year": 2025,
+      "tags": [
+        "StockholdersEquity",
+        "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"
+      ],
+      "values": [
+        "20451000000",
+        "20969000000"
+      ]
+    },
+    {
+      "concept": "equity",
+      "end_year": 2026,
+      "tags": [
+        "StockholdersEquity",
+        "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"
+      ],
+      "values": [
+        "42508000000",
+        "43056000000"
+      ]
+    },
+    {
+      "concept": "operating_cash_flow",
+      "end_year": 2024,
+      "tags": [
+        "NetCashProvidedByUsedInOperatingActivities"
+      ],
+      "values": [
+        "18673000000"
+      ]
+    },
+    {
+      "concept": "operating_cash_flow",
+      "end_year": 2025,
+      "tags": [
+        "NetCashProvidedByUsedInOperatingActivities"
+      ],
+      "values": [
+        "20821000000"
+      ]
+    },
+    {
+      "concept": "operating_cash_flow",
+      "end_year": 2026,
+      "tags": [
+        "NetCashProvidedByUsedInOperatingActivities"
+      ],
+      "values": [
+        "31977000000"
+      ]
+    },
+    {
+      "concept": "capex",
+      "end_year": 2024,
+      "tags": [
+        "PaymentsToAcquirePropertyPlantAndEquipment"
+      ],
+      "values": [
+        "6866000000"
+      ]
+    },
+    {
+      "concept": "capex",
+      "end_year": 2025,
+      "tags": [
+        "PaymentsToAcquirePropertyPlantAndEquipment"
+      ],
+      "values": [
+        "21215000000"
+      ]
+    },
+    {
+      "concept": "capex",
+      "end_year": 2026,
+      "tags": [
+        "PaymentsToAcquirePropertyPlantAndEquipment"
+      ],
+      "values": [
+        "55663000000"
+      ]
+    }
+  ]
+}

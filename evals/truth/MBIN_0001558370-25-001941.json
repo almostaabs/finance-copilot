@@ -1,0 +1,177 @@
+{
+  "accession": "0001558370-25-001941",
+  "notes": [],
+  "ticker": "MBIN",
+  "truth": [
+    {
+      "concept": "net_income",
+      "end_year": 2022,
+      "tags": [
+        "NetIncomeLoss"
+      ],
+      "values": [
+        "219721000"
+      ]
+    },
+    {
+      "concept": "net_income",
+      "end_year": 2023,
+      "tags": [
+        "NetIncomeLoss"
+      ],
+      "values": [
+        "279234000"
+      ]
+    },
+    {
+      "concept": "net_income",
+      "end_year": 2024,
+      "tags": [
+        "NetIncomeLoss"
+      ],
+      "values": [
+        "320386000"
+      ]
+    },
+    {
+      "concept": "total_assets",
+      "end_year": 2022,
+      "tags": [
+        "Assets"
+      ],
+      "values": [
+        "12615227000"
+      ]
+    },
+    {
+      "concept": "total_assets",
+      "end_year": 2023,
+      "tags": [
+        "Assets"
+      ],
+      "values": [
+        "16952516000"
+      ]
+    },
+    {
+      "concept": "total_assets",
+      "end_year": 2024,
+      "tags": [
+        "Assets"
+      ],
+      "values": [
+        "18805732000"
+      ]
+    },
+    {
+      "concept": "total_liabilities",
+      "end_year": 2023,
+      "tags": [
+        "Liabilities"
+      ],
+      "values": [
+        "15251432000"
+      ]
+    },
+    {
+      "concept": "total_liabilities",
+      "end_year": 2024,
+      "tags": [
+        "Liabilities"
+      ],
+      "values": [
+        "16562422000"
+      ]
+    },
+    {
+      "concept": "equity",
+      "end_year": 2022,
+      "tags": [
+        "StockholdersEquity"
+      ],
+      "values": [
+        "1459739000"
+      ]
+    },
+    {
+      "concept": "equity",
+      "end_year": 2023,
+      "tags": [
+        "StockholdersEquity"
+      ],
+      "values": [
+        "1701084000"
+      ]
+    },
+    {
+      "concept": "equity",
+      "end_year": 2024,
+      "tags": [
+        "StockholdersEquity"
+      ],
+      "values": [
+        "2243310000"
+      ]
+    },
+    {
+      "concept": "operating_cash_flow",
+      "end_year": 2022,
+      "tags": [
+        "NetCashProvidedByUsedInOperatingActivities"
+      ],
+      "values": [
+        "975774000"
+      ]
+    },
+    {
+      "concept": "operating_cash_flow",
+      "end_year": 2023,
+      "tags": [
+        "NetCashProvidedByUsedInOperatingActivities"
+      ],
+      "values": [
+        "-356402000"
+      ]
+    },
+    {
+      "concept": "operating_cash_flow",
+      "end_year": 2024,
+      "tags": [
+        "NetCashProvidedByUsedInOperatingActivities"
+      ],
+      "values": [
+        "-835278000"
+      ]
+    },
+    {
+      "concept": "capex",
+      "end_year": 2022,
+      "tags": [
+        "PaymentsToAcquirePropertyPlantAndEquipment"
+      ],
+      "values": [
+        "6761000"
+      ]
+    },
+    {
+      "concept": "capex",
+      "end_year": 2023,
+      "tags": [
+        "PaymentsToAcquirePropertyPlantAndEquipment"
+      ],
+      "values": [
+        "7528000"
+      ]
+    },
+    {
+      "concept": "capex",
+      "end_year": 2024,
+      "tags": [
+        "PaymentsToAcquirePropertyPlantAndEquipment"
+      ],
+      "values": [
+        "18391000"
+      ]
+    }
+  ]
+}

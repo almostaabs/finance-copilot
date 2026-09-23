@@ -7,6 +7,126 @@
     "primary_document": "aapl-20230930.htm",
     "report_date": "2023-09-30"
   },
+  "ADBE": {
+    "accession": "0000796343-26-000003",
+    "cik": "0000796343",
+    "filing_date": "2026-01-15",
+    "form": "10-K",
+    "primary_document": "adbe-20251128.htm",
+    "report_date": "2025-11-28"
+  },
+  "AMZN": {
+    "accession": "0001018724-26-000004",
+    "cik": "0001018724",
+    "filing_date": "2026-02-06",
+    "form": "10-K",
+    "primary_document": "amzn-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "BAC": {
+    "accession": "0000070858-26-000157",
+    "cik": "0000070858",
+    "filing_date": "2026-02-25",
+    "form": "10-K",
+    "primary_document": "bac-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "BRK-B": {
+    "accession": "0000950170-24-019719",
+    "cik": "0001067983",
+    "filing_date": "2024-02-26",
+    "form": "10-K",
+    "primary_document": "brka-20231231.htm",
+    "report_date": "2023-12-31"
+  },
+  "COST": {
+    "accession": "0000909832-25-000101",
+    "cik": "0000909832",
+    "filing_date": "2025-10-08",
+    "form": "10-K",
+    "primary_document": "cost-20250831.htm",
+    "report_date": "2025-08-31"
+  },
+  "CRM": {
+    "accession": "0001108524-26-000060",
+    "cik": "0001108524",
+    "filing_date": "2026-03-02",
+    "form": "10-K",
+    "primary_document": "crm-20260131.htm",
+    "report_date": "2026-01-31"
+  },
+  "CSCO": {
+    "accession": "0000858877-25-000111",
+    "cik": "0000858877",
+    "filing_date": "2025-09-03",
+    "form": "10-K",
+    "primary_document": "csco-20250726.htm",
+    "report_date": "2025-07-26"
+  },
+  "CVX": {
+    "accession": "0000093410-26-000078",
+    "cik": "0000093410",
+    "filing_date": "2026-02-24",
+    "form": "10-K",
+    "primary_document": "cvx-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "DE": {
+    "accession": "0001104659-25-122321",
+    "cik": "0000315189",
+    "filing_date": "2025-12-18",
+    "form": "10-K",
+    "primary_document": "de-20251102x10k.htm",
+    "report_date": "2025-11-02"
+  },
+  "F": {
+    "accession": "0000037996-26-000015",
+    "cik": "0000037996",
+    "filing_date": "2026-02-11",
+    "form": "10-K",
+    "primary_document": "f-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "GOOGL": {
+    "accession": "0001652044-26-000018",
+    "cik": "0001652044",
+    "filing_date": "2026-02-05",
+    "form": "10-K",
+    "primary_document": "goog-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "GS": {
+    "accession": "0000886982-26-000091",
+    "cik": "0000886982",
+    "filing_date": "2026-02-25",
+    "form": "10-K",
+    "primary_document": "gs-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "HD": {
+    "accession": "0001628280-26-019436",
+    "cik": "0000354950",
+    "filing_date": "2026-03-18",
+    "form": "10-K",
+    "primary_document": "hd-20260201.htm",
+    "report_date": "2026-02-01"
+  },
+  "HON": {
+    "accession": "0000773840-26-000013",
+    "cik": "0000773840",
+    "filing_date": "2026-02-17",
+    "form": "10-K",
+    "primary_document": "hon-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "IBM": {
+    "accession": "0000051143-26-000010",
+    "cik": "0000051143",
+    "filing_date": "2026-02-24",
+    "form": "10-K",
+    "primary_document": "ibm-20251231.htm",
+    "report_date": "2025-12-31"
+  },
   "JPM": {
     "accession": "0001628280-26-008131",
     "cik": "0000019617",
@@ -23,6 +143,46 @@
     "primary_document": "ko-20251231.htm",
     "report_date": "2025-12-31"
   },
+  "LMT": {
+    "accession": "0001628280-26-004195",
+    "cik": "0000936468",
+    "filing_date": "2026-01-29",
+    "form": "10-K",
+    "primary_document": "lmt-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "LOW": {
+    "accession": "0000060667-26-000029",
+    "cik": "0000060667",
+    "filing_date": "2026-03-23",
+    "form": "10-K",
+    "primary_document": "low-20260130.htm",
+    "report_date": "2026-01-30"
+  },
+  "MBIN": {
+    "accession": "0001558370-25-001941",
+    "cik": "0001629019",
+    "filing_date": "2025-02-28",
+    "form": "10-K",
+    "primary_document": "mbin-20241231x10k.htm",
+    "report_date": "2024-12-31"
+  },
+  "META": {
+    "accession": "0001628280-26-003942",
+    "cik": "0001326801",
+    "filing_date": "2026-01-29",
+    "form": "10-K",
+    "primary_document": "meta-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "MRK": {
+    "accession": "0000310158-26-000063",
+    "cik": "0000310158",
+    "filing_date": "2026-02-24",
+    "form": "10-K",
+    "primary_document": "mrk-20251231.htm",
+    "report_date": "2025-12-31"
+  },
   "MSFT": {
     "accession": "0000950170-24-087843",
     "cik": "0000789019",
@@ -30,6 +190,102 @@
     "form": "10-K",
     "primary_document": "msft-20240630.htm",
     "report_date": "2024-06-30"
+  },
+  "NFLX": {
+    "accession": "0001065280-26-000034",
+    "cik": "0001065280",
+    "filing_date": "2026-01-23",
+    "form": "10-K",
+    "primary_document": "nflx-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "NKE": {
+    "accession": "0000320187-25-000047",
+    "cik": "0000320187",
+    "filing_date": "2025-07-17",
+    "form": "10-K",
+    "primary_document": "nke-20250531.htm",
+    "report_date": "2025-05-31"
+  },
+  "NVDA": {
+    "accession": "0001045810-26-000021",
+    "cik": "0001045810",
+    "filing_date": "2026-02-25",
+    "form": "10-K",
+    "primary_document": "nvda-20260125.htm",
+    "report_date": "2026-01-25"
+  },
+  "ORCL": {
+    "accession": "0001193125-26-277521",
+    "cik": "0001341439",
+    "filing_date": "2026-06-22",
+    "form": "10-K",
+    "primary_document": "orcl-20260531.htm",
+    "report_date": "2026-05-31"
+  },
+  "PFE": {
+    "accession": "0000078003-26-000026",
+    "cik": "0000078003",
+    "filing_date": "2026-02-26",
+    "form": "10-K",
+    "primary_document": "pfe-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "SBUX": {
+    "accession": "0000829224-25-000114",
+    "cik": "0000829224",
+    "filing_date": "2025-11-14",
+    "form": "10-K",
+    "primary_document": "sbux-20250928.htm",
+    "report_date": "2025-09-28"
+  },
+  "T": {
+    "accession": "0000732717-26-000120",
+    "cik": "0000732717",
+    "filing_date": "2026-02-09",
+    "form": "10-K",
+    "primary_document": "t-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "TSLA": {
+    "accession": "0001628280-26-003952",
+    "cik": "0001318605",
+    "filing_date": "2026-01-29",
+    "form": "10-K",
+    "primary_document": "tsla-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "UNH": {
+    "accession": "0000731766-26-000062",
+    "cik": "0000731766",
+    "filing_date": "2026-03-02",
+    "form": "10-K",
+    "primary_document": "unh-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "UPS": {
+    "accession": "0001628280-26-008432",
+    "cik": "0001090727",
+    "filing_date": "2026-02-17",
+    "form": "10-K",
+    "primary_document": "ups-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "VZ": {
+    "accession": "0000732712-26-000007",
+    "cik": "0000732712",
+    "filing_date": "2026-02-17",
+    "form": "10-K",
+    "primary_document": "vz-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "WMT": {
+    "accession": "0000104169-26-000055",
+    "cik": "0000104169",
+    "filing_date": "2026-03-13",
+    "form": "10-K",
+    "primary_document": "wmt-20260131.htm",
+    "report_date": "2026-01-31"
   },
   "XOM": {
     "accession": "0000034088-26-000045",

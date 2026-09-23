@@ -14,7 +14,7 @@ zero.
 
 ![Dashboard overview](docs/screenshots/overview.png)
 
-**Status:** Phases 0-15 complete. 451 tests, all passing. Deployed on Streamlit
+**Status:** Phases 0-15 complete. 454 tests, all passing. Deployed on Streamlit
 Community Cloud; also runs entirely on your own machine, where no data leaves it.
 Validated on five real annual reports (Apple, Berkshire Hathaway, Wipro,
 Microsoft, and a small US bank), see
@@ -48,6 +48,12 @@ Tests and lint:
 ```bash
 uv run pytest
 uv run ruff check . && uv run ruff format --check .
+```
+
+Regression snapshot (every number, mapping, flag and reason, AI off; exits 1 with a diff on any change):
+
+```bash
+uv run python scripts/snapshot.py --check
 ```
 
 ## What the dashboard shows

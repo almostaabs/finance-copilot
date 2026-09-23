@@ -1,0 +1,34 @@
+{
+  "AAPL": {
+    "accession": "0000320193-23-000106",
+    "cik": "0000320193",
+    "filing_date": "2023-11-03",
+    "form": "10-K",
+    "primary_document": "aapl-20230930.htm",
+    "report_date": "2023-09-30"
+  },
+  "JPM": {
+    "accession": "0001628280-26-008131",
+    "cik": "0000019617",
+    "filing_date": "2026-02-13",
+    "form": "10-K",
+    "primary_document": "jpm-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "KO": {
+    "accession": "0001628280-26-010047",
+    "cik": "0000021344",
+    "filing_date": "2026-02-20",
+    "form": "10-K",
+    "primary_document": "ko-20251231.htm",
+    "report_date": "2025-12-31"
+  },
+  "MSFT": {
+    "accession": "0000950170-24-087843",
+    "cik": "0000789019",
+    "filing_date": "2024-07-30",
+    "form": "10-K",
+    "primary_document": "msft-20240630.htm",
+    "report_date": "2024-06-30"
+  }
+}

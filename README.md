@@ -14,7 +14,7 @@ zero.
 
 ![Dashboard overview](docs/screenshots/overview.png)
 
-**Status:** Phases 0-15 complete. 457 tests, all passing. Deployed on Streamlit
+**Status:** Phases 0-15 complete. 509 tests, all passing. Deployed on Streamlit
 Community Cloud; also runs entirely on your own machine, where no data leaves it.
 Validated on five real annual reports (Apple, Berkshire Hathaway, Wipro,
 Microsoft, and a small US bank), see
@@ -173,6 +173,16 @@ are rejected; there is no OCR. No currency conversion, ever.
 - Two-period documents give a year-over-year *change*, deliberately not a "trend".
 - The full list of open items is in [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
 
+## Accuracy evaluation
+
+`evals/` scores the app against SEC XBRL facts for 50 US 10-K filings: every
+mapped value is `correct`, `wrong` or `withheld`, and `wrong` is the number
+that matters. It measures 16 concepts only, and most filings are EDGAR HTML
+rendered to PDF, which is not the same as a company-published PDF. How it
+works and how to run it: [evals/README.md](evals/README.md). No accuracy
+numbers are published yet; they are published at the end of tier 1, with the
+holdout result run once.
+
 ## Where things live
 
 ```
@@ -191,6 +201,7 @@ src/fincopilot/display.py    the only place a number is rounded for reading
 src/fincopilot/charts.py     the five chart specifications (pure, tested)
 src/fincopilot/panel.py      HTML for the KPI cards and red-flag grid (escaped, offline)
 src/fincopilot/store.py      SQLite history
+evals/                       XBRL accuracy eval (see evals/README.md)
 tests/fixtures/              nine generated PDFs with hand-computed answers
 docs/screenshots/            the images used in this README
 docs/                        design spec, build notes, validation, security review

@@ -30,6 +30,26 @@ XBRL `Assets` and `Liabilities`. All four are `wrong` in the eval. **Not fixed
 in T1.1** (the phase only measures); a dedicated fix phase follows.
 Reproduce: `uv run python -m evals.run --split all --only JPM`.
 
+The T1.1 dev run found the same pattern at Ford (accession
+0000037996-26-000015, rendered page 116): cash was mapped from the VIE table
+under the balance sheet (2,494 / 2,523 $M for 2024 / 2025) instead of the
+balance sheet's 22,935 / 23,356 $M.
+
+### T1.1-d. A "% of sales" column is read as amounts (HIGH: a wrong number is shown)
+
+Lowe's 10-K (accession 0000060667-26-000029, rendered page 41) prints each year
+as an Amount column and a % Sales column. The app took the % column for 2025 and
+2026: cogs 66.68 / 66.52, gross margin 33.32 / 33.48, operating income 12.51 /
+11.77, D&A 2.07 / 2.25, each scaled by millions (e.g. 66,680,000 instead of
+55,797 $M). Eight `wrong` records in the dev run. Not fixed in T1.1.
+
+### T1.1-e. One component row is mapped as total cost of revenue (HIGH: a wrong number is shown)
+
+Honeywell (accession 0000773840-26-000013, rendered page 59) prints "Cost of
+products sold" and "Cost of services sold" with no total. The app mapped the
+products row as cogs (14,836 / 15,017 / 16,153 $M for 2023-2025) against
+`CostOfGoodsAndServicesSold` 20,637 / 21,360 / 23,613 $M. Not fixed in T1.1.
+
 ### 0. Large reports are slow (MEDIUM)
 
 Wipro's 481-page report takes about 88 s; Berkshire's 152 pages about 40 s;

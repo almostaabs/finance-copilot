@@ -156,6 +156,15 @@ class GeminiClient:
         )
 
     def complete_json(self, prompt: str, schema: dict[str, Any]) -> str:
+        # The model goes into the URL and the key into a header; http.client refuses
+        # anything but printable ASCII there, and a pasted value can carry an NBSP or
+        # zero-width space. Name the field instead of failing as "UnicodeEncodeError".
+        for field, value in (("model name", self.model), ("API key", self.api_key)):
+            if (bad := next((c for c in value if not "!" <= c <= "~"), None)) is not None:
+                raise LLMError(
+                    f"gemini {field} has a character that cannot be sent "
+                    f"(U+{ord(bad):04X}); retype it"
+                )
         body = json.dumps(
             {
                 "contents": [{"role": "user", "parts": [{"text": prompt}]}],

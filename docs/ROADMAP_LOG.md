@@ -55,7 +55,52 @@ the audit trail: it is how a later reader can tell what each phase changed and w
 - Invariant spot-check: 1-5 ✔ (no new values, rounding, HTML or network calls; change is inside `ai/`)
 - Known issues added: 0d, "-0.0% vs prior year" coloured red for a sub-rounding change
 
-## T1.1: XBRL ground-truth eval harness. Gate pending
+## T1.1: XBRL ground-truth eval harness. PASS, 2026-09-24
+
+- Branch / merge commit: `roadmap/t1.1` / `aa4a6d9` (dev baseline `2c99a38`, generated at `af8cc61`)
+- Tests: 457 → 519 passed, 2 deselected (removed: none)
+- Lint/format: pass
+- Snapshot: no diff (fixtures 599, real 585); no snapshot update
+- Eval (dev, 36 companies, 0 errors; split dev 36 / holdout 14):
+
+  | scope | correct | wrong | withheld | unverified | precision | coverage |
+  |---|---|---|---|---|---|---|
+  | all | 632 | 23 | 536 | 40 | 0.9649 | 0.5500 |
+  | general | 585 | 19 | 483 | 36 | 0.9685 | 0.5557 |
+  | financial | 47 | 4 | 53 | 4 | 0.9216 | 0.4904 |
+
+  Wrong: 17 `value`, 6 `wrong_period`, 0 `sign_mismatch`. By root cause: HD balance sheet vs "Fiscal"
+  statements 6 (T1.1-g); LOW "% Sales" column read as amounts 8 (T1.1-d); HON component row taken over the
+  total 3 (T1.1-e); VIE footnote tables, JPM 4 and F 2 (T1.1-a). `--compare` on an unchanged tree: no
+  change, exit 0. Holdout not run.
+- App smoke: pass (`tests/test_app.py` 12 passed; `/_stcore/health` ok; browser click not checked)
+- Invariant spot-check: 1 ✔ no new `FinancialValue(`; 2 ✔ no `None`/`0` for `Unavailable`; 3 ✔ only
+  rounding is eval ratios in `evals/score.py`; 4 ✔ no app HTML, `render.py` escapes `<base href>`;
+  5 ✔ network only in `sources/edgar.py` (and pre-existing `ai/client.py`)
+- Acceptance criteria: 1-7 ✔ (criterion 1: suite passes with non-localhost sockets blocked; no test yet
+  carries the `network` marker)
+- Hand checks (evaluator, random): wrong JPM total_assets 2024 (p169 VIE table), HD total_assets and cash
+  2025 (p44, `wrong_period`), F cash 2024 (p116 VIE table), HON cogs 2023 (p59): all real app errors, none
+  a harness error. Correct UNH revenue and cogs 2024, MBIN net_income 2024, VZ cash 2024: confirmed.
+- New dependencies: `playwright>=1.45` in the `eval` dependency group only (Chromium installed by hand into
+  `%LOCALAPPDATA%\ms-playwright` after CDN timeouts)
+- Most important test and proof it can fail: `test_correct_exactly_at_the_tolerance_boundary`; with `<=`
+  changed to `<` in `evals.score._matches` it failed; `MIN_ANNUAL_DAYS = 0` failed
+  `test_quarterly_facts_are_dropped`
+- Known issues added: T1.1-a (VIE footnote tables, HIGH), T1.1-b (XOM CIK), T1.1-c (rendered-PDF caveat),
+  T1.1-d (LOW "% Sales", HIGH), T1.1-e (HON cogs, HIGH), T1.1-f (net-income basis, MEDIUM), T1.1-g (HD years)
+- Human decisions and amendments (2026-09-24): XOM hand-locked to CIK 0000034088, accession
+  0000034088-26-000045 (the ticker maps to a new holding company). Criterion 7 amended: `ai/client.py`
+  predates the phase. AAPL, viewed in the pilot hand check, is marked exposed and kept out of headline
+  holdout totals. `ProfitLoss` accepted for net_income. Truth year (fact 4) is rule C1: `year(end)` by
+  default, plus a per-ticker `fiscal_year_offset` in `evals/corpus.csv` only with page-and-header evidence
+  (HD only: -1, p45 and p48 "Fiscal 2025"; an earlier draft cited p44, which is the dated balance sheet).
+  A pure `fy`-derived offset was tried and rejected: LOW and CRM carry an `fy` one below their printed
+  naming. Each run prints an `fy`-mismatch listing (dev: CRM, LOW); the tier-1 exit gate checks holdout
+  headers from it before the holdout run.
+- Surprises / notes for the next phase: coverage (0.55) is limited mostly by withheld concepts, not wrong
+  ones. `edgar.py` catches `(OSError, ValueError)`, so an `http.client.IncompleteRead` escapes unwrapped
+  (run.py still records it as an error). `run.py` Markdown tables do not escape `|` in row labels.
 
 - Pilot hand check (step 7; AAPL 10-K, accession 0000320193-23-000106, rendered PDF), approved by the human
   2026-09-24 before the full dev run:

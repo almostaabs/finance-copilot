@@ -104,7 +104,7 @@ and the ROADMAP_LOG.md entry.
 | Phase | Title | Status | Merged commit |
 |---|---|---|---|
 | T1.0 | Baseline and regression snapshot | ☑ | `543f3fd` |
-| T1.1 | XBRL ground-truth eval harness | ☐ | |
+| T1.1 | XBRL ground-truth eval harness | ☑ | `aa4a6d9` |
 | T1.4 | Correctness fixes (10-K basis, plausibility flag) | ☐ | |
 | T1.2 | Hand-labelled Indian set | ☐ | |
 | T1.3 | Eval-driven coverage + public scoreboard | ☐ | |

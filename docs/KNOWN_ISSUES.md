@@ -46,8 +46,8 @@ as an Amount column and a % Sales column. The app took the % column for 2025 and
 ### T1.1-e. One component row is mapped as total cost of revenue (HIGH: a wrong number is shown)
 
 Honeywell (accession 0000773840-26-000013, rendered page 59) prints "Cost of
-products sold" and "Cost of services sold" with no total. The app mapped the
-products row as cogs (14,836 / 15,017 / 16,153 $M for 2023-2025) against
+products sold", "Cost of services sold" and "Total Cost of products and services
+sold". The app skipped the total row and mapped the products row as cogs (14,836 / 15,017 / 16,153 $M for 2023-2025) against
 `CostOfGoodsAndServicesSold` 20,637 / 21,360 / 23,613 $M. Not fixed in T1.1.
 
 ### 0. Large reports are slow (MEDIUM)

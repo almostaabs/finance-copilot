@@ -54,3 +54,19 @@ the audit trail: it is how a later reader can tell what each phase changed and w
 - Lint/format: pass. Snapshot: no diff (fixtures 599, real 585). Eval: n/a. App smoke: pass
 - Invariant spot-check: 1-5 ✔ (no new values, rounding, HTML or network calls; change is inside `ai/`)
 - Known issues added: 0d, "-0.0% vs prior year" coloured red for a sub-rounding change
+
+## T1.1: XBRL ground-truth eval harness. Gate pending
+
+- Pilot hand check (step 7; AAPL 10-K, accession 0000320193-23-000106, rendered PDF), approved by the human
+  2026-09-24 before the full dev run:
+
+  | concept, year | app value | row label, page | XBRL value (tag) | filing shows | harness |
+  |---|---|---|---|---|---|
+  | revenue 2023 | 383,285,000,000 | Total net sales, p31 | 383,285,000,000 (RevenueFromContractWithCustomerExcludingAssessedTax) | 383,285 ($M) | correct ✔ |
+  | total_assets 2022 | 352,755,000,000 | Total assets, p33 | 352,755,000,000 (Assets, end 2022-09-24) | 352,755 ($M) | correct ✔ |
+  | capex 2021 | -11,085,000,000 | Payments for acquisition of property, plant and equipment, p35 | 11,085,000,000 (PaymentsToAcquirePropertyPlantAndEquipment) | (11,085) ($M) | correct ✔ (capex sign ignored) |
+  | d_and_a 2023 | withheld (`not_mapped`) | none | 11,519,000,000 (DepreciationDepletionAndAmortization) | 11,519 on p35 | withheld ✔ (a real app gap) |
+
+  Pilot wrong records: JPM total_assets and total_liabilities, p169, a VIE footnote table read as the
+  balance sheet (KNOWN_ISSUES T1.1-a). AAPL is a holdout company, so it is marked exposed
+  (`evals/exposed.json`) and kept out of headline holdout totals.

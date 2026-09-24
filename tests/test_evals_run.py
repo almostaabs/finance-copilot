@@ -239,3 +239,7 @@ def test_main_prints_and_stores_the_fy_mismatch_listing(tmp_path, monkeypatch, c
     assert "| LOW | A | [2025] | 2026-01-30 | 0 |" in out
     stored = json.loads((tmp_path / "latest_dev.json").read_text(encoding="utf-8"))
     assert stored["fy_mismatch"] == [mismatch]
+
+
+def test_a_pipe_in_a_row_label_is_escaped_in_markdown():
+    assert R._row(["F", "Net income | (loss)", 3]) == r"| F | Net income \| (loss) | 3 |"

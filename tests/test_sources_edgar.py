@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import http.client
 import json
 
 import pytest
@@ -140,6 +141,20 @@ def test_network_error_names_url_and_is_wrapped(tmp_path):
     client, _ = _client(tmp_path, {})
     with pytest.raises(SourceError, match=r"companyfacts/CIK0000000001\.json"):
         client.company_facts("1")
+
+
+def test_a_truncated_response_is_wrapped_and_not_cached(tmp_path):
+    class Truncating(FakeOpener):
+        def __call__(self, request) -> bytes:
+            self.requests.append(request)
+            raise http.client.IncompleteRead(b"{", 100)
+
+    opener = Truncating({})
+    clock = FakeClock()
+    client = EdgarClient(UA, tmp_path, opener=opener, clock=clock, sleep=clock.sleep)
+    with pytest.raises(SourceError, match="IncompleteRead"):
+        client.cik_for_ticker("AAPL")
+    assert not any(tmp_path.iterdir())
 
 
 def test_invalid_json_is_wrapped_and_not_cached(tmp_path):

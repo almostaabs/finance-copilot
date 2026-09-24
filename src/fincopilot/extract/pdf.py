@@ -20,7 +20,7 @@ from fincopilot.extract.anchors import (
     is_amount_token,
     looks_like_header,
 )
-from fincopilot.extract.textgrid import Word, text_grid
+from fincopilot.extract.textgrid import Word, text_grids
 from fincopilot.types import ExtractedTable, RawDocument, SourceRef, TableRow, make_ref_id
 
 DEFAULT_MAX_BYTES = 50 * 1024 * 1024
@@ -264,9 +264,7 @@ def extract_pdf(
                     # its own line assembly, so reading words row-tight costs nothing.
                     for w in page.extract_words(x_tolerance=x_tol, y_tolerance=Y_TOLERANCE)
                 ]
-                grid = text_grid(words)
-                if grid is not None:
-                    rows, col_x = grid
+                for rows, col_x in text_grids(words):
                     n = sum(1 for t in tables if t.first_page == page_no)
                     built = _build_table(
                         ref.document_id, page_no, page_texts[page_no - 1], n, rows, col_x

@@ -105,6 +105,17 @@ February 2, 2025 column) as `wrong_period`, because HD's truth years follow
 its "Fiscal YYYY" headers (`fiscal_year_offset = -1` in `evals/corpus.csv`).
 Not fixed in T1.1.
 
+### T1.1b-1. The scored fallback can pick a non-statement table (MEDIUM)
+
+When no anchor matches, the scored fallback can select a non-statement table on
+a nearby page (seen with UPS before the anchor fix). In T1.1b, splitting UPS's
+page 67 into its income and comprehensive-income tables lowered the income
+table's score below an MD&A segment table on rendered page 40, whose segment
+"Total Revenue" was then reported as revenue. The literal "Statements of
+Consolidated <X>" anchors added in T1.1b locate UPS directly, so the fallback
+no longer runs there, but any filing whose heading matches no anchor is still
+exposed. Not fixed in T1.1b.
+
 ### T1.1-f. Which net income the app reports is undecided (MEDIUM)
 
 US income statements print consolidated net income (including noncontrolling

@@ -167,8 +167,11 @@ BLOCKED: dict[C, frozenset[str]] = {
     C.NET_INCOME: frozenset({"profit before tax", "income before income taxes"}),
 }
 
+# A "(a)" closing a label is a footnote reference ("Total assets(a)"); a
+# leading "(a)" is list numbering, handled by _LEADING_NUMBERING.
 _FOOTNOTE = re.compile(
     r"[*\u2020\u2021\u00a7\u00b9\u00b2\u00b3]+|\(note \d+[a-z]?\)|\(refer note [^)]*\)"
+    r"|(?:\([a-z]\))+$"
 )
 _LEADING_NUMBERING = re.compile(r"^(?:\(?[0-9ivx]+[.)]|\(?[a-z][.)])\s+")
 _PUNCT = re.compile(r"[^\w\s]")

@@ -18,6 +18,8 @@ from fincopilot.types import StatementKind as K
         ("Revenue (Note 4)", "revenue"),
         ("1. Revenue from operations", "revenue from operations"),
         ("(a) Cost of materials consumed", "cost of materials consumed"),
+        ("Total assets(a)", "total assets"),
+        ("Total liabilities (a)(b)", "total liabilities"),
         ("Total stockholders' equity", "total stockholders equity"),
         ("Depreciation & amortisation", "depreciation and amortisation"),
         (

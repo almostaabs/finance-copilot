@@ -11,12 +11,17 @@ from pathlib import Path
 import pipeline
 import pytest
 
-from fincopilot.extract.textgrid import Word, text_grid
+from fincopilot.extract.textgrid import Word, text_grids
 from fincopilot.types import CanonicalConcept as C
 from fincopilot.types import Period, ReconciliationStatus
 
 PDF = Path("tests/fixtures/text_aligned.pdf")
 P24, P23 = Period(2024, "2024"), Period(2023, "2023")
+
+
+def text_grid(words: list[Word]):
+    grids = text_grids(words)
+    return grids[0] if grids else None
 
 
 def _w(text: str, x1: float, top: float, width: float = 30) -> Word:
@@ -122,6 +127,35 @@ def test_cash_flow_ignores_convenience_column(result):
 def test_every_reconciliation_passes(result):
     checks = [c for c in result.reconciliations if c.period == P24]
     assert checks and all(c.status is ReconciliationStatus.PASSED for c in checks)
+
+
+def _shifted(words: list[Word], dy: float) -> list[Word]:
+    return [Word(w.text, w.x0, w.x1, w.top + dy) for w in words]
+
+
+def test_a_second_year_header_under_the_data_starts_a_new_table():
+    rows = [("Cash", ("10", "9")), ("Loans", ("80", "75")), ("Total assets", ("100", "93"))]
+    vie = [("Cash", ("1", "2")), ("Loans", ("3", "4")), ("Total assets", ("5", "6"))]
+    grids = text_grids(_statement(rows) + _shifted(_statement(vie), 100))
+    assert [g[0][3] for g in grids] == [["Total assets", "100", "93"], ["Total assets", "5", "6"]]
+
+
+def test_a_note_reference_wrapped_as_note_and_9_stays_in_the_label():
+    words = _statement([("Cash (Note", ("1", "2")), ("B", ("3", "4")), ("C", ("5", "6"))])
+    words.append(Word("9)", 130, 138, 70))
+    rows, _ = text_grid(words)
+    assert rows[1] == ["Cash (Note 9)", "1", "2"]
+
+
+def test_footnote_table_under_the_balance_sheet_never_supplies_its_totals():
+    """T1.1-a: the VIE table under footnote (a) prints its own Total assets and
+    Cash rows; only the balance sheet's figures may be mapped."""
+    r = pipeline.analyze(Path("tests/fixtures/footnote_table.pdf").read_bytes())
+    got = {(v.concept, v.period.end_year): v.value for v in r.mapping.values}
+    assert got[(C.TOTAL_ASSETS, 2024)] == Decimal("100000000000")
+    assert got[(C.TOTAL_LIABILITIES, 2023)] == Decimal("82500000000")
+    assert got[(C.CASH, 2024)] == Decimal("12400000000")
+    assert r.mapping.conflicts == ()
 
 
 def test_non_finite_and_empty_words_are_ignored():

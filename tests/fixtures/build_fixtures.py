@@ -261,6 +261,10 @@ def main() -> None:
     build_text_aligned_pdf(aligned)
     print(f"wrote {aligned}")
 
+    footnote = FIXTURE_DIR / "footnote_table.pdf"
+    build_footnote_table_pdf(footnote)
+    print(f"wrote {footnote}")
+
     write_hashes()
 
 
@@ -420,6 +424,61 @@ def build_text_aligned_pdf(out_path: Path) -> None:
             ("Cash used in investing activities", "3,705", "(22,354)", "(14,545)", "42"),
         ],
         extra=1,
+    )
+    c.showPage()
+    c.save()
+
+
+def build_footnote_table_pdf(out_path: Path) -> None:
+    """One unruled page: a balance sheet, then footnote (a)'s VIE table under it.
+
+    Both tables print "Cash and cash equivalents" and "Total assets"; the
+    balance sheet's own labels carry "(Note 9)" and a "(a)" footnote marker.
+    The balance sheet's figures are the only right answer (T1.1-a).
+    """
+    from reportlab.pdfgen import canvas as pdfcanvas
+
+    c = pdfcanvas.Canvas(str(out_path), pagesize=A4, invariant=1)
+    y = _ta_page(
+        c, "CONSOLIDATED BALANCE SHEETS", "(In millions)", ["December 31,"], ("2024", "2023")
+    )
+    y = _ta_rows(
+        c,
+        y,
+        [
+            ("Assets",),
+            ("Cash and cash equivalents (Note 9)", "$ 12,400", "$ 11,300"),
+            ("Loans", "80,100", "75,200"),
+            ("Other assets", "7,500", "6,500"),
+            ("Total assets(a)", "100,000", "93,000"),
+            ("Liabilities",),
+            ("Deposits", "70,000", "66,000"),
+            ("Long-term debt", "18,000", "16,500"),
+            ("Total liabilities(a)", "88,000", "82,500"),
+            ("Total stockholders' equity", "12,000", "10,500"),
+            ("Total liabilities and stockholders' equity", "100,000", "93,000"),
+        ],
+    )
+    c.setFont(_TA_FONT, 9)
+    y -= 10
+    for line in (
+        "(a) The following table presents assets and liabilities of consolidated VIEs.",
+        "They are included in the balance sheet above.",
+    ):
+        c.drawString(60, y, line)
+        y -= 12
+    c.drawString(60, y, "December 31, (in millions)")
+    for x, yr in zip(_TA_COLS, ("2024", "2023"), strict=False):
+        c.drawRightString(x, y, yr)
+    _ta_rows(
+        c,
+        y - 14,
+        [
+            ("Cash and cash equivalents", "900", "800"),
+            ("Loans", "4,100", "3,900"),
+            ("Total assets", "5,000", "4,700"),
+            ("Total liabilities", "3,200", "3,000"),
+        ],
     )
     c.showPage()
     c.save()

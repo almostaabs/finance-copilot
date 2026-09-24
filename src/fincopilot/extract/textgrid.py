@@ -9,6 +9,8 @@ rebuilds the grid from word coordinates:
   to one onto those columns
 - a column whose header carries no year and whose values are all small
   plain integers is a notes column, and is dropped
+- a year-only header line below data rows starts a new table, so a footnote
+  table printed under a statement never becomes part of it
 
 Everything is geometric and deterministic. No text is altered; every cell is
 the exact token printed on the page.
@@ -21,7 +23,10 @@ import re
 from dataclasses import dataclass
 
 _YEAR = re.compile(r"^(?:19|20|21)[0-9]{2}$")
-_AMOUNT = re.compile(r"^\(?-?[0-9](?:[0-9,]*[0-9])?(?:\.[0-9]+)?\)?%?$")
+_NUMBER = r"-?[0-9](?:[0-9,]*[0-9])?(?:\.[0-9]+)?"
+# A closing paren needs its opening one: "(Note 9)" wraps onto the label as
+# "(Note" + "9)", and "9)" read as an amount cuts the label in half.
+_AMOUNT = re.compile(rf"^(?:\({_NUMBER}\)?|{_NUMBER})%?$")
 _SKIP = frozenset({"$", "Rs.", "Rs", "\u20b9", "USD", "INR"})
 _DASH = frozenset({"-", "\u2013", "\u2014", "Nil", "NIL", "nil"})
 _NOTE = re.compile(r"^[0-9]{1,3}(?:\([a-z]\))?$")
@@ -106,9 +111,36 @@ def _nearest(center: float, spans: list[tuple[float, float]]) -> int:
     return min(range(len(spans)), key=lambda i: abs((spans[i][0] + spans[i][1]) / 2 - center))
 
 
-def text_grid(words: list[Word]) -> tuple[list[list[str]], tuple[float, ...]] | None:
-    """Rows (header first when found) and column left edges, or None."""
+def _is_year_header(line: list[Word]) -> bool:
+    values = _split(line)[1]
+    return len(values) >= MIN_COLUMNS and all(_YEAR.match(v.text) for v in values)
+
+
+def text_grids(words: list[Word]) -> list[tuple[list[list[str]], tuple[float, ...]]]:
+    """One grid per table on the page.
+
+    A page can print a second table under the statement (a footnote's VIE
+    table, say) with its own year header. A year header below the first data
+    row starts a new table there; otherwise the second table's rows join the
+    statement and its "Total assets" competes with the statement's own.
+    """
     lines = _lines(words)
+    starts = [0]
+    seen_data = False
+    for i, line in enumerate(lines):
+        if _is_year_header(line):
+            if seen_data:
+                starts.append(i)
+                seen_data = False
+        elif len(_split(line)[1]) >= MIN_COLUMNS:
+            seen_data = True
+    bounds = zip(starts, [*starts[1:], len(lines)], strict=True)
+    grids = [_grid(lines[a:b]) for a, b in bounds]
+    return [g for g in grids if g is not None]
+
+
+def _grid(lines: list[list[Word]]) -> tuple[list[list[str]], tuple[float, ...]] | None:
+    """One table from its lines: rows (header first) and column left edges, or None."""
     parsed = [(_split(line), line) for line in lines]
     data = [
         (i, label, values)

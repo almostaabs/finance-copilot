@@ -13,6 +13,117 @@ ambiguous_periods.pdf | periods | - | UNAVAILABLE ambiguous: income columns 1 an
 ambiguous_periods.pdf | statement | balance | UNAVAILABLE not_located: no balance statement found by anchor or scored fallback
 ambiguous_periods.pdf | statement | cash_flow | UNAVAILABLE not_located: no cash_flow statement found by anchor or scored fallback
 ambiguous_periods.pdf | statement | income | page_3_table_0 pages=(3,)
+component_total.pdf | basis | - | consolidated
+component_total.pdf | flag | earnings_quality | not_evaluated warning
+component_total.pdf | flag | high_leverage | not_evaluated critical
+component_total.pdf | flag | leverage_increase | not_evaluated warning
+component_total.pdf | flag | low_confidence_kpi | clear info
+component_total.pdf | flag | margin_compression | not_evaluated warning
+component_total.pdf | flag | negative_fcf | not_evaluated warning
+component_total.pdf | flag | negative_ocf | not_evaluated critical
+component_total.pdf | flag | reconciliation_warning | not_evaluated warning
+component_total.pdf | flag | revenue_decline | fired warning
+component_total.pdf | flag | weak_liquidity | not_evaluated warning
+component_total.pdf | metric | net_margin@2024 | 0.3926499032882011605415860735009671 percent conf=high
+component_total.pdf | metric | net_margin@2025 | 0.3026315789473684210526315789473684 percent conf=high
+component_total.pdf | metric_unavailable | current_ratio@2024 | missing_input: current_assets not mapped for 2024
+component_total.pdf | metric_unavailable | current_ratio@2025 | missing_input: current_assets not mapped for 2025
+component_total.pdf | metric_unavailable | debt_to_equity@2024 | missing_input: short_term_borrowings not mapped for 2024
+component_total.pdf | metric_unavailable | debt_to_equity@2025 | missing_input: short_term_borrowings not mapped for 2025
+component_total.pdf | metric_unavailable | ebitda_margin@2024 | missing_input: operating_income not mapped for 2024
+component_total.pdf | metric_unavailable | ebitda_margin@2025 | missing_input: operating_income not mapped for 2025
+component_total.pdf | metric_unavailable | gross_margin@2024 | missing_input: gross_profit not mapped for 2024
+component_total.pdf | metric_unavailable | gross_margin@2025 | missing_input: gross_profit not mapped for 2025
+component_total.pdf | metric_unavailable | ocf_to_net_income@2024 | missing_input: operating_cash_flow not mapped for 2024
+component_total.pdf | metric_unavailable | ocf_to_net_income@2025 | missing_input: operating_cash_flow not mapped for 2025
+component_total.pdf | metric_unavailable | operating_margin@2024 | missing_input: operating_income not mapped for 2024
+component_total.pdf | metric_unavailable | operating_margin@2025 | missing_input: operating_income not mapped for 2025
+component_total.pdf | metric_unavailable | roa@2024 | missing_input: total_assets not mapped for 2024
+component_total.pdf | metric_unavailable | roa@2025 | missing_input: total_assets not mapped for 2025
+component_total.pdf | metric_unavailable | roe@2024 | missing_input: equity not mapped for 2024
+component_total.pdf | metric_unavailable | roe@2025 | missing_input: equity not mapped for 2025
+component_total.pdf | periods | - | 2025,2024
+component_total.pdf | recon | assets_equal_liabilities_plus_equity@2024 | unavailable delta=UNAVAILABLE
+component_total.pdf | recon | assets_equal_liabilities_plus_equity@2025 | unavailable delta=UNAVAILABLE
+component_total.pdf | recon | fcf_equals_ocf_minus_capex@2024 | unavailable delta=UNAVAILABLE
+component_total.pdf | recon | fcf_equals_ocf_minus_capex@2025 | unavailable delta=UNAVAILABLE
+component_total.pdf | recon | gross_profit_equals_revenue_minus_cogs@2024 | unavailable delta=UNAVAILABLE
+component_total.pdf | recon | gross_profit_equals_revenue_minus_cogs@2025 | unavailable delta=UNAVAILABLE
+component_total.pdf | statement | balance | UNAVAILABLE not_located: no balance statement found by anchor or scored fallback
+component_total.pdf | statement | cash_flow | UNAVAILABLE not_located: no cash_flow statement found by anchor or scored fallback
+component_total.pdf | statement | income | page_1_table_0 pages=(1,)
+component_total.pdf | trend | net_income@2024->2025 | -6500000000 rel=-0.3201970443349753694581280788177340 down negative
+component_total.pdf | trend | net_margin@2024->2025 | -0.09001832434083273948895449455 rel=-0.2292584910552242675654653875983479 down negative
+component_total.pdf | trend | revenue@2024->2025 | -6100000000 rel=-0.1179883945841392649903288201160542 down negative
+component_total.pdf | value | cogs@2024 | 21300000000 USD src=page_1_table_0_row_8 conf=synonym_match/high
+component_total.pdf | value | cogs@2025 | 23600000000 USD src=page_1_table_0_row_8 conf=synonym_match/high
+component_total.pdf | value | net_income@2024 | 20300000000 USD src=page_1_table_0_row_12 conf=exact_match/high
+component_total.pdf | value | net_income@2025 | 13800000000 USD src=page_1_table_0_row_12 conf=exact_match/high
+component_total.pdf | value | revenue@2024 | 51700000000 USD src=page_1_table_0_row_4 conf=synonym_match/high
+component_total.pdf | value | revenue@2025 | 45600000000 USD src=page_1_table_0_row_4 conf=synonym_match/high
+component_total.pdf | value_unavailable | ebitda@2024 | missing_input: operating_income not mapped for 2024
+component_total.pdf | value_unavailable | ebitda@2025 | missing_input: operating_income not mapped for 2025
+component_total.pdf | value_unavailable | free_cash_flow@2024 | missing_input: operating_cash_flow not mapped for 2024
+component_total.pdf | value_unavailable | free_cash_flow@2025 | missing_input: operating_cash_flow not mapped for 2025
+component_total.pdf | value_unavailable | total_debt@2024 | missing_input: short_term_borrowings not mapped for 2024
+component_total.pdf | value_unavailable | total_debt@2025 | missing_input: short_term_borrowings not mapped for 2025
+footnote_table.pdf | basis | - | consolidated
+footnote_table.pdf | flag | earnings_quality | not_evaluated warning
+footnote_table.pdf | flag | high_leverage | not_evaluated critical
+footnote_table.pdf | flag | leverage_increase | not_evaluated warning
+footnote_table.pdf | flag | low_confidence_kpi | fired info
+footnote_table.pdf | flag | margin_compression | not_evaluated warning
+footnote_table.pdf | flag | negative_fcf | not_evaluated warning
+footnote_table.pdf | flag | negative_ocf | not_evaluated critical
+footnote_table.pdf | flag | reconciliation_warning | clear warning
+footnote_table.pdf | flag | revenue_decline | not_evaluated warning
+footnote_table.pdf | flag | weak_liquidity | not_evaluated warning
+footnote_table.pdf | metric_unavailable | current_ratio@2023 | missing_input: current_assets not mapped for 2023
+footnote_table.pdf | metric_unavailable | current_ratio@2024 | missing_input: current_assets not mapped for 2024
+footnote_table.pdf | metric_unavailable | debt_to_equity@2023 | missing_input: short_term_borrowings not mapped for 2023
+footnote_table.pdf | metric_unavailable | debt_to_equity@2024 | missing_input: short_term_borrowings not mapped for 2024
+footnote_table.pdf | metric_unavailable | ebitda_margin@2023 | missing_input: operating_income not mapped for 2023
+footnote_table.pdf | metric_unavailable | ebitda_margin@2024 | missing_input: operating_income not mapped for 2024
+footnote_table.pdf | metric_unavailable | gross_margin@2023 | missing_input: gross_profit not mapped for 2023
+footnote_table.pdf | metric_unavailable | gross_margin@2024 | missing_input: gross_profit not mapped for 2024
+footnote_table.pdf | metric_unavailable | net_margin@2023 | missing_input: net_income not mapped for 2023
+footnote_table.pdf | metric_unavailable | net_margin@2024 | missing_input: net_income not mapped for 2024
+footnote_table.pdf | metric_unavailable | ocf_to_net_income@2023 | missing_input: operating_cash_flow not mapped for 2023
+footnote_table.pdf | metric_unavailable | ocf_to_net_income@2024 | missing_input: operating_cash_flow not mapped for 2024
+footnote_table.pdf | metric_unavailable | operating_margin@2023 | missing_input: operating_income not mapped for 2023
+footnote_table.pdf | metric_unavailable | operating_margin@2024 | missing_input: operating_income not mapped for 2024
+footnote_table.pdf | metric_unavailable | roa@2023 | missing_input: net_income not mapped for 2023
+footnote_table.pdf | metric_unavailable | roa@2024 | missing_input: net_income not mapped for 2024
+footnote_table.pdf | metric_unavailable | roe@2023 | missing_input: net_income not mapped for 2023
+footnote_table.pdf | metric_unavailable | roe@2024 | missing_input: net_income not mapped for 2024
+footnote_table.pdf | periods | - | 2024,2023
+footnote_table.pdf | recon | assets_equal_liabilities_plus_equity@2023 | passed delta=0
+footnote_table.pdf | recon | assets_equal_liabilities_plus_equity@2024 | passed delta=0
+footnote_table.pdf | recon | fcf_equals_ocf_minus_capex@2023 | unavailable delta=UNAVAILABLE
+footnote_table.pdf | recon | fcf_equals_ocf_minus_capex@2024 | unavailable delta=UNAVAILABLE
+footnote_table.pdf | recon | gross_profit_equals_revenue_minus_cogs@2023 | unavailable delta=UNAVAILABLE
+footnote_table.pdf | recon | gross_profit_equals_revenue_minus_cogs@2024 | unavailable delta=UNAVAILABLE
+footnote_table.pdf | statement | balance | page_1_table_0 pages=(1,)
+footnote_table.pdf | statement | cash_flow | UNAVAILABLE not_located: no cash_flow statement found by anchor or scored fallback
+footnote_table.pdf | statement | income | UNAVAILABLE not_located: no income statement found by anchor or scored fallback
+footnote_table.pdf | trend | cash@2023->2024 | 1100000000 rel=0.09734513274336283185840707964601770 up positive
+footnote_table.pdf | trend | equity@2023->2024 | 1500000000 rel=0.1428571428571428571428571428571429 up positive
+footnote_table.pdf | value | cash@2023 | 11300000000 USD src=page_1_table_0_row_1 conf=exact_match/high
+footnote_table.pdf | value | cash@2024 | 12400000000 USD src=page_1_table_0_row_1 conf=exact_match/high
+footnote_table.pdf | value | equity@2023 | 10500000000 USD src=page_1_table_0_row_9 conf=synonym_match/high
+footnote_table.pdf | value | equity@2024 | 12000000000 USD src=page_1_table_0_row_9 conf=synonym_match/high
+footnote_table.pdf | value | long_term_borrowings@2023 | 16500000000 USD src=page_1_table_0_row_7 conf=synonym_match/high
+footnote_table.pdf | value | long_term_borrowings@2024 | 18000000000 USD src=page_1_table_0_row_7 conf=synonym_match/high
+footnote_table.pdf | value | total_assets@2023 | 93000000000 USD src=page_1_table_0_row_4 conf=exact_match/high
+footnote_table.pdf | value | total_assets@2024 | 100000000000 USD src=page_1_table_0_row_4 conf=exact_match/high
+footnote_table.pdf | value | total_liabilities@2023 | 82500000000 USD src=page_1_table_0_row_8 conf=exact_match/high
+footnote_table.pdf | value | total_liabilities@2024 | 88000000000 USD src=page_1_table_0_row_8 conf=exact_match/high
+footnote_table.pdf | value_unavailable | ebitda@2023 | missing_input: operating_income not mapped for 2023
+footnote_table.pdf | value_unavailable | ebitda@2024 | missing_input: operating_income not mapped for 2024
+footnote_table.pdf | value_unavailable | free_cash_flow@2023 | missing_input: operating_cash_flow not mapped for 2023
+footnote_table.pdf | value_unavailable | free_cash_flow@2024 | missing_input: operating_cash_flow not mapped for 2024
+footnote_table.pdf | value_unavailable | total_debt@2023 | missing_input: short_term_borrowings not mapped for 2023
+footnote_table.pdf | value_unavailable | total_debt@2024 | missing_input: short_term_borrowings not mapped for 2024
 golden_indian.pdf | basis | - | consolidated
 golden_indian.pdf | flag | earnings_quality | clear warning
 golden_indian.pdf | flag | high_leverage | clear critical
@@ -346,6 +457,68 @@ no_scale.pdf | value_unavailable | free_cash_flow@2023 | missing_input: operatin
 no_scale.pdf | value_unavailable | free_cash_flow@2024 | missing_input: operating_cash_flow not mapped for 2024
 no_scale.pdf | value_unavailable | total_debt@2023 | missing_input: short_term_borrowings not mapped for 2023
 no_scale.pdf | value_unavailable | total_debt@2024 | missing_input: short_term_borrowings not mapped for 2024
+percent_sales.pdf | basis | - | consolidated
+percent_sales.pdf | flag | earnings_quality | not_evaluated warning
+percent_sales.pdf | flag | high_leverage | not_evaluated critical
+percent_sales.pdf | flag | leverage_increase | not_evaluated warning
+percent_sales.pdf | flag | low_confidence_kpi | clear info
+percent_sales.pdf | flag | margin_compression | clear warning
+percent_sales.pdf | flag | negative_fcf | not_evaluated warning
+percent_sales.pdf | flag | negative_ocf | not_evaluated critical
+percent_sales.pdf | flag | reconciliation_warning | clear warning
+percent_sales.pdf | flag | revenue_decline | clear warning
+percent_sales.pdf | flag | weak_liquidity | not_evaluated warning
+percent_sales.pdf | metric | gross_margin@2024 | 0.33 percent conf=high
+percent_sales.pdf | metric | gross_margin@2025 | 0.34 percent conf=high
+percent_sales.pdf | metric | net_margin@2024 | 0.1 percent conf=high
+percent_sales.pdf | metric | net_margin@2025 | 0.12 percent conf=high
+percent_sales.pdf | metric | operating_margin@2024 | 0.13 percent conf=high
+percent_sales.pdf | metric | operating_margin@2025 | 0.15 percent conf=high
+percent_sales.pdf | metric_unavailable | current_ratio@2024 | missing_input: current_assets not mapped for 2024
+percent_sales.pdf | metric_unavailable | current_ratio@2025 | missing_input: current_assets not mapped for 2025
+percent_sales.pdf | metric_unavailable | debt_to_equity@2024 | missing_input: short_term_borrowings not mapped for 2024
+percent_sales.pdf | metric_unavailable | debt_to_equity@2025 | missing_input: short_term_borrowings not mapped for 2025
+percent_sales.pdf | metric_unavailable | ebitda_margin@2024 | missing_input: d_and_a not mapped for 2024
+percent_sales.pdf | metric_unavailable | ebitda_margin@2025 | missing_input: d_and_a not mapped for 2025
+percent_sales.pdf | metric_unavailable | ocf_to_net_income@2024 | missing_input: operating_cash_flow not mapped for 2024
+percent_sales.pdf | metric_unavailable | ocf_to_net_income@2025 | missing_input: operating_cash_flow not mapped for 2025
+percent_sales.pdf | metric_unavailable | roa@2024 | missing_input: total_assets not mapped for 2024
+percent_sales.pdf | metric_unavailable | roa@2025 | missing_input: total_assets not mapped for 2025
+percent_sales.pdf | metric_unavailable | roe@2024 | missing_input: equity not mapped for 2024
+percent_sales.pdf | metric_unavailable | roe@2025 | missing_input: equity not mapped for 2025
+percent_sales.pdf | periods | - | 2025,2024
+percent_sales.pdf | recon | assets_equal_liabilities_plus_equity@2024 | unavailable delta=UNAVAILABLE
+percent_sales.pdf | recon | assets_equal_liabilities_plus_equity@2025 | unavailable delta=UNAVAILABLE
+percent_sales.pdf | recon | fcf_equals_ocf_minus_capex@2024 | unavailable delta=UNAVAILABLE
+percent_sales.pdf | recon | fcf_equals_ocf_minus_capex@2025 | unavailable delta=UNAVAILABLE
+percent_sales.pdf | recon | gross_profit_equals_revenue_minus_cogs@2024 | passed delta=0
+percent_sales.pdf | recon | gross_profit_equals_revenue_minus_cogs@2025 | passed delta=0
+percent_sales.pdf | statement | balance | UNAVAILABLE not_located: no balance statement found by anchor or scored fallback
+percent_sales.pdf | statement | cash_flow | UNAVAILABLE not_located: no cash_flow statement found by anchor or scored fallback
+percent_sales.pdf | statement | income | page_1_table_0 pages=(1,)
+percent_sales.pdf | trend | gross_margin@2024->2025 | 0.01 rel=0.03030303030303030303030303030303030 up positive
+percent_sales.pdf | trend | gross_profit@2024->2025 | 430000000 rel=0.1447811447811447811447811447811448 up positive
+percent_sales.pdf | trend | net_income@2024->2025 | 300000000 rel=0.3333333333333333333333333333333333 up positive
+percent_sales.pdf | trend | net_margin@2024->2025 | 0.02 rel=0.2 up positive
+percent_sales.pdf | trend | operating_income@2024->2025 | 330000000 rel=0.2820512820512820512820512820512821 up positive
+percent_sales.pdf | trend | operating_margin@2024->2025 | 0.02 rel=0.1538461538461538461538461538461538 up positive
+percent_sales.pdf | trend | revenue@2024->2025 | 1000000000 rel=0.1111111111111111111111111111111111 up positive
+percent_sales.pdf | value | cogs@2024 | 6030000000 USD src=page_1_table_0_row_1 conf=synonym_match/high
+percent_sales.pdf | value | cogs@2025 | 6600000000 USD src=page_1_table_0_row_1 conf=synonym_match/high
+percent_sales.pdf | value | gross_profit@2024 | 2970000000 USD src=page_1_table_0_row_2 conf=synonym_match/high
+percent_sales.pdf | value | gross_profit@2025 | 3400000000 USD src=page_1_table_0_row_2 conf=synonym_match/high
+percent_sales.pdf | value | net_income@2024 | 900000000 USD src=page_1_table_0_row_6 conf=synonym_match/high
+percent_sales.pdf | value | net_income@2025 | 1200000000 USD src=page_1_table_0_row_6 conf=synonym_match/high
+percent_sales.pdf | value | operating_income@2024 | 1170000000 USD src=page_1_table_0_row_4 conf=exact_match/high
+percent_sales.pdf | value | operating_income@2025 | 1500000000 USD src=page_1_table_0_row_4 conf=exact_match/high
+percent_sales.pdf | value | revenue@2024 | 9000000000 USD src=page_1_table_0_row_0 conf=synonym_match/high
+percent_sales.pdf | value | revenue@2025 | 10000000000 USD src=page_1_table_0_row_0 conf=synonym_match/high
+percent_sales.pdf | value_unavailable | ebitda@2024 | missing_input: d_and_a not mapped for 2024
+percent_sales.pdf | value_unavailable | ebitda@2025 | missing_input: d_and_a not mapped for 2025
+percent_sales.pdf | value_unavailable | free_cash_flow@2024 | missing_input: operating_cash_flow not mapped for 2024
+percent_sales.pdf | value_unavailable | free_cash_flow@2025 | missing_input: operating_cash_flow not mapped for 2025
+percent_sales.pdf | value_unavailable | total_debt@2024 | missing_input: short_term_borrowings not mapped for 2024
+percent_sales.pdf | value_unavailable | total_debt@2025 | missing_input: short_term_borrowings not mapped for 2025
 scanned.pdf | error | - | ScannedPDFUnsupported: no usable text layer: fewer than 200 characters sampled
 standalone_only.pdf | basis | - | standalone_fallback
 standalone_only.pdf | flag | earnings_quality | not_evaluated warning

@@ -124,6 +124,36 @@
       ]
     },
     {
+      "concept": "net_income",
+      "end_year": 2023,
+      "tags": [
+        "ProfitLoss"
+      ],
+      "values": [
+        "4329000000"
+      ]
+    },
+    {
+      "concept": "net_income",
+      "end_year": 2024,
+      "tags": [
+        "ProfitLoss"
+      ],
+      "values": [
+        "5894000000"
+      ]
+    },
+    {
+      "concept": "net_income",
+      "end_year": 2025,
+      "tags": [
+        "ProfitLoss"
+      ],
+      "values": [
+        "-8162000000"
+      ]
+    },
+    {
       "concept": "total_assets",
       "end_year": 2023,
       "tags": [

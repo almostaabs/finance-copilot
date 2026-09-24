@@ -73,30 +73,36 @@
       "concept": "net_income",
       "end_year": 2021,
       "tags": [
-        "NetIncomeLoss"
+        "NetIncomeLoss",
+        "ProfitLoss"
       ],
       "values": [
-        "89937000000"
+        "89937000000",
+        "90949000000"
       ]
     },
     {
       "concept": "net_income",
       "end_year": 2022,
       "tags": [
-        "NetIncomeLoss"
+        "NetIncomeLoss",
+        "ProfitLoss"
       ],
       "values": [
-        "-22759000000"
+        "-22759000000",
+        "-21998000000"
       ]
     },
     {
       "concept": "net_income",
       "end_year": 2023,
       "tags": [
-        "NetIncomeLoss"
+        "NetIncomeLoss",
+        "ProfitLoss"
       ],
       "values": [
-        "96223000000"
+        "96223000000",
+        "97147000000"
       ]
     },
     {

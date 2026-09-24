@@ -90,6 +90,16 @@ narrative fails intermittently on the free tier. `GeminiClient.complete_json`
 makes one request and turns any failure into `LLMError`, so the narrative
 declines. **Option.** One retry with exponential backoff for 503/timeout only.
 
+### T1.1-f. Which net income the app reports is undecided (MEDIUM)
+
+US income statements print consolidated net income (including noncontrolling
+interests) and net income attributable to the parent. The app takes the first
+row labelled "Net income" or "Net earnings", which is usually the consolidated
+figure: MRK, UNH, HON, T, TSLA and BRK-B in the T1.1 dev run all matched XBRL
+`ProfitLoss`, not `NetIncomeLoss`. ROE divides by parent equity, so the basis
+matters. The eval accepts both tags (human decision, 2026-09-24) until the app's
+basis is decided. Target: T1.4 or T1.3.
+
 ### T1.1-b. XOM is hand-locked to its pre-reorganisation CIK (LOW)
 
 On 2026-07-01 Exxon Mobil became a subsidiary of a new holding company,

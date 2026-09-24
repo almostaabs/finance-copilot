@@ -76,3 +76,54 @@ def test_truth_file_round_trips(tmp_path):
 def test_derived_concepts_have_no_truth_tags():
     assert {C.EBITDA, C.TOTAL_DEBT, C.FREE_CASH_FLOW}.isdisjoint(CONCEPT_TAGS)
     assert len(CONCEPT_TAGS) == 16
+
+
+def _filing(fy: int, *periods: tuple[str, str], fys: tuple[int, ...] = ()) -> dict:
+    """One filing's NetIncomeLoss facts: (start, end) pairs, all with `fy` unless `fys`."""
+    facts = [
+        {"start": s, "end": e, "val": 100 + i, "accn": "A", "fy": (fys or (fy,) * 9)[i]}
+        for i, (s, e) in enumerate(periods)
+    ]
+    return {"facts": {"us-gaap": {"NetIncomeLoss": {"units": {"USD": facts}}}}}
+
+
+def _years(facts: dict) -> dict[int, tuple[str, ...]]:
+    truth, _ = truth_for_filing(facts, "A")
+    return {t.end_year: t.values for t in truth}
+
+
+def test_start_year_naming_filer_shifts_truth_back_one_year():
+    # Home Depot: the year ending 2026-02-01 is "fiscal 2025", and fy says 2025.
+    facts = _filing(2025, ("2025-02-03", "2026-02-01"), ("2024-02-05", "2025-02-02"))
+    assert _years(facts) == {2025: ("100",), 2024: ("101",)}
+    assert any("end year -1" in n for n in truth_for_filing(facts, "A")[1])
+
+
+def test_end_year_naming_january_filer_keeps_the_end_year():
+    # NVIDIA: the year ending 2026-01-25 is "fiscal 2026", and fy says 2026.
+    facts = _filing(2026, ("2025-01-27", "2026-01-25"), ("2024-01-29", "2025-01-26"))
+    assert _years(facts) == {2026: ("100",), 2025: ("101",)}
+
+
+def test_december_filer_keeps_the_end_year():
+    facts = _filing(2025, ("2025-01-01", "2025-12-31"), ("2024-01-01", "2024-12-31"))
+    assert _years(facts) == {2025: ("100",), 2024: ("101",)}
+
+
+def test_inconsistent_fy_excludes_the_whole_filing_with_a_note():
+    facts = _filing(
+        2025, ("2025-01-01", "2025-12-31"), ("2024-01-01", "2024-12-31"), fys=(2025, 2024)
+    )
+    truth, notes = truth_for_filing(facts, "A")
+    assert truth == []
+    assert any("whole filing excluded: fy is inconsistent" in n for n in notes)
+
+
+def test_offset_outside_zero_or_minus_one_excludes_the_whole_filing():
+    truth, notes = truth_for_filing(_filing(2027, ("2025-01-01", "2025-12-31")), "A")
+    assert truth == []
+    assert any("whole filing excluded: fiscal-year offset 2" in n for n in notes)
+
+
+def test_net_income_accepts_profit_loss_after_net_income_loss():
+    assert CONCEPT_TAGS[C.NET_INCOME].tags == ("NetIncomeLoss", "ProfitLoss")

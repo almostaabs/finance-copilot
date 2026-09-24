@@ -29,9 +29,17 @@ For one (filing, concept, year) with a truth value:
 - wrong rate = wrong / (correct + wrong + withheld)
 
 Truth is the `units.USD` facts whose `accn` is the filing's accession: 350-380
-day durations for flow concepts, instants for balance-sheet concepts, with the
-year taken from `end` (never `fy`). If one tag gives two values for a year,
-that (concept, year) is excluded with a note rather than picked.
+day durations for flow concepts, instants for balance-sheet concepts. The
+truth year is the year the filing itself names: `year(end) + offset`, where
+`offset = fy - year(latest period end)` for that filing. Home Depot and Lowe's
+name a year ending in early February by its start year (offset -1); NVIDIA and
+Walmart name theirs by the end year (offset 0). If `fy` is inconsistent across
+the filing or the offset is not 0 or -1, the whole filing's truth is excluded
+with a note. If one tag gives two values for a year, that (concept, year) is
+excluded with a note rather than picked. Net income accepts `NetIncomeLoss`
+(attributable to the parent) and `ProfitLoss` (consolidated, including
+noncontrolling interests); which one the app should report is undecided (see
+`docs/KNOWN_ISSUES.md`).
 
 Truth can include years the statements do not show side by side (for example,
 equity at the start of the oldest year, from the statement of shareholders'

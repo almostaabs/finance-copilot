@@ -36,18 +36,42 @@ def _kind_ok(fact: dict, kind: str) -> bool:
     return MIN_ANNUAL_DAYS <= days <= MAX_ANNUAL_DAYS
 
 
+def _year_offset(gaap: dict, accession: str, latest_end: date) -> tuple[int | None, str | None]:
+    """How this filing names its fiscal year: fy - year(latest period end).
+
+    HD calls the year ending 2026-02-01 "fiscal 2025" (offset -1); NVDA calls the
+    year ending 2026-01-25 "fiscal 2026" (offset 0). Returns (offset, None), or
+    (None, why) when fy is inconsistent or the offset is not 0 or -1.
+    """
+    fys = {
+        f.get("fy")
+        for tag in gaap.values()
+        for facts in tag.get("units", {}).values()
+        for f in facts
+        if f.get("accn") == accession
+    }
+    if len(fys) != 1 or not isinstance(next(iter(fys)), int):
+        return None, f"fy is inconsistent across the filing's facts: {sorted(map(str, fys))}"
+    offset = next(iter(fys)) - latest_end.year
+    if offset not in (0, -1):
+        return None, f"fiscal-year offset {offset} (fy - year of {latest_end}) is not 0 or -1"
+    return offset, None
+
+
 def truth_for_filing(facts: dict, accession: str) -> tuple[list[TruthValue], list[str]]:
     """Truth values for one filing and a note for every exclusion.
 
-    The year of a fact is the year of its `end` date, never `fy`: `fy` is the
-    filing's fiscal year, so prior-year comparatives carry the same `fy`.
+    The year of a fact is the year of its `end` date plus the filing's own
+    fiscal-year offset (see `_year_offset`), so a truth year is the year the
+    filing prints over the column. `fy` alone is never the year: comparatives
+    carry the filing's `fy`. The latest end is taken over the facts this module
+    scores (the right kind, this accession), not every fact: a filing may carry a
+    fact dated after its year end.
     """
     gaap = facts.get("facts", {}).get("us-gaap", {})
-    truth: list[TruthValue] = []
     notes: list[str] = []
+    kept_by_concept: dict = {}
     for concept, spec in CONCEPT_TAGS.items():
-        # year -> tag -> distinct values (Decimal keys dedupe "100" and "100.0")
-        by_year: dict[int, dict[str, dict[Decimal, str]]] = {}
         for tag in spec.tags:
             usd = gaap.get(tag, {}).get("units", {}).get("USD", [])
             in_filing = [f for f in usd if f["accn"] == accession]
@@ -57,9 +81,26 @@ def truth_for_filing(facts: dict, accession: str) -> tuple[list[TruthValue], lis
                     f"{concept.value}/{tag}: dropped {dropped} fact(s) that are not "
                     f"{'an instant' if spec.kind == 'instant' else 'a 350-380 day duration'}"
                 )
+            kept_by_concept.setdefault(concept, []).append((tag, kept))
+
+    ends = [date.fromisoformat(f["end"]) for c in kept_by_concept.values() for _, k in c for f in k]
+    if not ends:
+        return [], notes
+    offset, why = _year_offset(gaap, accession, max(ends))
+    if offset is None:
+        return [], [*notes, f"whole filing excluded: {why}"]
+    if offset:
+        notes.append(f"fiscal years named by start year: truth year = end year {offset:+d}")
+
+    truth: list[TruthValue] = []
+    for concept, tagged in kept_by_concept.items():
+        # year -> tag -> distinct values (Decimal keys dedupe "100" and "100.0")
+        by_year: dict[int, dict[str, dict[Decimal, str]]] = {}
+        for tag, kept in tagged:
             for f in kept:
                 text = str(f["val"])
-                year_tags = by_year.setdefault(date.fromisoformat(f["end"]).year, {})
+                year = date.fromisoformat(f["end"]).year + offset
+                year_tags = by_year.setdefault(year, {})
                 year_tags.setdefault(tag, {}).setdefault(Decimal(text), str(Decimal(text)))
         for year in sorted(by_year):
             tag_values = by_year[year]

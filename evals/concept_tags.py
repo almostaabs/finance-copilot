@@ -40,7 +40,7 @@ CONCEPT_TAGS: dict[C, ConceptTruthSpec] = {
         "DepreciationAndAmortization",
         "DepreciationAmortizationAndAccretionNet",
     ),
-    C.NET_INCOME: _d("NetIncomeLoss"),
+    C.NET_INCOME: _d("NetIncomeLoss", "ProfitLoss"),
     C.TOTAL_ASSETS: _i("Assets"),
     C.CURRENT_ASSETS: _i("AssetsCurrent"),
     C.CASH: _i("CashAndCashEquivalentsAtCarryingValue"),

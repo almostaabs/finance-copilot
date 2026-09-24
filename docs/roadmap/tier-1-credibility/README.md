@@ -12,9 +12,10 @@ is worse than no viewer.
 |---|---|---|
 | 1 | `T1.0-baseline-and-snapshot.md` | `scripts/snapshot.py` + committed snapshot = the mechanical "did anything break?" check |
 | 2 | `T1.1-xbrl-eval-harness.md` | `evals/` package: fetch SEC filings, render to PDF, score against XBRL. Dev/holdout split. Baseline numbers. |
-| 3 | `T1.4-correctness-fixes.md` | 10-K unprefixed statements → consolidated; new `implausible_magnitude` INFO rule |
-| 4 | `T1.2-indian-labeled-set.md` | ~15 hand-verified Indian reports as a second truth source in the same harness |
-| 5 | `T1.3-eval-driven-coverage.md` | Alias/blocklist growth driven by dev-set failures; `docs/EVAL_RESULTS.md` scoreboard; README accuracy section |
+| 3 | `T1.1b-eval-found-bugs.md` | Root-cause fixes for the 23 dev `wrong` records T1.1 found (KNOWN_ISSUES T1.1-a/-d/-e/-g) |
+| 4 | `T1.4-correctness-fixes.md` | 10-K unprefixed statements → consolidated; new `implausible_magnitude` INFO rule |
+| 5 | `T1.2-indian-labeled-set.md` | ~15 hand-verified Indian reports as a second truth source in the same harness |
+| 6 | `T1.3-eval-driven-coverage.md` | Alias/blocklist growth driven by dev-set failures; `docs/EVAL_RESULTS.md` scoreboard; README accuracy section |
 
 (T1.4 runs before T1.2 on purpose: its basis fix changes US results, and it is cheaper to label Indian
 reports once the pipeline's behaviour has settled.)

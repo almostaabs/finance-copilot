@@ -30,6 +30,7 @@ roadmap/
 │   ├── README.md
 │   ├── T1.0-baseline-and-snapshot.md
 │   ├── T1.1-xbrl-eval-harness.md
+│   ├── T1.1b-eval-found-bugs.md
 │   ├── T1.2-indian-labeled-set.md
 │   ├── T1.3-eval-driven-coverage.md
 │   └── T1.4-correctness-fixes.md
@@ -50,9 +51,9 @@ roadmap/
 ## Execution order and dependencies
 
 ```
-T1.0 ──► T1.1 ──► T1.4 ──► T1.2 ──► T1.3 ──► [TIER 1 EXIT GATE]
-                                                   │
-         ┌─────────────────────────────────────────┘
+T1.0 ──► T1.1 ──► T1.1b ──► T1.4 ──► T1.2 ──► T1.3 ──► [TIER 1 EXIT GATE]
+                                                              │
+         ┌────────────────────────────────────────────────────┘
          ▼
 T2.1 ──► T2.2 ──► T2.3 ──► T2.4 ──► T2.5 ──► [TIER 2 EXIT GATE]
                                                    │
@@ -65,6 +66,8 @@ Why this order:
 - **T1.0 first**: it builds the regression snapshot that the verification gate depends on. Without it
   "did anything break?" cannot be answered mechanically.
 - **T1.1 before T1.4**: the correctness fixes must be measured by the harness, not by eye.
+- **T1.1b right after T1.1**: it fixes the wrong numbers T1.1's eval found, so every later phase is
+  measured against a baseline without known wrong values.
 - **T1.3 last in tier 1**: coverage work is only safe once there is a dev/holdout split to stop
   overfitting the alias tables.
 - **T2.1 (speed) first in tier 2**: every later tier-2 feature is demoed live; a 90-second wait kills demos.
@@ -105,6 +108,7 @@ and the ROADMAP_LOG.md entry.
 |---|---|---|---|
 | T1.0 | Baseline and regression snapshot | ☑ | `543f3fd` |
 | T1.1 | XBRL ground-truth eval harness | ☑ | `aa4a6d9` |
+| T1.1b | Fix the wrong-number bugs found by the T1.1 eval | ☐ | |
 | T1.4 | Correctness fixes (10-K basis, plausibility flag) | ☐ | |
 | T1.2 | Hand-labelled Indian set | ☐ | |
 | T1.3 | Eval-driven coverage + public scoreboard | ☐ | |

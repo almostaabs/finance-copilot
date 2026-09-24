@@ -90,6 +90,19 @@ narrative fails intermittently on the free tier. `GeminiClient.complete_json`
 makes one request and turns any failure into `LLMError`, so the narrative
 declines. **Option.** One retry with exponential backoff for 503/timeout only.
 
+### T1.1-g. One filing's statements get different year labels (HIGH: a wrong number is shown)
+
+Home Depot's 10-K (accession 0001628280-26-019436) heads the income and
+cash-flow statements "Fiscal 2025 / 2024 / 2023" (rendered pages 45 and 48)
+and the balance sheet "February 1, 2026 / February 2, 2025" (page 44). The app
+labels the first by the fiscal year and the second by the calendar year of the
+date, so the year that ends 2026-02-01 is 2025 on the income statement and
+2026 on the balance sheet. Any ratio pairing the two (ROE, asset turnover)
+pairs different years. The T1.1 dev run scores the six balance-sheet values
+labelled 2025 (total assets 96,119, current assets 31,683, cash 1,659, total
+liabilities 89,479, current liabilities 28,661, equity 6,640 $M, all from the
+February 2, 2025 column) as `wrong_period`. Not fixed in T1.1.
+
 ### T1.1-f. Which net income the app reports is undecided (MEDIUM)
 
 US income statements print consolidated net income (including noncontrolling

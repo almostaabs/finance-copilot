@@ -192,3 +192,50 @@ def test_exposed_file_lists_the_pilot_holdout_companies():
     exposed = R.read_exposed()
     pilot = ("AAPL", "MSFT", "KO", "XOM", "JPM")
     assert set(exposed) == {t for t in pilot if R.split_for(t) == "holdout"} == {"AAPL"}
+
+
+_HEAD = "ticker,bucket,sector,local_pdf,fiscal_year_offset,offset_evidence\n"
+
+
+@pytest.mark.parametrize(
+    ("row", "error"),
+    [
+        ("HD,general,Retail,,-1,\n", "has no offset_evidence"),
+        ("HD,general,Retail,,-1,   \n", "has no offset_evidence"),
+        ("HD,general,Retail,,1,p1 header\n", "is not 0 or -1"),
+    ],
+)
+def test_corpus_rejects_an_override_without_evidence_or_out_of_range(tmp_path, row, error):
+    path = tmp_path / "corpus.csv"
+    path.write_text(_HEAD + row, encoding="utf-8")
+    with pytest.raises(ValueError, match=error):
+        R.read_corpus(path)
+
+
+def test_the_only_override_today_is_hd_with_its_evidence():
+    overrides = {r["ticker"]: r for r in R.read_corpus() if r["fiscal_year_offset"]}
+    assert overrides.keys() == {"HD"}
+    assert overrides["HD"]["fiscal_year_offset"] == "-1"
+    assert '"Fiscal 2025"' in overrides["HD"]["offset_evidence"]
+
+
+def test_main_prints_and_stores_the_fy_mismatch_listing(tmp_path, monkeypatch, capsys):
+    mismatch = {
+        "ticker": "LOW", "accession": "A", "fy": [2025], "latest_end": "2026-01-30", "offset": 0,
+    }  # fmt: skip
+    companies = [
+        {"ticker": "LOW", "bucket": "general", "split": "dev", "status": "ok", "error": None,
+         "fy_mismatch": mismatch},
+        {"ticker": "KO", "bucket": "general", "split": "dev", "status": "ok", "error": None,
+         "fy_mismatch": None},
+    ]  # fmt: skip
+    monkeypatch.setattr(R, "RESULTS_DIR", tmp_path)
+    monkeypatch.setattr(R, "EXPOSED", tmp_path / "none.json")
+    monkeypatch.setattr(R.EdgarClient, "from_env", staticmethod(lambda *a, **k: None))
+    monkeypatch.setattr(R, "run", lambda rows, workers, client: (companies, []))
+    assert R.main(["--only", "LOW", "KO"]) == 0
+    out = capsys.readouterr().out
+    assert "## fy-mismatch: statement headers to check (1)" in out
+    assert "| LOW | A | [2025] | 2026-01-30 | 0 |" in out
+    stored = json.loads((tmp_path / "latest_dev.json").read_text(encoding="utf-8"))
+    assert stored["fy_mismatch"] == [mismatch]

@@ -29,7 +29,14 @@ from pathlib import Path
 import pipeline
 
 from evals.score import OutcomeRecord, score, summarize
-from evals.truth_xbrl import read_truth, truth_for_filing, truth_path, write_truth
+from evals.truth_xbrl import (
+    fy_check,
+    fy_mismatch,
+    read_truth,
+    truth_for_filing,
+    truth_path,
+    write_truth,
+)
 from fincopilot.sources.edgar import EdgarClient, Filing
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,8 +59,20 @@ def split_for(ticker: str) -> str:
 
 
 def read_corpus(path: Path = CORPUS) -> list[dict[str, str]]:
+    """Corpus rows. A `fiscal_year_offset` override (empty = 0; else 0 or -1) must cite
+    its `offset_evidence`: the page and exact header text that names the year."""
     with path.open(newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+        rows = list(csv.DictReader(f))
+    for row in rows:
+        offset = row["fiscal_year_offset"].strip()
+        if offset not in ("", "0", "-1"):
+            raise ValueError(f"{row['ticker']}: fiscal_year_offset {offset!r} is not 0 or -1")
+        if offset and not row["offset_evidence"].strip():
+            raise ValueError(
+                f"{row['ticker']}: fiscal_year_offset {offset} has no offset_evidence; "
+                "cite the page and exact header text that names the year"
+            )
+    return rows
 
 
 def fiscal_year_of(file_name: str) -> int:
@@ -109,8 +128,11 @@ def _prepare(row: dict[str, str], lock: dict[str, Filing], client: EdgarClient) 
     filing = locked_filing(ticker, local_pdf, lock, client)
     tpath = truth_path(TRUTH_DIR, ticker, filing.accession)
     if not tpath.exists():
-        truth, notes = truth_for_filing(client.company_facts(filing.cik), filing.accession)
-        write_truth(TRUTH_DIR, ticker, filing.accession, truth, notes)
+        facts = client.company_facts(filing.cik)
+        truth, notes = truth_for_filing(facts, filing.accession)
+        write_truth(
+            TRUTH_DIR, ticker, filing.accession, truth, notes, fy_check(facts, filing.accession)
+        )
     local = LOCAL_PDF_DIR / local_pdf if local_pdf else None
     if local is not None and local.exists():
         pdf = local
@@ -126,12 +148,25 @@ def _prepare(row: dict[str, str], lock: dict[str, Filing], client: EdgarClient) 
             rendered = html_to_pdf(client.document(filing), base_url=base)
             pdf.parent.mkdir(parents=True, exist_ok=True)
             pdf.write_bytes(rendered)
-    return {"ticker": ticker, "accession": filing.accession, "pdf": str(pdf), "truth": str(tpath)}
+    offset = int(row["fiscal_year_offset"] or 0)
+    check = read_truth(tpath)[2]
+    mismatch = None
+    if check is None or fy_mismatch(check, offset):
+        check = check or {"fy": [], "latest_end": None}
+        mismatch = {"ticker": ticker, "accession": filing.accession, **check, "offset": offset}
+    return {
+        "ticker": ticker,
+        "accession": filing.accession,
+        "pdf": str(pdf),
+        "truth": str(tpath),
+        "offset": offset,
+        "fy_mismatch": mismatch,
+    }
 
 
 def _analyze(job: dict) -> list[dict]:
     """CPU stage; safe in a worker process. Deterministic, no LLM."""
-    truth, _ = read_truth(Path(job["truth"]))
+    truth, _, _ = read_truth(Path(job["truth"]), job["offset"])
     result = pipeline.analyze(Path(job["pdf"]).read_bytes())
     records = score(result, truth, ticker=job["ticker"], accession=job["accession"])
     return [asdict(r) for r in records]
@@ -169,7 +204,12 @@ def run(rows: list[dict[str, str]], workers: int, client: EdgarClient) -> tuple[
             entry |= {"status": "error", "error": _error(exc)}
             print(f"  {row['ticker']:6} error  {entry['error']}", flush=True)
             continue
-        entry |= {"accession": job["accession"], "pdf": Path(job["pdf"]).name}
+        entry |= {
+            "accession": job["accession"],
+            "pdf": Path(job["pdf"]).name,
+            "fiscal_year_offset": job["offset"],
+            "fy_mismatch": job["fy_mismatch"],
+        }
         jobs.append(job)
 
     records: list[dict] = []
@@ -242,6 +282,7 @@ def build_report(
         "timestamp": datetime.now(UTC).isoformat(timespec="seconds"),
         "errors": sum(c["status"] == "error" for c in companies),
         "exposed": sorted(hidden),
+        "fy_mismatch": [c["fy_mismatch"] for c in companies if c.get("fy_mismatch")],
         "companies": companies,
         "summary": summary,
         "records": records,
@@ -293,6 +334,15 @@ def markdown(report: dict) -> str:
             ]
         )
         for r in wrong
+    ]
+    mismatches = report["fy_mismatch"]
+    lines += ["", f"## fy-mismatch: statement headers to check ({len(mismatches)})", ""]
+    lines += ["fy - year(latest end) is not the offset in use. Open the header only."]
+    head = ("ticker", "accession", "fy", "latest end", "offset in use")
+    lines += ["", _row(head), _row(["---"] * len(head))]
+    lines += [
+        _row([m["ticker"], m["accession"], m["fy"], m["latest_end"], m["offset"]])
+        for m in mismatches
     ]
     errors = [c for c in report["companies"] if c["status"] == "error"]
     lines += ["", f"## Errors ({len(errors)})", ""]

@@ -36,71 +36,43 @@ def _kind_ok(fact: dict, kind: str) -> bool:
     return MIN_ANNUAL_DAYS <= days <= MAX_ANNUAL_DAYS
 
 
-def _year_offset(gaap: dict, accession: str, latest_end: date) -> tuple[int | None, str | None]:
-    """How this filing names its fiscal year: fy - year(latest period end).
-
-    HD calls the year ending 2026-02-01 "fiscal 2025" (offset -1); NVDA calls the
-    year ending 2026-01-25 "fiscal 2026" (offset 0). Returns (offset, None), or
-    (None, why) when fy is inconsistent or the offset is not 0 or -1.
-    """
-    fys = {
-        f.get("fy")
-        for tag in gaap.values()
-        for facts in tag.get("units", {}).values()
-        for f in facts
-        if f.get("accn") == accession
-    }
-    if len(fys) != 1 or not isinstance(next(iter(fys)), int):
-        return None, f"fy is inconsistent across the filing's facts: {sorted(map(str, fys))}"
-    offset = next(iter(fys)) - latest_end.year
-    if offset not in (0, -1):
-        return None, f"fiscal-year offset {offset} (fy - year of {latest_end}) is not 0 or -1"
-    return offset, None
-
-
-def truth_for_filing(facts: dict, accession: str) -> tuple[list[TruthValue], list[str]]:
-    """Truth values for one filing and a note for every exclusion.
-
-    The year of a fact is the year of its `end` date plus the filing's own
-    fiscal-year offset (see `_year_offset`), so a truth year is the year the
-    filing prints over the column. `fy` alone is never the year: comparatives
-    carry the filing's `fy`. The latest end is taken over the facts this module
-    scores (the right kind, this accession), not every fact: a filing may carry a
-    fact dated after its year end.
-    """
-    gaap = facts.get("facts", {}).get("us-gaap", {})
-    notes: list[str] = []
-    kept_by_concept: dict = {}
+def _scored(gaap: dict, accession: str):
+    """(concept, tag, kept facts, dropped count) for every concept tag in this filing."""
     for concept, spec in CONCEPT_TAGS.items():
         for tag in spec.tags:
             usd = gaap.get(tag, {}).get("units", {}).get("USD", [])
             in_filing = [f for f in usd if f["accn"] == accession]
             kept = [f for f in in_filing if _kind_ok(f, spec.kind)]
-            if dropped := len(in_filing) - len(kept):
-                notes.append(
-                    f"{concept.value}/{tag}: dropped {dropped} fact(s) that are not "
-                    f"{'an instant' if spec.kind == 'instant' else 'a 350-380 day duration'}"
-                )
-            kept_by_concept.setdefault(concept, []).append((tag, kept))
+            yield concept, tag, kept, len(in_filing) - len(kept)
 
-    ends = [date.fromisoformat(f["end"]) for c in kept_by_concept.values() for _, k in c for f in k]
-    if not ends:
-        return [], notes
-    offset, why = _year_offset(gaap, accession, max(ends))
-    if offset is None:
-        return [], [*notes, f"whole filing excluded: {why}"]
-    if offset:
-        notes.append(f"fiscal years named by start year: truth year = end year {offset:+d}")
 
+def truth_for_filing(facts: dict, accession: str) -> tuple[list[TruthValue], list[str]]:
+    """Truth values for one filing and a note for every exclusion.
+
+    The year of a fact is the year of its `end` date. `fy` is never the year:
+    comparatives carry the filing's `fy`. A filing that prints its years one
+    lower ("Fiscal 2025" for a year ending 2026-02-01) is shifted when read,
+    by the evidenced `fiscal_year_offset` in corpus.csv (see `read_truth`).
+    """
+    gaap = facts.get("facts", {}).get("us-gaap", {})
+    notes: list[str] = []
     truth: list[TruthValue] = []
-    for concept, tagged in kept_by_concept.items():
+    by_concept: dict = {}
+    for concept, tag, kept, dropped in _scored(gaap, accession):
+        if dropped:
+            instant = CONCEPT_TAGS[concept].kind == "instant"
+            notes.append(
+                f"{concept.value}/{tag}: dropped {dropped} fact(s) that are not "
+                f"{'an instant' if instant else 'a 350-380 day duration'}"
+            )
+        by_concept.setdefault(concept, []).append((tag, kept))
+    for concept, tagged in by_concept.items():
         # year -> tag -> distinct values (Decimal keys dedupe "100" and "100.0")
         by_year: dict[int, dict[str, dict[Decimal, str]]] = {}
         for tag, kept in tagged:
             for f in kept:
                 text = str(f["val"])
-                year = date.fromisoformat(f["end"]).year + offset
-                year_tags = by_year.setdefault(year, {})
+                year_tags = by_year.setdefault(date.fromisoformat(f["end"]).year, {})
                 year_tags.setdefault(tag, {}).setdefault(Decimal(text), str(Decimal(text)))
         for year in sorted(by_year):
             tag_values = by_year[year]
@@ -117,12 +89,43 @@ def truth_for_filing(facts: dict, accession: str) -> tuple[list[TruthValue], lis
     return truth, notes
 
 
+def fy_check(facts: dict, accession: str) -> dict:
+    """Diagnostics only, never used for a truth year: the filing's `fy` values and
+    its latest scored period end. The latest end is taken over the facts this
+    module scores, not every fact: a filing may carry a fact dated after its year end.
+    """
+    gaap = facts.get("facts", {}).get("us-gaap", {})
+    fys = {
+        f.get("fy")
+        for tag in gaap.values()
+        for unit in tag.get("units", {}).values()
+        for f in unit
+        if f.get("accn") == accession
+    }
+    ends = [f["end"] for _, _, kept, _ in _scored(gaap, accession) for f in kept]
+    return {"fy": sorted(fys, key=str), "latest_end": max(ends, default=None)}
+
+
+def fy_mismatch(check: dict, offset: int) -> bool:
+    """True when `fy - year(latest end)` is not the offset in use (or fy is not one
+    integer): a human should read that filing's statement headers."""
+    fys, end = check["fy"], check["latest_end"]
+    if end is None:
+        return False
+    return len(fys) != 1 or not isinstance(fys[0], int) or fys[0] - int(end[:4]) != offset
+
+
 def truth_path(truth_dir: Path, ticker: str, accession: str) -> Path:
     return truth_dir / f"{ticker}_{accession}.json"
 
 
 def write_truth(
-    truth_dir: Path, ticker: str, accession: str, truth: list[TruthValue], notes: list[str]
+    truth_dir: Path,
+    ticker: str,
+    accession: str,
+    truth: list[TruthValue],
+    notes: list[str],
+    check: dict | None = None,
 ) -> Path:
     """Freeze truth to disk so later SEC amendments cannot silently move it."""
     path = truth_path(truth_dir, ticker, accession)
@@ -132,15 +135,17 @@ def write_truth(
         "accession": accession,
         "truth": [asdict(t) for t in truth],
         "notes": notes,
+        "fy_check": check,
     }
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return path
 
 
-def read_truth(path: Path) -> tuple[list[TruthValue], list[str]]:
+def read_truth(path: Path, offset: int = 0) -> tuple[list[TruthValue], list[str], dict | None]:
+    """(truth with every year shifted by `offset`, notes, fy_check)."""
     payload = json.loads(path.read_text(encoding="utf-8"))
     truth = [
-        TruthValue(t["concept"], t["end_year"], tuple(t["values"]), tuple(t["tags"]))
+        TruthValue(t["concept"], t["end_year"] + offset, tuple(t["values"]), tuple(t["tags"]))
         for t in payload["truth"]
     ]
-    return truth, payload["notes"]
+    return truth, payload["notes"], payload.get("fy_check")

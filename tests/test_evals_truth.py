@@ -5,7 +5,14 @@ from pathlib import Path
 
 import pytest
 from evals.concept_tags import CONCEPT_TAGS
-from evals.truth_xbrl import TruthValue, read_truth, truth_for_filing, write_truth
+from evals.truth_xbrl import (
+    TruthValue,
+    fy_check,
+    fy_mismatch,
+    read_truth,
+    truth_for_filing,
+    write_truth,
+)
 
 from fincopilot.types import CanonicalConcept as C
 
@@ -70,7 +77,7 @@ def test_truth_file_round_trips(tmp_path):
     truth, notes = truth_for_filing(FACTS, ACCN)
     path = write_truth(tmp_path, "TEST", ACCN, truth, notes)
     assert path.name == f"TEST_{ACCN}.json"
-    assert read_truth(path) == (truth, notes)
+    assert read_truth(path) == (truth, notes, None)
 
 
 def test_derived_concepts_have_no_truth_tags():
@@ -87,42 +94,43 @@ def _filing(fy: int, *periods: tuple[str, str], fys: tuple[int, ...] = ()) -> di
     return {"facts": {"us-gaap": {"NetIncomeLoss": {"units": {"USD": facts}}}}}
 
 
-def _years(facts: dict) -> dict[int, tuple[str, ...]]:
-    truth, _ = truth_for_filing(facts, "A")
-    return {t.end_year: t.values for t in truth}
+def _years(facts: dict, offset: int = 0, tmp_path=None) -> dict[int, tuple[str, ...]]:
+    """Truth years as run.py sees them: frozen by end year, shifted by the corpus offset."""
+    truth, notes = truth_for_filing(facts, "A")
+    path = write_truth(tmp_path, "T", "A", truth, notes, fy_check(facts, "A"))
+    return {t.end_year: t.values for t in read_truth(path, offset)[0]}
 
 
-def test_start_year_naming_filer_shifts_truth_back_one_year():
-    # Home Depot: the year ending 2026-02-01 is "fiscal 2025", and fy says 2025.
+def test_january_filers_keep_the_end_year_by_default_whatever_fy_says(tmp_path):
+    # Lowe's prints "January 30, 2026"; Salesforce calls its year ending 2026-01-31
+    # "fiscal 2026". Both carry fy 2025, and fy must not move the truth year.
+    low = _filing(2025, ("2025-02-01", "2026-01-30"), ("2024-02-03", "2025-01-31"))
+    crm = _filing(2025, ("2025-02-01", "2026-01-31"), ("2024-02-01", "2025-01-31"))
+    for facts in (low, crm):
+        assert _years(facts, tmp_path=tmp_path) == {2026: ("100",), 2025: ("101",)}
+        assert fy_mismatch(fy_check(facts, "A"), 0)  # listed for a header check
+
+
+def test_evidenced_override_shifts_every_year_back_one(tmp_path):
+    # Home Depot prints the year ending 2026-02-01 as "Fiscal 2025": corpus offset -1.
     facts = _filing(2025, ("2025-02-03", "2026-02-01"), ("2024-02-05", "2025-02-02"))
-    assert _years(facts) == {2025: ("100",), 2024: ("101",)}
-    assert any("end year -1" in n for n in truth_for_filing(facts, "A")[1])
+    assert _years(facts, -1, tmp_path) == {2025: ("100",), 2024: ("101",)}
+    assert not fy_mismatch(fy_check(facts, "A"), -1)
 
 
-def test_end_year_naming_january_filer_keeps_the_end_year():
-    # NVIDIA: the year ending 2026-01-25 is "fiscal 2026", and fy says 2026.
-    facts = _filing(2026, ("2025-01-27", "2026-01-25"), ("2024-01-29", "2025-01-26"))
-    assert _years(facts) == {2026: ("100",), 2025: ("101",)}
-
-
-def test_december_filer_keeps_the_end_year():
+def test_december_filer_keeps_the_end_year_and_is_not_listed(tmp_path):
     facts = _filing(2025, ("2025-01-01", "2025-12-31"), ("2024-01-01", "2024-12-31"))
-    assert _years(facts) == {2025: ("100",), 2024: ("101",)}
+    assert _years(facts, tmp_path=tmp_path) == {2025: ("100",), 2024: ("101",)}
+    assert fy_check(facts, "A") == {"fy": [2025], "latest_end": "2025-12-31"}
+    assert not fy_mismatch(fy_check(facts, "A"), 0)
 
 
-def test_inconsistent_fy_excludes_the_whole_filing_with_a_note():
+def test_inconsistent_fy_keeps_the_truth_and_is_listed(tmp_path):
     facts = _filing(
         2025, ("2025-01-01", "2025-12-31"), ("2024-01-01", "2024-12-31"), fys=(2025, 2024)
     )
-    truth, notes = truth_for_filing(facts, "A")
-    assert truth == []
-    assert any("whole filing excluded: fy is inconsistent" in n for n in notes)
-
-
-def test_offset_outside_zero_or_minus_one_excludes_the_whole_filing():
-    truth, notes = truth_for_filing(_filing(2027, ("2025-01-01", "2025-12-31")), "A")
-    assert truth == []
-    assert any("whole filing excluded: fiscal-year offset 2" in n for n in notes)
+    assert _years(facts, tmp_path=tmp_path) == {2025: ("100",), 2024: ("101",)}
+    assert fy_mismatch(fy_check(facts, "A"), 0)
 
 
 def test_net_income_accepts_profit_loss_after_net_income_loss():

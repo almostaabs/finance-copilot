@@ -16,40 +16,6 @@ four more (section H below), all fixed with regression tests in
 
 ## Open - needs a decision
 
-### T1.1-a. A footnote table's totals replace the balance sheet's (HIGH: a wrong number is shown)
-
-Found by the T1.1 XBRL eval pilot. JPMorgan's 10-K (accession
-0001628280-26-008131, rendered page 169) prints the consolidated balance sheet
-with "Total assets(a)" and "Total liabilities(a)" (footnote marker attached),
-then, on the same page, footnote (a)'s table of consolidated-VIE assets and
-liabilities with plain "Total assets" and "Total liabilities" rows. The app
-mapped total_assets and total_liabilities from the footnote table: 43,295 /
-41,076 and 28,642 / 27,777 $M (2025 / 2024) instead of the balance sheet's
-4,424,900 / 4,002,814 and 4,062,462 / 3,658,056 $M, which match the filer's
-XBRL `Assets` and `Liabilities`. All four are `wrong` in the eval. **Not fixed
-in T1.1** (the phase only measures); a dedicated fix phase follows.
-Reproduce: `uv run python -m evals.run --split all --only JPM`.
-
-The T1.1 dev run found the same pattern at Ford (accession
-0000037996-26-000015, rendered page 116): cash was mapped from the VIE table
-under the balance sheet (2,494 / 2,523 $M for 2024 / 2025) instead of the
-balance sheet's 22,935 / 23,356 $M.
-
-### T1.1-d. A "% of sales" column is read as amounts (HIGH: a wrong number is shown)
-
-Lowe's 10-K (accession 0000060667-26-000029, rendered page 41) prints each year
-as an Amount column and a % Sales column. The app took the % column for 2025 and
-2026: cogs 66.68 / 66.52, gross margin 33.32 / 33.48, operating income 12.51 /
-11.77, D&A 2.07 / 2.25, each scaled by millions (e.g. 66,680,000 instead of
-55,797 $M). Eight `wrong` records in the dev run. Not fixed in T1.1.
-
-### T1.1-e. One component row is mapped as total cost of revenue (HIGH: a wrong number is shown)
-
-Honeywell (accession 0000773840-26-000013, rendered page 59) prints "Cost of
-products sold", "Cost of services sold" and "Total Cost of products and services
-sold". The app skipped the total row and mapped the products row as cogs (14,836 / 15,017 / 16,153 $M for 2023-2025) against
-`CostOfGoodsAndServicesSold` 20,637 / 21,360 / 23,613 $M. Not fixed in T1.1.
-
 ### 0. Large reports are slow (MEDIUM)
 
 Wipro's 481-page report takes about 88 s; Berkshire's 152 pages about 40 s;
@@ -89,21 +55,6 @@ Gemini 503 (model overloaded) and request timeouts are not retried; the
 narrative fails intermittently on the free tier. `GeminiClient.complete_json`
 makes one request and turns any failure into `LLMError`, so the narrative
 declines. **Option.** One retry with exponential backoff for 503/timeout only.
-
-### T1.1-g. One filing's statements get different year labels (HIGH: a wrong number is shown)
-
-Home Depot's 10-K (accession 0001628280-26-019436) heads the income and
-cash-flow statements "Fiscal 2025 / 2024 / 2023" (rendered pages 45 and 48)
-and the balance sheet "February 1, 2026 / February 2, 2025" (page 44). The app
-labels the first by the fiscal year and the second by the calendar year of the
-date, so the year that ends 2026-02-01 is 2025 on the income statement and
-2026 on the balance sheet. Any ratio pairing the two (ROE, asset turnover)
-pairs different years. The T1.1 dev run scores the six balance-sheet values
-labelled 2025 (total assets 96,119, current assets 31,683, cash 1,659, total
-liabilities 89,479, current liabilities 28,661, equity 6,640 $M, all from the
-February 2, 2025 column) as `wrong_period`, because HD's truth years follow
-its "Fiscal YYYY" headers (`fiscal_year_offset = -1` in `evals/corpus.csv`).
-Not fixed in T1.1.
 
 ### T1.1b-1. The scored fallback can pick a non-statement table (MEDIUM)
 
@@ -238,6 +189,65 @@ makes it silent.
 ---
 
 ---
+
+## Resolved in T1.1b - eval-found bugs
+
+### T1.1-a. A footnote table's totals replace the balance sheet's (was HIGH)
+
+Found by the T1.1 XBRL eval pilot. JPMorgan's 10-K (accession
+0001628280-26-008131, rendered page 169) prints the consolidated balance sheet
+with "Total assets(a)" and "Total liabilities(a)" (footnote marker attached),
+then, on the same page, footnote (a)'s table of consolidated-VIE assets and
+liabilities with plain "Total assets" and "Total liabilities" rows. The app
+mapped total_assets and total_liabilities from the footnote table: 43,295 /
+41,076 and 28,642 / 27,777 $M (2025 / 2024) instead of the balance sheet's
+4,424,900 / 4,002,814 and 4,062,462 / 3,658,056 $M, which match the filer's
+XBRL `Assets` and `Liabilities`. All four are `wrong` in the eval. **Not fixed
+in T1.1** (the phase only measures); a dedicated fix phase follows.
+Reproduce: `uv run python -m evals.run --split all --only JPM`.
+
+The T1.1 dev run found the same pattern at Ford (accession
+0000037996-26-000015, rendered page 116): cash was mapped from the VIE table
+under the balance sheet (2,494 / 2,523 $M for 2024 / 2025) instead of the
+balance sheet's 22,935 / 23,356 $M.
+
+**Fixed in `dc317d2` (T1.1b):** `textgrid.text_grids` starts a new table at a year-only header line that follows data rows, so the VIE table is its own table; a closing paren needs its opening one ("(Note 9)" is no longer cut at "9)"); a trailing "(a)" marker is stripped from labels; literal "Statements of Consolidated <X>" anchors were added so UPS's statements are located by heading once the split changed their scores (see T1.1b-1). Dev: JPM 4 and F 2 records now correct. Regression: `tests/fixtures/footnote_table.pdf`.
+
+### T1.1-d. A "% of sales" column is read as amounts (was HIGH)
+
+Lowe's 10-K (accession 0000060667-26-000029, rendered page 41) prints each year
+as an Amount column and a % Sales column. The app took the % column for 2025 and
+2026: cogs 66.68 / 66.52, gross margin 33.32 / 33.48, operating income 12.51 /
+11.77, D&A 2.07 / 2.25, each scaled by millions (e.g. 66,680,000 instead of
+55,797 $M). Eight `wrong` records in the dev run. Not fixed in T1.1.
+
+**Fixed in `b3e22f8` (T1.1b):** a sub-header line under the years ("Amount % Sales") is header, not body; when it prints a `%` sub-column, each year goes to the one sub-column whose printed sub-header says "Amount", and without exactly one the periods are withheld. Dev: all 8 LOW records now correct. Regression: `tests/fixtures/percent_sales.pdf`.
+
+### T1.1-e. One component row is mapped as total cost of revenue (was HIGH)
+
+Honeywell (accession 0000773840-26-000013, rendered page 59) prints "Cost of
+products sold", "Cost of services sold" and "Total Cost of products and services
+sold". The app skipped the total row and mapped the products row as cogs (14,836 / 15,017 / 16,153 $M for 2023-2025) against
+`CostOfGoodsAndServicesSold` 20,637 / 21,360 / 23,613 $M. Not fixed in T1.1.
+
+**Fixed in `e2d9499` (T1.1b):** `validate_mappings`: when two rows of a statement claim one concept and exactly one is a total row ("total ...", or a bare "Total" resolved by section in `map_rows`), the total wins; otherwise CONFLICT. Literal aliases added for "total cost of products and services sold" (cogs) and "total net sales and revenues" (revenue, Deere's bare Total). Dev: HON cogs 3 and DE revenue 3 correct. Regression: `tests/fixtures/component_total.pdf`.
+
+### T1.1-g. One filing's statements get different year labels (was HIGH)
+
+Home Depot's 10-K (accession 0001628280-26-019436) heads the income and
+cash-flow statements "Fiscal 2025 / 2024 / 2023" (rendered pages 45 and 48)
+and the balance sheet "February 1, 2026 / February 2, 2025" (page 44). The app
+labels the first by the fiscal year and the second by the calendar year of the
+date, so the year that ends 2026-02-01 is 2025 on the income statement and
+2026 on the balance sheet. Any ratio pairing the two (ROE, asset turnover)
+pairs different years. The T1.1 dev run scores the six balance-sheet values
+labelled 2025 (total assets 96,119, current assets 31,683, cash 1,659, total
+liabilities 89,479, current liabilities 28,661, equity 6,640 $M, all from the
+February 2, 2025 column) as `wrong_period`, because HD's truth years follow
+its "Fiscal YYYY" headers (`fiscal_year_offset = -1` in `evals/corpus.csv`).
+Not fixed in T1.1.
+
+**Fixed in `f85dab5` (T1.1b):** `periods.reconcile_fiscal_years` (human decision A with B fallback): when a document mixes "Fiscal YYYY" headers with date headers, a date column is relabelled only from one sentence or table row binding one fiscal-year label to an end date equal to that column's date (HD p4 "fiscal 2025 Fiscal year ended February 1, 2026"), recorded in `Period.label`; otherwise the document is AMBIGUOUS. Documents with consistent headers are untouched. Dev: the 6 HD `wrong_period` records now correct.
 
 ## Resolved - fixed in `2ea19cd` and `dd3e8a8`
 

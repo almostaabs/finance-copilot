@@ -14,7 +14,7 @@ zero.
 
 ![Dashboard overview](docs/screenshots/overview.png)
 
-**Status:** Phases 0-15 complete. 519 tests, all passing. Deployed on Streamlit
+**Status:** Phases 0-15 complete. 551 tests, all passing. Deployed on Streamlit
 Community Cloud; also runs entirely on your own machine, where no data leaves it.
 Validated on five real annual reports (Apple, Berkshire Hathaway, Wipro,
 Microsoft, and a small US bank), see
@@ -202,7 +202,7 @@ src/fincopilot/charts.py     the five chart specifications (pure, tested)
 src/fincopilot/panel.py      HTML for the KPI cards and red-flag grid (escaped, offline)
 src/fincopilot/store.py      SQLite history
 evals/                       XBRL accuracy eval (see evals/README.md)
-tests/fixtures/              nine generated PDFs with hand-computed answers
+tests/fixtures/              twelve generated PDFs with hand-computed answers
 docs/screenshots/            the images used in this README
 docs/                        design spec, build notes, validation, security review
 ```

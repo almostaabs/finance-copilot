@@ -9,6 +9,9 @@ rebuilds the grid from word coordinates:
   to one onto those columns
 - a column whose header carries no year and whose values are all small
   plain integers is a notes column, and is dropped
+- a sub-header line under the years ("Amount  % Sales") is header, not body;
+  when it prints a % sub-column, only the sub-column printed as "Amount" takes
+  the year, and without one the years are withheld
 - a year-only header line below data rows starts a new table, so a footnote
   table printed under a statement never becomes part of it
 
@@ -30,6 +33,7 @@ _AMOUNT = re.compile(rf"^(?:\({_NUMBER}\)?|{_NUMBER})%?$")
 _SKIP = frozenset({"$", "Rs.", "Rs", "\u20b9", "USD", "INR"})
 _DASH = frozenset({"-", "\u2013", "\u2014", "Nil", "NIL", "nil"})
 _NOTE = re.compile(r"^[0-9]{1,3}(?:\([a-z]\))?$")
+_AMOUNT_HEADER = re.compile(r"\bamounts?\b", re.I)
 
 LINE_TOL = 3.0  # points; words within this vertical distance share a line
 COL_GAP = 14.0  # points; right edges further apart than this start a new column
@@ -111,6 +115,70 @@ def _nearest(center: float, spans: list[tuple[float, float]]) -> int:
     return min(range(len(spans)), key=lambda i: abs((spans[i][0] + spans[i][1]) / 2 - center))
 
 
+def _extents(data: list, spans: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Each column's printed width: leftmost start to rightmost end of its values."""
+    ext = [(math.inf, -math.inf)] * len(spans)
+    for _, _, values in data:
+        for v in values:
+            c = _column_of(v, spans)
+            if c is not None:
+                ext[c] = (min(ext[c][0], v.x0), max(ext[c][1], v.x1))
+    return ext
+
+
+def _over(w: Word, extents: list[tuple[float, float]]) -> int | None:
+    """The column a header word overlaps most, if any."""
+    best, col = 0.0, None
+    for c, (lo, hi) in enumerate(extents):
+        overlap = min(w.x1, hi + COL_SLACK) - max(w.x0, lo - COL_SLACK)
+        if overlap > best:
+            best, col = overlap, c
+    return col
+
+
+def _sub_headers(
+    lines: list[list[Word]], extents: list[tuple[float, float]]
+) -> tuple[set[int], list[str]]:
+    """Header lines under the year line ("Amount  % Sales"): their indices in
+    `lines`, and the text each prints over each column. Such a line has no
+    value token and words over at least two columns."""
+    found: set[int] = set()
+    text = [""] * len(extents)
+    for i, line in enumerate(lines):
+        if any(_is_value(w.text) for w in line):
+            continue
+        cols = [(_over(w, extents), w) for w in line]
+        if len({c for c, _ in cols if c is not None}) < MIN_COLUMNS:
+            continue
+        found.add(i)
+        for c, w in cols:
+            if c is not None:
+                text[c] = (text[c] + " " + w.text).strip()
+    return found, text
+
+
+def _amount_header(
+    years: list[Word], extents: list[tuple[float, float]], sub: list[str]
+) -> list[str]:
+    """Year per column when a year spans an amount and a % sub-column.
+
+    Each sub-column belongs to its nearest year; within that year the printed
+    sub-header, never position, names the amount column. If it does not name
+    exactly one, no column gets a year and the statement's periods are withheld.
+    """
+    header = [""] * len(extents)
+    printed = [c for c, (lo, hi) in enumerate(extents) if lo <= hi]
+    owner = {
+        c: min(years, key=lambda y: abs((y.x0 + y.x1) / 2 - sum(extents[c]) / 2)) for c in printed
+    }
+    for y in years:
+        amount = [c for c in printed if owner[c] is y and _AMOUNT_HEADER.search(sub[c])]
+        if len(amount) != 1:
+            return [""] * len(extents)
+        header[amount[0]] = y.text
+    return header
+
+
 def _is_year_header(line: list[Word]) -> bool:
     values = _split(line)[1]
     return len(values) >= MIN_COLUMNS and all(_YEAR.match(v.text) for v in values)
@@ -166,12 +234,16 @@ def _grid(lines: list[list[Word]]) -> tuple[list[list[str]], tuple[float, ...]] 
             break
     if header_line is None:
         return None
+    extents = _extents(data, spans)
+    sub_lines, sub = _sub_headers(lines[header_line + 1 : first_data], extents)
+    if any("%" in text for text in sub):
+        header = _amount_header(years, extents, sub)
 
     last_data = data[-1][0]
     body: list[list[str]] = []
     for i in range(header_line + 1, last_data + 1):
         (label, values), _ = parsed[i]
-        if not label:
+        if not label or i - header_line - 1 in sub_lines:
             continue
         cells = [""] * len(spans)
         for v in values:

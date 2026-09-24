@@ -116,17 +116,33 @@ the audit trail: it is how a later reader can tell what each phase changed and w
   balance sheet (KNOWN_ISSUES T1.1-a). AAPL is a holdout company, so it is marked exposed
   (`evals/exposed.json`) and kept out of headline holdout totals.
 
-## T1.1b: Eval-found bugs (T1.1-a, -d, -e, -g). Builder entry, awaiting gate, 2026-09-24
+## T1.1b: Eval-found bugs (T1.1-a, -d, -e, -g). PASS, 2026-09-24
 
-- Branch: `roadmap/t1-1b`. Commits: `dc317d2` (T1.1-a, with the literal "Statements of Consolidated <X>"
-  anchors), `e2d9499` (T1.1-e, reordered before T1.1-d by human decision), `b3e22f8` (T1.1-d), `f85dab5`
-  (T1.1-g), `1cf0e45` (hygiene: `edgar.py` wraps `http.client.HTTPException`; `run.py` escapes `|`), then docs.
-- Tests: 519 -> 551 collected, 2 deselected. 550 pass; `test_fixture_snapshot_matches` fails only on the new
-  fixtures' added lines (amendment rule; the snapshot is not updated by the builder).
+- Branch / merge commit: `roadmap/t1-1b` / `b20ace8` (snapshot `35ff8bd`, dev baseline `b152c88`).
+  Commits: `dc317d2` (T1.1-a, with the literal "Statements of Consolidated <X>" anchors), `e2d9499` (T1.1-e,
+  reordered before T1.1-d by human decision), `b3e22f8` (T1.1-d), `f85dab5` (T1.1-g), `1cf0e45` (hygiene:
+  `edgar.py` wraps `http.client.HTTPException`; `run.py` escapes `|`), `fbcf4a0` (docs).
+- Gate run by a fresh evaluator (phase ID, roadmap paths and branch only); verdict PASS on the condition that
+  the orchestrator updates the snapshot, done in `35ff8bd`.
+- Tests: 519 -> 551 passed, 2 deselected (removed: none; `test_all_nine_fixtures_are_present` renamed to
+  `test_every_pinned_fixture_is_present`). Before the snapshot update, `test_fixture_snapshot_matches` failed
+  only on the new fixtures' added lines (amendment rule).
 - Lint/format: pass
-- Snapshot `--check`: fixtures.snap diff is ADDED lines only, 173 in all: `component_total.pdf` 54,
-  `footnote_table.pdf` 57, `percent_sales.pdf` 62. 0 removed or changed lines. `.snapshots/real.snap`: ok
-  (585 lines), 0 changes.
+- Snapshot: fixtures.snap 599 -> 772 lines, ADDED lines only (173): `component_total.pdf` 54,
+  `footnote_table.pdf` 57, `percent_sales.pdf` 62; 0 removed or changed. `.snapshots/real.snap`: 585 lines,
+  0 changes. The fiscal reconcile (T1.1-g) was run by the evaluator on all 36 dev filings: 35 untouched
+  (including LOW, NVDA, WMT, CRM, the December filers); only HD relabelled, each label quoting its p4 binding.
+- App smoke: pass (`tests/test_app.py` 12 passed; `/_stcore/health` ok; browser click not checked)
+- Invariant spot-check: 1 ✔ no new `FinancialValue(`; 2 ✔ undecidable cases are `Unavailable(AMBIGUOUS)`
+  or `CONFLICT`, `types.py` unchanged; 3 ✔ no new rounding; 4 ✔ no new HTML, eval Markdown escapes `|`;
+  5 ✔ network change only in `sources/edgar.py` (exception wrap)
+- Acceptance criteria: 1-6 ✔. Break-and-restore by the evaluator: `_total_of` -> `None` fails
+  `test_the_total_row_wins_over_its_component`; grid split disabled fails 2 textgrid tests incl.
+  `test_footnote_table_under_the_balance_sheet_never_supplies_its_totals`; `%` sub-header branch disabled
+  fails 3 incl. `test_percent_sales_fixture_maps_amounts_and_never_the_percentages`; reconcile early-return
+  fails 4 periods tests (the date-only "untouched" test still passes, as it should)
+- Most important test: `test_the_total_row_wins_over_its_component` (the general total-wins rule)
+- New dependencies: none
 - Eval (dev only, `--compare` against the T1.1 baseline; holdout not run):
 
   | scope | correct | wrong | withheld | unverified | precision | coverage |
@@ -153,3 +169,9 @@ the audit trail: it is how a later reader can tell what each phase changed and w
   word-grid split and paren/footnote tests fail on revert of `dc317d2`.
 - Known issues: T1.1-a, -d, -e, -g moved to resolved with their commits. Added T1.1b-1 (MEDIUM): the scored
   fallback can pick a non-statement table when no anchor matches (UPS before the anchors).
+- Human decisions and amendments (2026-09-24, in the phase file): bug 2 header includes the "Amount % Sales"
+  sub-header; bug 4 = A (one-sentence binding, exact date match) with B fallback; bug 1 = split plus literal
+  anchors; Deere revenue regression fixed as bug 3 via a general total-wins rule (Deere revenue now correct).
+- Surprises / notes for the next phase: `_total_of` decides only two-way claims; three or more claims are
+  withheld as CONFLICT. When the total wins, the component's claim is dropped without a conflict record.
+  The KNOWN_ISSUES status line still reads "Phase 15, 451 tests" (stale, not touched here).

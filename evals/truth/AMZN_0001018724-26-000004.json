@@ -1,5 +1,11 @@
 {
   "accession": "0001018724-26-000004",
+  "fy_check": {
+    "fy": [
+      2025
+    ],
+    "latest_end": "2025-12-31"
+  },
   "notes": [],
   "ticker": "AMZN",
   "truth": [

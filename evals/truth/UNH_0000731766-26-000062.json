@@ -1,5 +1,11 @@
 {
   "accession": "0000731766-26-000062",
+  "fy_check": {
+    "fy": [
+      2025
+    ],
+    "latest_end": "2025-12-31"
+  },
   "notes": [],
   "ticker": "UNH",
   "truth": [

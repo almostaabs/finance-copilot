@@ -1,5 +1,11 @@
 {
   "accession": "0000950170-24-019719",
+  "fy_check": {
+    "fy": [
+      2023
+    ],
+    "latest_end": "2023-12-31"
+  },
   "notes": [],
   "ticker": "BRK-B",
   "truth": [

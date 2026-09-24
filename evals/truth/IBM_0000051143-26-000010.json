@@ -1,5 +1,11 @@
 {
   "accession": "0000051143-26-000010",
+  "fy_check": {
+    "fy": [
+      2025
+    ],
+    "latest_end": "2025-12-31"
+  },
   "notes": [],
   "ticker": "IBM",
   "truth": [

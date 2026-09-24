@@ -1,5 +1,11 @@
 {
   "accession": "0001628280-26-003952",
+  "fy_check": {
+    "fy": [
+      2025
+    ],
+    "latest_end": "2025-12-31"
+  },
   "notes": [],
   "ticker": "TSLA",
   "truth": [

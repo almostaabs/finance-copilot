@@ -1,5 +1,11 @@
 {
   "accession": "0000104169-26-000055",
+  "fy_check": {
+    "fy": [
+      2026
+    ],
+    "latest_end": "2026-01-31"
+  },
   "notes": [],
   "ticker": "WMT",
   "truth": [

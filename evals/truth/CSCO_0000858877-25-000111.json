@@ -1,5 +1,11 @@
 {
   "accession": "0000858877-25-000111",
+  "fy_check": {
+    "fy": [
+      2025
+    ],
+    "latest_end": "2025-07-26"
+  },
   "notes": [],
   "ticker": "CSCO",
   "truth": [

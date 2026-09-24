@@ -1,5 +1,11 @@
 {
   "accession": "0000950170-24-087843",
+  "fy_check": {
+    "fy": [
+      2024
+    ],
+    "latest_end": "2024-06-30"
+  },
   "notes": [],
   "ticker": "MSFT",
   "truth": [

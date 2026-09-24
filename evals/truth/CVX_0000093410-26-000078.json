@@ -1,5 +1,11 @@
 {
   "accession": "0000093410-26-000078",
+  "fy_check": {
+    "fy": [
+      2025
+    ],
+    "latest_end": "2025-12-31"
+  },
   "notes": [],
   "ticker": "CVX",
   "truth": [

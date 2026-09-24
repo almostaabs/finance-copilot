@@ -1,5 +1,11 @@
 {
   "accession": "0000773840-26-000013",
+  "fy_check": {
+    "fy": [
+      2025
+    ],
+    "latest_end": "2025-12-31"
+  },
   "notes": [
     "revenue/RevenueFromContractWithCustomerExcludingAssessedTax: dropped 8 fact(s) that are not a 350-380 day duration",
     "gross_profit/GrossProfit: dropped 8 fact(s) that are not a 350-380 day duration",

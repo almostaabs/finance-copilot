@@ -1,5 +1,11 @@
 {
   "accession": "0000796343-26-000003",
+  "fy_check": {
+    "fy": [
+      2025
+    ],
+    "latest_end": "2025-11-28"
+  },
   "notes": [],
   "ticker": "ADBE",
   "truth": [

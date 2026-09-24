@@ -1,5 +1,11 @@
 {
   "accession": "0001558370-25-001941",
+  "fy_check": {
+    "fy": [
+      2024
+    ],
+    "latest_end": "2024-12-31"
+  },
   "notes": [],
   "ticker": "MBIN",
   "truth": [

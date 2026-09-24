@@ -1,5 +1,11 @@
 {
   "accession": "0001193125-26-277521",
+  "fy_check": {
+    "fy": [
+      2026
+    ],
+    "latest_end": "2026-05-31"
+  },
   "notes": [],
   "ticker": "ORCL",
   "truth": [

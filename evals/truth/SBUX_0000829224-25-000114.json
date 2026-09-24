@@ -1,5 +1,11 @@
 {
   "accession": "0000829224-25-000114",
+  "fy_check": {
+    "fy": [
+      2025
+    ],
+    "latest_end": "2025-09-28"
+  },
   "notes": [],
   "ticker": "SBUX",
   "truth": [

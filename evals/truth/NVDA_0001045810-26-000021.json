@@ -1,5 +1,11 @@
 {
   "accession": "0001045810-26-000021",
+  "fy_check": {
+    "fy": [
+      2026
+    ],
+    "latest_end": "2026-01-25"
+  },
   "notes": [],
   "ticker": "NVDA",
   "truth": [

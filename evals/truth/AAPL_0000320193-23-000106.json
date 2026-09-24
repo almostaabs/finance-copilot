@@ -1,5 +1,11 @@
 {
   "accession": "0000320193-23-000106",
+  "fy_check": {
+    "fy": [
+      2023
+    ],
+    "latest_end": "2023-09-30"
+  },
   "notes": [],
   "ticker": "AAPL",
   "truth": [

@@ -49,6 +49,19 @@ _ANCHOR_RE = {
     for kind, pats in _KIND_PATTERNS.items()
 }
 
+# UPS heads its statements "STATEMENTS OF CONSOLIDATED INCOME": the scope word
+# sits inside the title. Literal forms only, always consolidated scope.
+_INNER_CONSOLIDATED: dict[StatementKind, tuple[str, ...]] = {
+    StatementKind.INCOME: (r"income", r"operations"),
+    StatementKind.BALANCE: (r"balance sheets?", r"financial position"),
+    StatementKind.CASH_FLOW: (r"cash flows?",),
+}
+
+_INNER_RE = {
+    kind: re.compile(r"^\s*statements?\s+of\s+consolidated\s+(?:" + "|".join(pats) + r")\b", re.I)
+    for kind, pats in _INNER_CONSOLIDATED.items()
+}
+
 _YEAR = re.compile(r"(?<![0-9])(?:19|20|21)[0-9]{2}(?![0-9])")
 _AMOUNT = re.compile(r"^\(?[-+]?\d[\d,]*(?:\.\d+)?\)?-?$")
 _NUMERIC_TOKEN = re.compile(r"\(?\d[\d,]*(?:\.\d+)?\)?")
@@ -78,7 +91,8 @@ def anchor_lines(text: str) -> tuple[str, ...]:
     return tuple(
         " ".join(line.split()).lower()
         for line in text.splitlines()
-        if _is_heading(line) and any(rx.match(line) for rx in _ANCHOR_RE.values())
+        if _is_heading(line)
+        and any(rx.match(line) for rx in (*_ANCHOR_RE.values(), *_INNER_RE.values()))
     )
 
 
@@ -89,6 +103,9 @@ def find_anchors(text: str) -> list[tuple[StatementKind, Scope]]:
         if not _is_heading(line):
             continue
         for kind, rx in _ANCHOR_RE.items():
+            if _INNER_RE[kind].match(line):
+                hits.append((kind, Scope.CONSOLIDATED))
+                continue
             m = rx.match(line)
             if not m:
                 continue

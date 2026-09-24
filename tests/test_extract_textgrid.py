@@ -11,12 +11,17 @@ from pathlib import Path
 import pipeline
 import pytest
 
-from fincopilot.extract.textgrid import Word, text_grid
+from fincopilot.extract.textgrid import Word, text_grids
 from fincopilot.types import CanonicalConcept as C
 from fincopilot.types import Period, ReconciliationStatus
 
 PDF = Path("tests/fixtures/text_aligned.pdf")
 P24, P23 = Period(2024, "2024"), Period(2023, "2023")
+
+
+def text_grid(words: list[Word]):
+    grids = text_grids(words)
+    return grids[0] if grids else None
 
 
 def _w(text: str, x1: float, top: float, width: float = 30) -> Word:
@@ -124,9 +129,85 @@ def test_every_reconciliation_passes(result):
     assert checks and all(c.status is ReconciliationStatus.PASSED for c in checks)
 
 
+def _shifted(words: list[Word], dy: float) -> list[Word]:
+    return [Word(w.text, w.x0, w.x1, w.top + dy) for w in words]
+
+
+def test_a_second_year_header_under_the_data_starts_a_new_table():
+    rows = [("Cash", ("10", "9")), ("Loans", ("80", "75")), ("Total assets", ("100", "93"))]
+    vie = [("Cash", ("1", "2")), ("Loans", ("3", "4")), ("Total assets", ("5", "6"))]
+    grids = text_grids(_statement(rows) + _shifted(_statement(vie), 100))
+    assert [g[0][3] for g in grids] == [["Total assets", "100", "93"], ["Total assets", "5", "6"]]
+
+
+def test_a_note_reference_wrapped_as_note_and_9_stays_in_the_label():
+    words = _statement([("Cash (Note", ("1", "2")), ("B", ("3", "4")), ("C", ("5", "6"))])
+    words.append(Word("9)", 130, 138, 70))
+    rows, _ = text_grid(words)
+    assert rows[1] == ["Cash (Note 9)", "1", "2"]
+
+
+def test_footnote_table_under_the_balance_sheet_never_supplies_its_totals():
+    """T1.1-a: the VIE table under footnote (a) prints its own Total assets and
+    Cash rows; only the balance sheet's figures may be mapped."""
+    r = pipeline.analyze(Path("tests/fixtures/footnote_table.pdf").read_bytes())
+    got = {(v.concept, v.period.end_year): v.value for v in r.mapping.values}
+    assert got[(C.TOTAL_ASSETS, 2024)] == Decimal("100000000000")
+    assert got[(C.TOTAL_LIABILITIES, 2023)] == Decimal("82500000000")
+    assert got[(C.CASH, 2024)] == Decimal("12400000000")
+    assert r.mapping.conflicts == ()
+
+
 def test_non_finite_and_empty_words_are_ignored():
     nan = float("nan")
     words = _statement([("A", ("1", "2")), ("B", ("3", "4")), ("C", ("5", "6"))])
     words += [Word("9", nan, nan, nan), Word("", 1, 2, 3), Word("7", float("inf"), 1, 1)]
     rows, _ = text_grid(words)
     assert rows[1] == ["A", "1", "2"]
+
+
+def _percent_statement(sub: tuple[str, str]) -> list[Word]:
+    """Two years, each over an amount and a % sub-column; the year token sits
+    nearer the % column's right edge, as at Lowe's."""
+    amount, pct = (330, 450), (385, 505)
+    words = [Word(y, x - 10, x + 10, 40) for y, x in (("2025", 370), ("2024", 490))]
+    words.append(Word("Earnings", 60, 100, 52))
+    for a, p in zip(amount, pct, strict=True):
+        words += [_w(sub[0], a, 52, 36), _w(sub[1], p, 52, 30)]
+    top = 66
+    for label, values in (
+        ("Net sales", ("10,000", "100.00", "9,000", "100.00")),
+        ("Cost of sales", ("6,600", "66.00", "6,030", "67.00")),
+        ("Gross margin", ("3,400", "34.00", "2,970", "33.00")),
+    ):
+        words.append(Word(label, 60, 60 + 6 * len(label), top))
+        words += [_w(v, x, top) for v, x in zip(values, (330, 385, 450, 505), strict=True)]
+        top += 13
+    return words
+
+
+def test_a_percent_sub_column_is_dropped_and_the_amount_takes_the_year():
+    """T1.1-d: the printed "Amount" sub-header, not the nearest centre, says
+    which sub-column holds the dollars; the sub-header is not a body row."""
+    rows, _ = text_grid(_percent_statement(("Amount", "% Sales")))
+    assert rows == [
+        ["", "2025", "2024"],
+        ["Net sales", "10,000", "9,000"],
+        ["Cost of sales", "6,600", "6,030"],
+        ["Gross margin", "3,400", "2,970"],
+    ]
+
+
+def test_a_percent_sub_column_without_a_printed_amount_header_withholds_the_years():
+    rows, _ = text_grid(_percent_statement(("Value", "% Sales")))
+    assert not any(rows[0][1:])
+
+
+def test_percent_sales_fixture_maps_amounts_and_never_the_percentages():
+    """T1.1-d regression on a rendered page: % Sales beside every year."""
+    r = pipeline.analyze(Path("tests/fixtures/percent_sales.pdf").read_bytes())
+    got = {(v.concept, v.period.end_year): v.value for v in r.mapping.values}
+    assert got[(C.REVENUE, 2025)] == Decimal("10000000000")
+    assert got[(C.COGS, 2024)] == Decimal("6030000000")
+    assert got[(C.NET_INCOME, 2025)] == Decimal("1200000000")
+    assert all(v.value >= Decimal("100000000") for v in r.mapping.values)

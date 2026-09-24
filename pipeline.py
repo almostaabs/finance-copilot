@@ -16,7 +16,7 @@ from fincopilot.calc.reconcile import run_reconciliations
 from fincopilot.calc.trends import calculate_trends
 from fincopilot.extract.locate import locate_statements
 from fincopilot.extract.pdf import DEFAULT_MAX_BYTES, DEFAULT_MAX_PAGES, extract_pdf, validate_input
-from fincopilot.extract.periods import detect_periods
+from fincopilot.extract.periods import detect_periods, reconcile_fiscal_years
 from fincopilot.extract.units import normalize_document
 from fincopilot.mapping.synonyms import map_rows
 from fincopilot.mapping.validate import validate_mappings
@@ -60,7 +60,7 @@ def analyze(
     ref = validate_input(data, max_bytes=max_bytes)
     doc = extract_pdf(data, ref, max_pages=max_pages)
     statements = locate_statements(doc)
-    periods = detect_periods(statements)
+    periods = reconcile_fiscal_years(statements, detect_periods(statements), doc.page_text)
     normalized = normalize_document(statements, periods, doc)
 
     mappings = map_rows(normalized)

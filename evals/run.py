@@ -296,7 +296,8 @@ _TOTAL_COLS = (
 
 
 def _row(cells: list[object]) -> str:
-    return "| " + " | ".join(str(c) for c in cells) + " |"
+    """One Markdown table row. A "|" inside a cell (a row label) would split it."""
+    return "| " + " | ".join(str(c).replace("|", r"\|") for c in cells) + " |"
 
 
 def _table(title: str, rows: dict[str, dict]) -> list[str]:

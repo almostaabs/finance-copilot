@@ -18,6 +18,8 @@ from fincopilot.types import StatementKind as K
         ("Revenue (Note 4)", "revenue"),
         ("1. Revenue from operations", "revenue from operations"),
         ("(a) Cost of materials consumed", "cost of materials consumed"),
+        ("Total assets(a)", "total assets"),
+        ("Total liabilities (a)(b)", "total liabilities"),
         ("Total stockholders' equity", "total stockholders equity"),
         ("Depreciation & amortisation", "depreciation and amortisation"),
         (
@@ -71,6 +73,9 @@ def test_normalize_label(raw, norm):
         ("Purchase of property, plant and equipment", K.CASH_FLOW, C.CAPEX, X.SYNONYM_MATCH),
         ("Purchases of property and equipment", K.CASH_FLOW, C.CAPEX, X.SYNONYM_MATCH),
         ("Free cash flow", K.CASH_FLOW, C.FREE_CASH_FLOW, X.EXACT_MATCH),
+        # T1.1-e: Deere's bare "Total" as map_rows resolves it, Honeywell's total
+        ("Total net sales and revenues", K.INCOME, C.REVENUE, X.SYNONYM_MATCH),
+        ("Total Cost of products and services sold", K.INCOME, C.COGS, X.SYNONYM_MATCH),
     ],
 )
 def test_positive_matches(label, kind, concept, conf):

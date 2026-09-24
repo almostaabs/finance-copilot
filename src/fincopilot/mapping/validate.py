@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from fincopilot.mapping.synonyms import CONCEPT_STATEMENT
+from fincopilot.mapping.synonyms import CONCEPT_STATEMENT, normalize_label
 from fincopilot.types import (
     AnalyticalConfidence,
     CanonicalConcept,
@@ -32,6 +32,24 @@ def _tables(normalized: NormalizedTables) -> dict[StatementKind, NormalizedTable
         if isinstance(t, NormalizedTable):
             out[t.kind] = t
     return out
+
+
+def _is_total(table: NormalizedTable, ref_id: str) -> bool:
+    """A row printed as a total. A bare "Total" can only have been claimed
+    through its section heading (map_rows), so it counts as one too."""
+    label = next(normalize_label(r.label) for r in table.table.rows if r.ref.ref_id == ref_id)
+    return label == "total" or label.startswith("total ")
+
+
+def _total_of(claims: list[RowMapping], table: NormalizedTable) -> RowMapping | None:
+    """Of two rows claiming one concept, the one total row; None if undecidable.
+
+    A statement prints components and then their total ("Net sales", ...,
+    "Total"); the component must never win over the total."""
+    if len(claims) != 2:
+        return None
+    totals = [c for c in claims if _is_total(table, c.ref_id)]
+    return totals[0] if len(totals) == 1 else None
 
 
 def validate_mappings(
@@ -70,6 +88,10 @@ def validate_mappings(
     accepted: dict[CanonicalConcept, RowMapping] = {}
     for concept, claims in by_concept.items():
         if len({c.ref_id for c in claims}) > 1:
+            total = _total_of(claims, tables[CONCEPT_STATEMENT[concept]])
+            if total is not None:
+                accepted[concept] = total
+                continue
             conflict = Unavailable(
                 UnavailableReason.CONFLICT,
                 f"{concept.value}: {len(claims)} rows claim it",

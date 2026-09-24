@@ -11,6 +11,7 @@ and error messages carry the URL only, never a response body.
 from __future__ import annotations
 
 import hashlib
+import http.client
 import json
 import os
 import time
@@ -167,7 +168,8 @@ class EdgarClient:
         request = urllib.request.Request(url, headers={"User-Agent": self._user_agent})
         try:
             body = self._opener(request)
-        except (OSError, ValueError) as e:
+        except (OSError, ValueError, http.client.HTTPException) as e:
+            # HTTPException covers IncompleteRead: a body cut short mid-download.
             raise SourceError(f"request failed for {url}: {type(e).__name__}: {e}") from e
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         tmp = path.with_suffix(".tmp")

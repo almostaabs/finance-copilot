@@ -261,6 +261,18 @@ def main() -> None:
     build_text_aligned_pdf(aligned)
     print(f"wrote {aligned}")
 
+    footnote = FIXTURE_DIR / "footnote_table.pdf"
+    build_footnote_table_pdf(footnote)
+    print(f"wrote {footnote}")
+
+    component = FIXTURE_DIR / "component_total.pdf"
+    build_component_total_pdf(component)
+    print(f"wrote {component}")
+
+    percent = FIXTURE_DIR / "percent_sales.pdf"
+    build_percent_sales_pdf(percent)
+    print(f"wrote {percent}")
+
     write_hashes()
 
 
@@ -421,6 +433,140 @@ def build_text_aligned_pdf(out_path: Path) -> None:
         ],
         extra=1,
     )
+    c.showPage()
+    c.save()
+
+
+def build_footnote_table_pdf(out_path: Path) -> None:
+    """One unruled page: a balance sheet, then footnote (a)'s VIE table under it.
+
+    Both tables print "Cash and cash equivalents" and "Total assets"; the
+    balance sheet's own labels carry "(Note 9)" and a "(a)" footnote marker.
+    The balance sheet's figures are the only right answer (T1.1-a).
+    """
+    from reportlab.pdfgen import canvas as pdfcanvas
+
+    c = pdfcanvas.Canvas(str(out_path), pagesize=A4, invariant=1)
+    y = _ta_page(
+        c, "CONSOLIDATED BALANCE SHEETS", "(In millions)", ["December 31,"], ("2024", "2023")
+    )
+    y = _ta_rows(
+        c,
+        y,
+        [
+            ("Assets",),
+            ("Cash and cash equivalents (Note 9)", "$ 12,400", "$ 11,300"),
+            ("Loans", "80,100", "75,200"),
+            ("Other assets", "7,500", "6,500"),
+            ("Total assets(a)", "100,000", "93,000"),
+            ("Liabilities",),
+            ("Deposits", "70,000", "66,000"),
+            ("Long-term debt", "18,000", "16,500"),
+            ("Total liabilities(a)", "88,000", "82,500"),
+            ("Total stockholders' equity", "12,000", "10,500"),
+            ("Total liabilities and stockholders' equity", "100,000", "93,000"),
+        ],
+    )
+    c.setFont(_TA_FONT, 9)
+    y -= 10
+    for line in (
+        "(a) The following table presents assets and liabilities of consolidated VIEs.",
+        "They are included in the balance sheet above.",
+    ):
+        c.drawString(60, y, line)
+        y -= 12
+    c.drawString(60, y, "December 31, (in millions)")
+    for x, yr in zip(_TA_COLS, ("2024", "2023"), strict=False):
+        c.drawRightString(x, y, yr)
+    _ta_rows(
+        c,
+        y - 14,
+        [
+            ("Cash and cash equivalents", "900", "800"),
+            ("Loans", "4,100", "3,900"),
+            ("Total assets", "5,000", "4,700"),
+            ("Total liabilities", "3,200", "3,000"),
+        ],
+    )
+    c.showPage()
+    c.save()
+
+
+def build_component_total_pdf(out_path: Path) -> None:
+    """One unruled income statement where a component row and its total both
+    carry a mapped label (T1.1-e): Deere-like revenue (section "Net Sales and
+    Revenues" closed by a bare "Total") and Honeywell-like cost of sales
+    ("Cost of products sold" beside "Total cost of products and services sold").
+    """
+    from reportlab.pdfgen import canvas as pdfcanvas
+
+    c = pdfcanvas.Canvas(str(out_path), pagesize=A4, invariant=1)
+    y = _ta_page(c, "STATEMENTS OF CONSOLIDATED INCOME", "(In millions)", [], ("2025", "2024"))
+    _ta_rows(
+        c,
+        y,
+        [
+            ("Net Sales and Revenues",),
+            ("Net sales", "$ 38,900", "$ 44,700"),
+            ("Finance and interest income", "5,700", "5,800"),
+            ("Other income", "1,000", "1,200"),
+            ("Total", "45,600", "51,700"),
+            ("Costs and Expenses",),
+            ("Cost of products sold", "16,100", "15,000"),
+            ("Cost of services sold", "7,500", "6,300"),
+            ("Total cost of products and services sold", "23,600", "21,300"),
+            ("Selling, administrative and general expenses", "4,600", "4,800"),
+            ("Income before income taxes", "17,400", "25,600"),
+            ("Provision for income taxes", "3,600", "5,300"),
+            ("Net income", "13,800", "20,300"),
+        ],
+    )
+    c.showPage()
+    c.save()
+
+
+def build_percent_sales_pdf(out_path: Path) -> None:
+    """One unruled income statement where each year spans an Amount and a
+    % Sales sub-column (T1.1-d). Each date ("December 31, 2025") is centred
+    over its pair, so the year token itself sits nearer the % column, as at
+    Lowe's; only the printed "Amount" sub-header says which holds the dollars.
+    """
+    from reportlab.pdfgen import canvas as pdfcanvas
+
+    amount_x, pct_x = (330, 450), (385, 505)
+    c = pdfcanvas.Canvas(str(out_path), pagesize=A4, invariant=1)
+    _, height = A4
+    y = height - 60
+    c.setFont(_TA_FONT, 11)
+    c.drawString(60, y, "Text Aligned Holdings Inc.")
+    y -= 16
+    c.setFont(_TA_FONT + "-Bold", 12)
+    c.drawString(60, y, "CONSOLIDATED STATEMENTS OF EARNINGS")
+    y -= 16
+    c.setFont(_TA_FONT, 9)
+    c.drawString(60, y, "(In millions, except percentage data)")
+    y -= 14
+    for a, p, yr in zip(amount_x, pct_x, ("2025", "2024"), strict=True):
+        c.drawCentredString((a - 40 + p) / 2, y, f"December 31, {yr}")
+    y -= 12
+    for a, p in zip(amount_x, pct_x, strict=True):
+        c.drawRightString(a, y, "Amount")
+        c.drawRightString(p, y, "% Sales")
+    y -= 14
+    rows = [
+        ("Net sales", "$ 10,000", "100.00", "$ 9,000", "100.00"),
+        ("Cost of sales", "6,600", "66.00", "6,030", "67.00"),
+        ("Gross margin", "3,400", "34.00", "2,970", "33.00"),
+        ("Selling, general and administrative", "1,900", "19.00", "1,800", "20.00"),
+        ("Operating income", "1,500", "15.00", "1,170", "13.00"),
+        ("Income tax provision", "300", "3.00", "270", "3.00"),
+        ("Net earnings", "1,200", "12.00", "900", "10.00"),
+    ]
+    for label, *values in rows:
+        c.drawString(60, y, label)
+        for x, v in zip((amount_x[0], pct_x[0], amount_x[1], pct_x[1]), values, strict=True):
+            c.drawRightString(x, y, v)
+        y -= 13
     c.showPage()
     c.save()
 

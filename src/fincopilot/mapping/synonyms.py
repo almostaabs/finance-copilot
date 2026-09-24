@@ -101,7 +101,15 @@ INDIAN_ALIASES: dict[C, tuple[str, ...]] = {
 }
 
 US_ALIASES: dict[C, tuple[str, ...]] = {
-    C.REVENUE: ("net sales", "total net sales", "net revenues", "net revenue", "sales"),
+    C.REVENUE: (
+        "net sales",
+        "total net sales",
+        "net revenues",
+        "net revenue",
+        "sales",
+        # Deere: a bare "Total" under "Net Sales and Revenues", resolved by map_rows
+        "total net sales and revenues",
+    ),
     C.COGS: (
         "cost of sales",
         "cost of revenues",
@@ -110,6 +118,7 @@ US_ALIASES: dict[C, tuple[str, ...]] = {
         "total cost of revenue",
         "total cost of revenues",
         "total cost of sales",
+        "total cost of products and services sold",
     ),
     C.GROSS_PROFIT: ("gross margin",),
     C.OPERATING_INCOME: ("income from operations", "operating income loss"),
@@ -167,8 +176,11 @@ BLOCKED: dict[C, frozenset[str]] = {
     C.NET_INCOME: frozenset({"profit before tax", "income before income taxes"}),
 }
 
+# A "(a)" closing a label is a footnote reference ("Total assets(a)"); a
+# leading "(a)" is list numbering, handled by _LEADING_NUMBERING.
 _FOOTNOTE = re.compile(
     r"[*\u2020\u2021\u00a7\u00b9\u00b2\u00b3]+|\(note \d+[a-z]?\)|\(refer note [^)]*\)"
+    r"|(?:\([a-z]\))+$"
 )
 _LEADING_NUMBERING = re.compile(r"^(?:\(?[0-9ivx]+[.)]|\(?[a-z][.)])\s+")
 _PUNCT = re.compile(r"[^\w\s]")

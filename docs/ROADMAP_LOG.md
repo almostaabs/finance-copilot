@@ -115,3 +115,41 @@ the audit trail: it is how a later reader can tell what each phase changed and w
   Pilot wrong records: JPM total_assets and total_liabilities, p169, a VIE footnote table read as the
   balance sheet (KNOWN_ISSUES T1.1-a). AAPL is a holdout company, so it is marked exposed
   (`evals/exposed.json`) and kept out of headline holdout totals.
+
+## T1.1b: Eval-found bugs (T1.1-a, -d, -e, -g). Builder entry, awaiting gate, 2026-09-24
+
+- Branch: `roadmap/t1-1b`. Commits: `dc317d2` (T1.1-a, with the literal "Statements of Consolidated <X>"
+  anchors), `e2d9499` (T1.1-e, reordered before T1.1-d by human decision), `b3e22f8` (T1.1-d), `f85dab5`
+  (T1.1-g), `1cf0e45` (hygiene: `edgar.py` wraps `http.client.HTTPException`; `run.py` escapes `|`), then docs.
+- Tests: 519 -> 551 collected, 2 deselected. 550 pass; `test_fixture_snapshot_matches` fails only on the new
+  fixtures' added lines (amendment rule; the snapshot is not updated by the builder).
+- Lint/format: pass
+- Snapshot `--check`: fixtures.snap diff is ADDED lines only, 173 in all: `component_total.pdf` 54,
+  `footnote_table.pdf` 57, `percent_sales.pdf` 62. 0 removed or changed lines. `.snapshots/real.snap`: ok
+  (585 lines), 0 changes.
+- Eval (dev only, `--compare` against the T1.1 baseline; holdout not run):
+
+  | scope | correct | wrong | withheld | unverified | precision | coverage |
+  |---|---|---|---|---|---|---|
+  | all | 632 -> 708 | 23 -> 0 | 536 -> 483 | 40 -> 37 | 0.9649 -> 1.0000 | 0.5500 -> 0.5945 |
+  | general | 585 -> 654 | 19 -> 0 | 483 -> 433 | 36 -> 33 | 0.9685 -> 1.0000 | 0.5557 -> 0.6017 |
+  | financial | 47 -> 54 | 4 -> 0 | 53 -> 50 | | 0.9216 -> 1.0000 | |
+
+  New wrong records: 0. Every changed record:
+  - wrong -> correct (23): JPM total_assets, total_liabilities 2024-2025; F cash 2024-2025; HON cogs
+    2023-2025; LOW cogs, d_and_a, gross_profit, operating_income 2025-2026; HD cash, current_assets,
+    current_liabilities, equity, total_assets, total_liabilities 2025.
+  - withheld -> correct (53): BAC net_income 2023-2025; F cogs, net_income, revenue 2023-2025; UPS capex,
+    d_and_a, net_income, operating_cash_flow, operating_income, revenue 2023-2025 and cash, current_assets,
+    current_liabilities, total_assets 2024-2025 (26); DE revenue 2023-2025; TSLA revenue 2023-2025; WMT
+    revenue 2024-2026; HD cash, current_assets, current_liabilities, equity, total_assets,
+    total_liabilities 2024.
+  - new unverified (4): DE cogs 2023-2025 (now mapped, no XBRL truth); HD short_term_borrowings 2024.
+  - dropped (7): HD 2026 unverified records (cash, current_assets, current_liabilities, equity,
+    short_term_borrowings, total_assets, total_liabilities); the balance-sheet date February 1, 2026 is now
+    fiscal 2025.
+- Proof each fix's tests can fail (fix reverted or disabled, tests run): anchors 5 fail; total-wins 1;
+  aliases 3; % sub-column 3; fiscal reconcile 4 (disabled), 1 (clash check off); edgar wrap 1; `|` escape 1;
+  word-grid split and paren/footnote tests fail on revert of `dc317d2`.
+- Known issues: T1.1-a, -d, -e, -g moved to resolved with their commits. Added T1.1b-1 (MEDIUM): the scored
+  fallback can pick a non-statement table when no anchor matches (UPS before the anchors).

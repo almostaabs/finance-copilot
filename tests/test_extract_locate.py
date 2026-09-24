@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from fincopilot.extract.anchors import Scope, anchor_lines, find_anchors
 from fincopilot.extract.locate import locate_statements, stitch_tables
 from fincopilot.extract.pdf import extract_pdf, validate_input
 from fincopilot.types import (
@@ -179,3 +180,24 @@ def test_stitch_refuses_a_page_that_starts_a_different_statement():
     assert len(stitch_tables((a, b), ("",) * 4 + (bs, cf))) == 2
     assert len(stitch_tables((a, b), ("",) * 4 + (bs, bs))) == 1
     assert len(stitch_tables((a, b), ("",) * 4 + (bs, "just numbers"))) == 1
+
+
+# UPS writes the scope inside the title: "STATEMENTS OF CONSOLIDATED INCOME".
+@pytest.mark.parametrize(
+    ("heading", "kind"),
+    [
+        ("STATEMENTS OF CONSOLIDATED INCOME", StatementKind.INCOME),
+        ("Statements of Consolidated Operations", StatementKind.INCOME),
+        ("STATEMENTS OF CONSOLIDATED BALANCE SHEETS", StatementKind.BALANCE),
+        ("Statement of Consolidated Financial Position", StatementKind.BALANCE),
+        ("STATEMENTS OF CONSOLIDATED CASH FLOWS", StatementKind.CASH_FLOW),
+    ],
+)
+def test_statements_of_consolidated_heading_is_a_consolidated_anchor(heading, kind):
+    assert find_anchors(heading) == [(kind, Scope.CONSOLIDATED)]
+    assert anchor_lines(heading) == (heading.lower(),)
+
+
+def test_statements_of_consolidated_forms_stay_literal():
+    assert find_anchors("STATEMENTS OF CONSOLIDATED COMPREHENSIVE INCOME") == []
+    assert find_anchors("STATEMENTS OF CONSOLIDATED SHAREOWNERS EQUITY") == []

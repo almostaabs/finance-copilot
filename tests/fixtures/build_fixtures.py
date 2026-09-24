@@ -265,6 +265,10 @@ def main() -> None:
     build_footnote_table_pdf(footnote)
     print(f"wrote {footnote}")
 
+    component = FIXTURE_DIR / "component_total.pdf"
+    build_component_total_pdf(component)
+    print(f"wrote {component}")
+
     write_hashes()
 
 
@@ -478,6 +482,39 @@ def build_footnote_table_pdf(out_path: Path) -> None:
             ("Loans", "4,100", "3,900"),
             ("Total assets", "5,000", "4,700"),
             ("Total liabilities", "3,200", "3,000"),
+        ],
+    )
+    c.showPage()
+    c.save()
+
+
+def build_component_total_pdf(out_path: Path) -> None:
+    """One unruled income statement where a component row and its total both
+    carry a mapped label (T1.1-e): Deere-like revenue (section "Net Sales and
+    Revenues" closed by a bare "Total") and Honeywell-like cost of sales
+    ("Cost of products sold" beside "Total cost of products and services sold").
+    """
+    from reportlab.pdfgen import canvas as pdfcanvas
+
+    c = pdfcanvas.Canvas(str(out_path), pagesize=A4, invariant=1)
+    y = _ta_page(c, "STATEMENTS OF CONSOLIDATED INCOME", "(In millions)", [], ("2025", "2024"))
+    _ta_rows(
+        c,
+        y,
+        [
+            ("Net Sales and Revenues",),
+            ("Net sales", "$ 38,900", "$ 44,700"),
+            ("Finance and interest income", "5,700", "5,800"),
+            ("Other income", "1,000", "1,200"),
+            ("Total", "45,600", "51,700"),
+            ("Costs and Expenses",),
+            ("Cost of products sold", "16,100", "15,000"),
+            ("Cost of services sold", "7,500", "6,300"),
+            ("Total cost of products and services sold", "23,600", "21,300"),
+            ("Selling, administrative and general expenses", "4,600", "4,800"),
+            ("Income before income taxes", "17,400", "25,600"),
+            ("Provision for income taxes", "3,600", "5,300"),
+            ("Net income", "13,800", "20,300"),
         ],
     )
     c.showPage()

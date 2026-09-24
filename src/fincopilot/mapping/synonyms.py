@@ -101,7 +101,15 @@ INDIAN_ALIASES: dict[C, tuple[str, ...]] = {
 }
 
 US_ALIASES: dict[C, tuple[str, ...]] = {
-    C.REVENUE: ("net sales", "total net sales", "net revenues", "net revenue", "sales"),
+    C.REVENUE: (
+        "net sales",
+        "total net sales",
+        "net revenues",
+        "net revenue",
+        "sales",
+        # Deere: a bare "Total" under "Net Sales and Revenues", resolved by map_rows
+        "total net sales and revenues",
+    ),
     C.COGS: (
         "cost of sales",
         "cost of revenues",
@@ -110,6 +118,7 @@ US_ALIASES: dict[C, tuple[str, ...]] = {
         "total cost of revenue",
         "total cost of revenues",
         "total cost of sales",
+        "total cost of products and services sold",
     ),
     C.GROSS_PROFIT: ("gross margin",),
     C.OPERATING_INCOME: ("income from operations", "operating income loss"),

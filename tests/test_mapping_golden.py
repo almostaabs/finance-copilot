@@ -147,3 +147,47 @@ def test_unknown_ref_is_rejected():
     )
     out = validate_mappings(mappings, normalized, periods)
     assert out.conflicts and CanonicalConcept.REVENUE in out.unmapped
+
+
+# --- T1.1-e: a component row and its total both claim one concept ----------
+
+
+def _claim(concept, table, label):
+    row = next(r for r in table.table.rows if r.label == label)
+    return RowMapping(concept, row.ref.ref_id, table.kind, ExtractionConfidence.SYNONYM_MATCH)
+
+
+def test_the_total_row_wins_over_its_component():
+    """Deere-like revenue ("Net sales" ... bare "Total" under "Net Sales and
+    Revenues") and Honeywell-like cogs: the total is taken, never the component."""
+    report, _, _ = _report("component_total.pdf")
+    got = {(v.concept, v.period.end_year): v.value for v in report.values}
+    assert got[(CanonicalConcept.REVENUE, 2025)] == Decimal("45600000000")
+    assert got[(CanonicalConcept.REVENUE, 2024)] == Decimal("51700000000")
+    assert got[(CanonicalConcept.COGS, 2025)] == Decimal("23600000000")
+    assert got[(CanonicalConcept.COGS, 2024)] == Decimal("21300000000")
+    assert report.conflicts == ()
+
+
+def test_two_component_rows_claiming_one_concept_are_withheld():
+    _, normalized, periods = _report("component_total.pdf")
+    inc = normalized.income
+    mappings = (
+        _claim(CanonicalConcept.REVENUE, inc, "Net sales"),
+        _claim(CanonicalConcept.REVENUE, inc, "Finance and interest income"),
+    )
+    out = validate_mappings(mappings, normalized, periods)
+    assert out.conflicts[0].reason is UnavailableReason.CONFLICT
+    assert is_unavailable(out.get(CanonicalConcept.REVENUE, Period(2025, "2025")))
+
+
+def test_two_total_rows_claiming_one_concept_are_withheld():
+    _, normalized, periods = _report("component_total.pdf")
+    inc = normalized.income
+    mappings = (
+        _claim(CanonicalConcept.REVENUE, inc, "Total"),
+        _claim(CanonicalConcept.REVENUE, inc, "Total cost of products and services sold"),
+    )
+    out = validate_mappings(mappings, normalized, periods)
+    assert out.conflicts[0].reason is UnavailableReason.CONFLICT
+    assert is_unavailable(out.get(CanonicalConcept.REVENUE, Period(2025, "2025")))

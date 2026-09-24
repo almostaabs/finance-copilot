@@ -2,8 +2,8 @@
   "split": "dev",
   "bucket": "all",
   "only": [],
-  "git_sha": "af8cc610b5b721c4584fc6d462d678d9abfc66e1",
-  "timestamp": "2026-09-24T06:49:28+00:00",
+  "git_sha": "fbcf4a098934710b84258ed8475f5a99d059f262",
+  "timestamp": "2026-09-24T13:56:07+00:00",
   "errors": 0,
   "exposed": [],
   "fy_mismatch": [
@@ -551,113 +551,113 @@
   "summary": {
     "all": {
       "totals": {
-        "correct": 632,
-        "wrong": 23,
-        "withheld": 536,
-        "unverified": 40,
+        "correct": 708,
+        "wrong": 0,
+        "withheld": 483,
+        "unverified": 37,
         "sign_mismatch": 0,
-        "wrong_period": 6,
-        "value": 17,
-        "precision": "0.9649",
-        "coverage": "0.5500",
-        "wrong_rate": "0.0193"
+        "wrong_period": 0,
+        "value": 0,
+        "precision": "1.0000",
+        "coverage": "0.5945",
+        "wrong_rate": "0.0000"
       },
       "per_concept": {
         "capex": {
-          "correct": 30,
+          "correct": 33,
           "wrong": 0,
-          "withheld": 48,
+          "withheld": 45,
           "unverified": 14,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.3846",
+          "coverage": "0.4231",
           "wrong_rate": "0.0000"
         },
         "cash": {
-          "correct": 42,
-          "wrong": 3,
-          "withheld": 21,
-          "unverified": 7,
+          "correct": 48,
+          "wrong": 0,
+          "withheld": 18,
+          "unverified": 6,
           "sign_mismatch": 0,
-          "wrong_period": 1,
-          "value": 2,
-          "precision": "0.9333",
-          "coverage": "0.6818",
-          "wrong_rate": "0.0455"
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.7273",
+          "wrong_rate": "0.0000"
         },
         "cogs": {
-          "correct": 43,
-          "wrong": 5,
-          "withheld": 24,
-          "unverified": 0,
+          "correct": 51,
+          "wrong": 0,
+          "withheld": 21,
+          "unverified": 3,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 5,
-          "precision": "0.8958",
-          "coverage": "0.6667",
-          "wrong_rate": "0.0694"
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.7083",
+          "wrong_rate": "0.0000"
         },
         "current_assets": {
-          "correct": 46,
-          "wrong": 1,
-          "withheld": 13,
-          "unverified": 1,
-          "sign_mismatch": 0,
-          "wrong_period": 1,
-          "value": 0,
-          "precision": "0.9787",
-          "coverage": "0.7833",
-          "wrong_rate": "0.0167"
-        },
-        "current_liabilities": {
-          "correct": 46,
-          "wrong": 1,
-          "withheld": 13,
-          "unverified": 1,
-          "sign_mismatch": 0,
-          "wrong_period": 1,
-          "value": 0,
-          "precision": "0.9787",
-          "coverage": "0.7833",
-          "wrong_rate": "0.0167"
-        },
-        "d_and_a": {
-          "correct": 19,
-          "wrong": 2,
-          "withheld": 66,
+          "correct": 50,
+          "wrong": 0,
+          "withheld": 10,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 2,
-          "precision": "0.9048",
-          "coverage": "0.2414",
-          "wrong_rate": "0.0230"
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.8333",
+          "wrong_rate": "0.0000"
+        },
+        "current_liabilities": {
+          "correct": 50,
+          "wrong": 0,
+          "withheld": 10,
+          "unverified": 0,
+          "sign_mismatch": 0,
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.8333",
+          "wrong_rate": "0.0000"
+        },
+        "d_and_a": {
+          "correct": 24,
+          "wrong": 0,
+          "withheld": 63,
+          "unverified": 0,
+          "sign_mismatch": 0,
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.2759",
+          "wrong_rate": "0.0000"
         },
         "equity": {
-          "correct": 52,
-          "wrong": 1,
-          "withheld": 80,
-          "unverified": 1,
+          "correct": 54,
+          "wrong": 0,
+          "withheld": 79,
+          "unverified": 0,
           "sign_mismatch": 0,
-          "wrong_period": 1,
+          "wrong_period": 0,
           "value": 0,
-          "precision": "0.9811",
-          "coverage": "0.3985",
-          "wrong_rate": "0.0075"
+          "precision": "1.0000",
+          "coverage": "0.4060",
+          "wrong_rate": "0.0000"
         },
         "gross_profit": {
-          "correct": 28,
-          "wrong": 2,
+          "correct": 30,
+          "wrong": 0,
           "withheld": 6,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 2,
-          "precision": "0.9333",
+          "value": 0,
+          "precision": "1.0000",
           "coverage": "0.8333",
-          "wrong_rate": "0.0556"
+          "wrong_rate": "0.0000"
         },
         "long_term_borrowings": {
           "correct": 20,
@@ -672,51 +672,51 @@
           "wrong_rate": "0.0000"
         },
         "net_income": {
-          "correct": 54,
+          "correct": 63,
           "wrong": 0,
-          "withheld": 54,
+          "withheld": 45,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.5000",
+          "coverage": "0.5833",
           "wrong_rate": "0.0000"
         },
         "operating_cash_flow": {
-          "correct": 71,
+          "correct": 74,
           "wrong": 0,
-          "withheld": 37,
+          "withheld": 34,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.6574",
+          "coverage": "0.6852",
           "wrong_rate": "0.0000"
         },
         "operating_income": {
-          "correct": 43,
-          "wrong": 2,
-          "withheld": 27,
-          "unverified": 0,
-          "sign_mismatch": 0,
-          "wrong_period": 0,
-          "value": 2,
-          "precision": "0.9556",
-          "coverage": "0.6250",
-          "wrong_rate": "0.0278"
-        },
-        "revenue": {
-          "correct": 42,
+          "correct": 48,
           "wrong": 0,
-          "withheld": 60,
+          "withheld": 24,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.4118",
+          "coverage": "0.6667",
+          "wrong_rate": "0.0000"
+        },
+        "revenue": {
+          "correct": 57,
+          "wrong": 0,
+          "withheld": 45,
+          "unverified": 0,
+          "sign_mismatch": 0,
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.5588",
           "wrong_rate": "0.0000"
         },
         "short_term_borrowings": {
@@ -732,28 +732,28 @@
           "wrong_rate": "0.0000"
         },
         "total_assets": {
-          "correct": 50,
-          "wrong": 3,
-          "withheld": 28,
-          "unverified": 1,
+          "correct": 56,
+          "wrong": 0,
+          "withheld": 25,
+          "unverified": 0,
           "sign_mismatch": 0,
-          "wrong_period": 1,
-          "value": 2,
-          "precision": "0.9434",
-          "coverage": "0.6543",
-          "wrong_rate": "0.0370"
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.6914",
+          "wrong_rate": "0.0000"
         },
         "total_liabilities": {
-          "correct": 34,
-          "wrong": 3,
-          "withheld": 15,
-          "unverified": 1,
+          "correct": 38,
+          "wrong": 0,
+          "withheld": 14,
+          "unverified": 0,
           "sign_mismatch": 0,
-          "wrong_period": 1,
-          "value": 2,
-          "precision": "0.9189",
-          "coverage": "0.7115",
-          "wrong_rate": "0.0577"
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.7308",
+          "wrong_rate": "0.0000"
         }
       },
       "per_filing": {
@@ -782,15 +782,15 @@
           "wrong_rate": "0.0000"
         },
         "BAC_0000070858-26-000157": {
-          "correct": 9,
+          "correct": 12,
           "wrong": 0,
-          "withheld": 11,
+          "withheld": 8,
           "unverified": 2,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.4500",
+          "coverage": "0.6000",
           "wrong_rate": "0.0000"
         },
         "BRK-B_0000950170-24-019719": {
@@ -854,28 +854,28 @@
           "wrong_rate": "0.0000"
         },
         "DE_0001104659-25-122321": {
-          "correct": 0,
+          "correct": 3,
           "wrong": 0,
-          "withheld": 29,
+          "withheld": 26,
+          "unverified": 3,
+          "sign_mismatch": 0,
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.1034",
+          "wrong_rate": "0.0000"
+        },
+        "F_0000037996-26-000015": {
+          "correct": 27,
+          "wrong": 0,
+          "withheld": 6,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
-          "precision": "n/a",
-          "coverage": "0.0000",
+          "precision": "1.0000",
+          "coverage": "0.8182",
           "wrong_rate": "0.0000"
-        },
-        "F_0000037996-26-000015": {
-          "correct": 16,
-          "wrong": 2,
-          "withheld": 15,
-          "unverified": 0,
-          "sign_mismatch": 0,
-          "wrong_period": 0,
-          "value": 2,
-          "precision": "0.8889",
-          "coverage": "0.5455",
-          "wrong_rate": "0.0606"
         },
         "GOOGL_0001652044-26-000018": {
           "correct": 26,
@@ -902,28 +902,28 @@
           "wrong_rate": "0.0000"
         },
         "HD_0001628280-26-019436": {
-          "correct": 21,
-          "wrong": 6,
-          "withheld": 7,
-          "unverified": 11,
+          "correct": 33,
+          "wrong": 0,
+          "withheld": 1,
+          "unverified": 5,
           "sign_mismatch": 0,
-          "wrong_period": 6,
+          "wrong_period": 0,
           "value": 0,
-          "precision": "0.7778",
-          "coverage": "0.7941",
-          "wrong_rate": "0.1765"
+          "precision": "1.0000",
+          "coverage": "0.9706",
+          "wrong_rate": "0.0000"
         },
         "HON_0000773840-26-000013": {
-          "correct": 20,
-          "wrong": 3,
+          "correct": 23,
+          "wrong": 0,
           "withheld": 11,
           "unverified": 2,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 3,
-          "precision": "0.8696",
+          "value": 0,
+          "precision": "1.0000",
           "coverage": "0.6765",
-          "wrong_rate": "0.0882"
+          "wrong_rate": "0.0000"
         },
         "IBM_0000051143-26-000010": {
           "correct": 0,
@@ -938,16 +938,16 @@
           "wrong_rate": "0.0000"
         },
         "JPM_0001628280-26-008131": {
-          "correct": 5,
-          "wrong": 4,
+          "correct": 9,
+          "wrong": 0,
           "withheld": 13,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 4,
-          "precision": "0.5556",
+          "value": 0,
+          "precision": "1.0000",
           "coverage": "0.4091",
-          "wrong_rate": "0.1818"
+          "wrong_rate": "0.0000"
         },
         "KO_0001628280-26-010047": {
           "correct": 25,
@@ -974,16 +974,16 @@
           "wrong_rate": "0.0000"
         },
         "LOW_0000060667-26-000029": {
-          "correct": 20,
-          "wrong": 8,
+          "correct": 28,
+          "wrong": 0,
           "withheld": 10,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 8,
-          "precision": "0.7143",
+          "value": 0,
+          "precision": "1.0000",
           "coverage": "0.7368",
-          "wrong_rate": "0.2105"
+          "wrong_rate": "0.0000"
         },
         "MBIN_0001558370-25-001941": {
           "correct": 9,
@@ -1106,15 +1106,15 @@
           "wrong_rate": "0.0000"
         },
         "TSLA_0001628280-26-003952": {
-          "correct": 24,
+          "correct": 27,
           "wrong": 0,
-          "withheld": 14,
+          "withheld": 11,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.6316",
+          "coverage": "0.7105",
           "wrong_rate": "0.0000"
         },
         "T_0000732717-26-000120": {
@@ -1142,15 +1142,15 @@
           "wrong_rate": "0.0000"
         },
         "UPS_0001628280-26-008432": {
-          "correct": 0,
+          "correct": 26,
           "wrong": 0,
-          "withheld": 30,
+          "withheld": 4,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
-          "precision": "n/a",
-          "coverage": "0.0000",
+          "precision": "1.0000",
+          "coverage": "0.8667",
           "wrong_rate": "0.0000"
         },
         "VZ_0000732712-26-000007": {
@@ -1166,15 +1166,15 @@
           "wrong_rate": "0.0000"
         },
         "WMT_0000104169-26-000055": {
-          "correct": 23,
+          "correct": 26,
           "wrong": 0,
-          "withheld": 15,
+          "withheld": 12,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.6053",
+          "coverage": "0.6842",
           "wrong_rate": "0.0000"
         },
         "XOM_0000034088-26-000045": {
@@ -1193,16 +1193,16 @@
     },
     "financial": {
       "totals": {
-        "correct": 47,
-        "wrong": 4,
-        "withheld": 53,
+        "correct": 54,
+        "wrong": 0,
+        "withheld": 50,
         "unverified": 4,
         "sign_mismatch": 0,
         "wrong_period": 0,
-        "value": 4,
-        "precision": "0.9216",
-        "coverage": "0.4904",
-        "wrong_rate": "0.0385"
+        "value": 0,
+        "precision": "1.0000",
+        "coverage": "0.5192",
+        "wrong_rate": "0.0000"
       },
       "per_concept": {
         "capex": {
@@ -1254,15 +1254,15 @@
           "wrong_rate": "0.0000"
         },
         "net_income": {
-          "correct": 9,
+          "correct": 12,
           "wrong": 0,
-          "withheld": 6,
+          "withheld": 3,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.6000",
+          "coverage": "0.8000",
           "wrong_rate": "0.0000"
         },
         "operating_cash_flow": {
@@ -1302,41 +1302,41 @@
           "wrong_rate": "0.0000"
         },
         "total_assets": {
-          "correct": 6,
-          "wrong": 2,
+          "correct": 8,
+          "wrong": 0,
           "withheld": 5,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 2,
-          "precision": "0.7500",
+          "value": 0,
+          "precision": "1.0000",
           "coverage": "0.6154",
-          "wrong_rate": "0.1538"
+          "wrong_rate": "0.0000"
         },
         "total_liabilities": {
-          "correct": 8,
-          "wrong": 2,
+          "correct": 10,
+          "wrong": 0,
           "withheld": 0,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 2,
-          "precision": "0.8000",
+          "value": 0,
+          "precision": "1.0000",
           "coverage": "1.0000",
-          "wrong_rate": "0.2000"
+          "wrong_rate": "0.0000"
         }
       },
       "per_filing": {
         "BAC_0000070858-26-000157": {
-          "correct": 9,
+          "correct": 12,
           "wrong": 0,
-          "withheld": 11,
+          "withheld": 8,
           "unverified": 2,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.4500",
+          "coverage": "0.6000",
           "wrong_rate": "0.0000"
         },
         "BRK-B_0000950170-24-019719": {
@@ -1364,16 +1364,16 @@
           "wrong_rate": "0.0000"
         },
         "JPM_0001628280-26-008131": {
-          "correct": 5,
-          "wrong": 4,
+          "correct": 9,
+          "wrong": 0,
           "withheld": 13,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 4,
-          "precision": "0.5556",
+          "value": 0,
+          "precision": "1.0000",
           "coverage": "0.4091",
-          "wrong_rate": "0.1818"
+          "wrong_rate": "0.0000"
         },
         "MBIN_0001558370-25-001941": {
           "correct": 9,
@@ -1391,113 +1391,113 @@
     },
     "general": {
       "totals": {
-        "correct": 585,
-        "wrong": 19,
-        "withheld": 483,
-        "unverified": 36,
+        "correct": 654,
+        "wrong": 0,
+        "withheld": 433,
+        "unverified": 33,
         "sign_mismatch": 0,
-        "wrong_period": 6,
-        "value": 13,
-        "precision": "0.9685",
-        "coverage": "0.5557",
-        "wrong_rate": "0.0175"
+        "wrong_period": 0,
+        "value": 0,
+        "precision": "1.0000",
+        "coverage": "0.6017",
+        "wrong_rate": "0.0000"
       },
       "per_concept": {
         "capex": {
-          "correct": 30,
+          "correct": 33,
           "wrong": 0,
-          "withheld": 39,
+          "withheld": 36,
           "unverified": 14,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.4348",
+          "coverage": "0.4783",
           "wrong_rate": "0.0000"
         },
         "cash": {
-          "correct": 40,
-          "wrong": 3,
+          "correct": 46,
+          "wrong": 0,
+          "withheld": 18,
+          "unverified": 2,
+          "sign_mismatch": 0,
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.7188",
+          "wrong_rate": "0.0000"
+        },
+        "cogs": {
+          "correct": 51,
+          "wrong": 0,
           "withheld": 21,
           "unverified": 3,
           "sign_mismatch": 0,
-          "wrong_period": 1,
-          "value": 2,
-          "precision": "0.9302",
-          "coverage": "0.6719",
-          "wrong_rate": "0.0469"
-        },
-        "cogs": {
-          "correct": 43,
-          "wrong": 5,
-          "withheld": 24,
-          "unverified": 0,
-          "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 5,
-          "precision": "0.8958",
-          "coverage": "0.6667",
-          "wrong_rate": "0.0694"
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.7083",
+          "wrong_rate": "0.0000"
         },
         "current_assets": {
-          "correct": 46,
-          "wrong": 1,
-          "withheld": 13,
-          "unverified": 1,
-          "sign_mismatch": 0,
-          "wrong_period": 1,
-          "value": 0,
-          "precision": "0.9787",
-          "coverage": "0.7833",
-          "wrong_rate": "0.0167"
-        },
-        "current_liabilities": {
-          "correct": 46,
-          "wrong": 1,
-          "withheld": 13,
-          "unverified": 1,
-          "sign_mismatch": 0,
-          "wrong_period": 1,
-          "value": 0,
-          "precision": "0.9787",
-          "coverage": "0.7833",
-          "wrong_rate": "0.0167"
-        },
-        "d_and_a": {
-          "correct": 16,
-          "wrong": 2,
-          "withheld": 57,
+          "correct": 50,
+          "wrong": 0,
+          "withheld": 10,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 2,
-          "precision": "0.8889",
-          "coverage": "0.2400",
-          "wrong_rate": "0.0267"
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.8333",
+          "wrong_rate": "0.0000"
+        },
+        "current_liabilities": {
+          "correct": 50,
+          "wrong": 0,
+          "withheld": 10,
+          "unverified": 0,
+          "sign_mismatch": 0,
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.8333",
+          "wrong_rate": "0.0000"
+        },
+        "d_and_a": {
+          "correct": 21,
+          "wrong": 0,
+          "withheld": 54,
+          "unverified": 0,
+          "sign_mismatch": 0,
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.2800",
+          "wrong_rate": "0.0000"
         },
         "equity": {
-          "correct": 42,
-          "wrong": 1,
-          "withheld": 73,
-          "unverified": 1,
+          "correct": 44,
+          "wrong": 0,
+          "withheld": 72,
+          "unverified": 0,
           "sign_mismatch": 0,
-          "wrong_period": 1,
+          "wrong_period": 0,
           "value": 0,
-          "precision": "0.9767",
-          "coverage": "0.3707",
-          "wrong_rate": "0.0086"
+          "precision": "1.0000",
+          "coverage": "0.3793",
+          "wrong_rate": "0.0000"
         },
         "gross_profit": {
-          "correct": 28,
-          "wrong": 2,
+          "correct": 30,
+          "wrong": 0,
           "withheld": 6,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 2,
-          "precision": "0.9333",
+          "value": 0,
+          "precision": "1.0000",
           "coverage": "0.8333",
-          "wrong_rate": "0.0556"
+          "wrong_rate": "0.0000"
         },
         "long_term_borrowings": {
           "correct": 20,
@@ -1512,51 +1512,51 @@
           "wrong_rate": "0.0000"
         },
         "net_income": {
-          "correct": 45,
+          "correct": 51,
           "wrong": 0,
-          "withheld": 48,
+          "withheld": 42,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.4839",
+          "coverage": "0.5484",
           "wrong_rate": "0.0000"
         },
         "operating_cash_flow": {
-          "correct": 65,
+          "correct": 68,
           "wrong": 0,
-          "withheld": 28,
+          "withheld": 25,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.6989",
+          "coverage": "0.7312",
           "wrong_rate": "0.0000"
         },
         "operating_income": {
-          "correct": 43,
-          "wrong": 2,
-          "withheld": 27,
-          "unverified": 0,
-          "sign_mismatch": 0,
-          "wrong_period": 0,
-          "value": 2,
-          "precision": "0.9556",
-          "coverage": "0.6250",
-          "wrong_rate": "0.0278"
-        },
-        "revenue": {
-          "correct": 39,
+          "correct": 48,
           "wrong": 0,
-          "withheld": 54,
+          "withheld": 24,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.4194",
+          "coverage": "0.6667",
+          "wrong_rate": "0.0000"
+        },
+        "revenue": {
+          "correct": 54,
+          "wrong": 0,
+          "withheld": 39,
+          "unverified": 0,
+          "sign_mismatch": 0,
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.5806",
           "wrong_rate": "0.0000"
         },
         "short_term_borrowings": {
@@ -1572,28 +1572,28 @@
           "wrong_rate": "0.0000"
         },
         "total_assets": {
-          "correct": 44,
-          "wrong": 1,
-          "withheld": 23,
-          "unverified": 1,
+          "correct": 48,
+          "wrong": 0,
+          "withheld": 20,
+          "unverified": 0,
           "sign_mismatch": 0,
-          "wrong_period": 1,
+          "wrong_period": 0,
           "value": 0,
-          "precision": "0.9778",
-          "coverage": "0.6618",
-          "wrong_rate": "0.0147"
+          "precision": "1.0000",
+          "coverage": "0.7059",
+          "wrong_rate": "0.0000"
         },
         "total_liabilities": {
-          "correct": 26,
-          "wrong": 1,
-          "withheld": 15,
-          "unverified": 1,
+          "correct": 28,
+          "wrong": 0,
+          "withheld": 14,
+          "unverified": 0,
           "sign_mismatch": 0,
-          "wrong_period": 1,
+          "wrong_period": 0,
           "value": 0,
-          "precision": "0.9630",
-          "coverage": "0.6429",
-          "wrong_rate": "0.0238"
+          "precision": "1.0000",
+          "coverage": "0.6667",
+          "wrong_rate": "0.0000"
         }
       },
       "per_filing": {
@@ -1670,28 +1670,28 @@
           "wrong_rate": "0.0000"
         },
         "DE_0001104659-25-122321": {
-          "correct": 0,
+          "correct": 3,
           "wrong": 0,
-          "withheld": 29,
+          "withheld": 26,
+          "unverified": 3,
+          "sign_mismatch": 0,
+          "wrong_period": 0,
+          "value": 0,
+          "precision": "1.0000",
+          "coverage": "0.1034",
+          "wrong_rate": "0.0000"
+        },
+        "F_0000037996-26-000015": {
+          "correct": 27,
+          "wrong": 0,
+          "withheld": 6,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
-          "precision": "n/a",
-          "coverage": "0.0000",
+          "precision": "1.0000",
+          "coverage": "0.8182",
           "wrong_rate": "0.0000"
-        },
-        "F_0000037996-26-000015": {
-          "correct": 16,
-          "wrong": 2,
-          "withheld": 15,
-          "unverified": 0,
-          "sign_mismatch": 0,
-          "wrong_period": 0,
-          "value": 2,
-          "precision": "0.8889",
-          "coverage": "0.5455",
-          "wrong_rate": "0.0606"
         },
         "GOOGL_0001652044-26-000018": {
           "correct": 26,
@@ -1706,28 +1706,28 @@
           "wrong_rate": "0.0000"
         },
         "HD_0001628280-26-019436": {
-          "correct": 21,
-          "wrong": 6,
-          "withheld": 7,
-          "unverified": 11,
+          "correct": 33,
+          "wrong": 0,
+          "withheld": 1,
+          "unverified": 5,
           "sign_mismatch": 0,
-          "wrong_period": 6,
+          "wrong_period": 0,
           "value": 0,
-          "precision": "0.7778",
-          "coverage": "0.7941",
-          "wrong_rate": "0.1765"
+          "precision": "1.0000",
+          "coverage": "0.9706",
+          "wrong_rate": "0.0000"
         },
         "HON_0000773840-26-000013": {
-          "correct": 20,
-          "wrong": 3,
+          "correct": 23,
+          "wrong": 0,
           "withheld": 11,
           "unverified": 2,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 3,
-          "precision": "0.8696",
+          "value": 0,
+          "precision": "1.0000",
           "coverage": "0.6765",
-          "wrong_rate": "0.0882"
+          "wrong_rate": "0.0000"
         },
         "IBM_0000051143-26-000010": {
           "correct": 0,
@@ -1766,16 +1766,16 @@
           "wrong_rate": "0.0000"
         },
         "LOW_0000060667-26-000029": {
-          "correct": 20,
-          "wrong": 8,
+          "correct": 28,
+          "wrong": 0,
           "withheld": 10,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
-          "value": 8,
-          "precision": "0.7143",
+          "value": 0,
+          "precision": "1.0000",
           "coverage": "0.7368",
-          "wrong_rate": "0.2105"
+          "wrong_rate": "0.0000"
         },
         "META_0001628280-26-003942": {
           "correct": 0,
@@ -1886,15 +1886,15 @@
           "wrong_rate": "0.0000"
         },
         "TSLA_0001628280-26-003952": {
-          "correct": 24,
+          "correct": 27,
           "wrong": 0,
-          "withheld": 14,
+          "withheld": 11,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.6316",
+          "coverage": "0.7105",
           "wrong_rate": "0.0000"
         },
         "T_0000732717-26-000120": {
@@ -1922,15 +1922,15 @@
           "wrong_rate": "0.0000"
         },
         "UPS_0001628280-26-008432": {
-          "correct": 0,
+          "correct": 26,
           "wrong": 0,
-          "withheld": 30,
+          "withheld": 4,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
-          "precision": "n/a",
-          "coverage": "0.0000",
+          "precision": "1.0000",
+          "coverage": "0.8667",
           "wrong_rate": "0.0000"
         },
         "VZ_0000732712-26-000007": {
@@ -1946,15 +1946,15 @@
           "wrong_rate": "0.0000"
         },
         "WMT_0000104169-26-000055": {
-          "correct": 23,
+          "correct": 26,
           "wrong": 0,
-          "withheld": 15,
+          "withheld": 12,
           "unverified": 0,
           "sign_mismatch": 0,
           "wrong_period": 0,
           "value": 0,
           "precision": "1.0000",
-          "coverage": "0.6053",
+          "coverage": "0.6842",
           "wrong_rate": "0.0000"
         },
         "XOM_0000034088-26-000045": {
@@ -10203,9 +10203,9 @@
       "accession": "0000104169-26-000055",
       "concept": "revenue",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "648125000000",
       "truth_values": [
         "648125000000",
         "642637000000"
@@ -10214,10 +10214,10 @@
         "Revenues",
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: revenue: 2 rows claim it",
+      "ref_id": "page_52_table_1_row_3",
+      "row_label": "Total revenues",
+      "page": 52,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -10225,9 +10225,9 @@
       "accession": "0000104169-26-000055",
       "concept": "revenue",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "680985000000",
       "truth_values": [
         "680985000000",
         "674538000000"
@@ -10236,10 +10236,10 @@
         "Revenues",
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: revenue: 2 rows claim it",
+      "ref_id": "page_52_table_1_row_3",
+      "row_label": "Total revenues",
+      "page": 52,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -10247,9 +10247,9 @@
       "accession": "0000104169-26-000055",
       "concept": "revenue",
       "end_year": 2026,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "713163000000",
       "truth_values": [
         "713163000000",
         "706413000000"
@@ -10258,10 +10258,10 @@
         "Revenues",
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: revenue: 2 rows claim it",
+      "ref_id": "page_52_table_1_row_3",
+      "row_label": "Total revenues",
+      "page": 52,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -12113,19 +12113,19 @@
       "accession": "0001628280-26-019436",
       "concept": "total_assets",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "96119000000",
       "truth_values": [
         "96119000000"
       ],
       "tags": [
         "Assets"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_44_table_2_row_12",
+      "row_label": "Total assets",
+      "page": 44,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -12133,9 +12133,9 @@
       "accession": "0001628280-26-019436",
       "concept": "total_assets",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "wrong_period",
-      "app_value": "96119000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "105095000000",
       "truth_values": [
         "105095000000"
       ],
@@ -12153,19 +12153,19 @@
       "accession": "0001628280-26-019436",
       "concept": "current_assets",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "31683000000",
       "truth_values": [
         "31683000000"
       ],
       "tags": [
         "AssetsCurrent"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_44_table_2_row_6",
+      "row_label": "Total current assets",
+      "page": 44,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -12173,9 +12173,9 @@
       "accession": "0001628280-26-019436",
       "concept": "current_assets",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "wrong_period",
-      "app_value": "31683000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "34391000000",
       "truth_values": [
         "34391000000"
       ],
@@ -12193,19 +12193,19 @@
       "accession": "0001628280-26-019436",
       "concept": "cash",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "1659000000",
       "truth_values": [
         "1659000000"
       ],
       "tags": [
         "CashAndCashEquivalentsAtCarryingValue"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_44_table_2_row_2",
+      "row_label": "Cash and cash equivalents",
+      "page": 44,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -12213,9 +12213,9 @@
       "accession": "0001628280-26-019436",
       "concept": "cash",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "wrong_period",
-      "app_value": "1659000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "1389000000",
       "truth_values": [
         "1389000000"
       ],
@@ -12233,19 +12233,19 @@
       "accession": "0001628280-26-019436",
       "concept": "total_liabilities",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "89479000000",
       "truth_values": [
         "89479000000"
       ],
       "tags": [
         "Liabilities"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_44_table_2_row_29",
+      "row_label": "Total liabilities",
+      "page": 44,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -12253,9 +12253,9 @@
       "accession": "0001628280-26-019436",
       "concept": "total_liabilities",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "wrong_period",
-      "app_value": "89479000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "92282000000",
       "truth_values": [
         "92282000000"
       ],
@@ -12273,19 +12273,19 @@
       "accession": "0001628280-26-019436",
       "concept": "current_liabilities",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "28661000000",
       "truth_values": [
         "28661000000"
       ],
       "tags": [
         "LiabilitiesCurrent"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_44_table_2_row_24",
+      "row_label": "Total current liabilities",
+      "page": 44,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -12293,9 +12293,9 @@
       "accession": "0001628280-26-019436",
       "concept": "current_liabilities",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "wrong_period",
-      "app_value": "28661000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "32424000000",
       "truth_values": [
         "32424000000"
       ],
@@ -12333,19 +12333,19 @@
       "accession": "0001628280-26-019436",
       "concept": "equity",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "6640000000",
       "truth_values": [
         "6640000000"
       ],
       "tags": [
         "StockholdersEquity"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_44_table_2_row_38",
+      "row_label": "Total stockholders\u2019 equity",
+      "page": 44,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -12353,9 +12353,9 @@
       "accession": "0001628280-26-019436",
       "concept": "equity",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "wrong_period",
-      "app_value": "6640000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "12813000000",
       "truth_values": [
         "12813000000"
       ],
@@ -12479,72 +12479,8 @@
     {
       "ticker": "HD",
       "accession": "0001628280-26-019436",
-      "concept": "cash",
-      "end_year": 2026,
-      "outcome": "unverified",
-      "sub": null,
-      "app_value": "1389000000",
-      "truth_values": [],
-      "tags": [],
-      "ref_id": "page_44_table_2_row_2",
-      "row_label": "Cash and cash equivalents",
-      "page": 44,
-      "reason": null,
-      "bucket": "general"
-    },
-    {
-      "ticker": "HD",
-      "accession": "0001628280-26-019436",
-      "concept": "current_assets",
-      "end_year": 2026,
-      "outcome": "unverified",
-      "sub": null,
-      "app_value": "34391000000",
-      "truth_values": [],
-      "tags": [],
-      "ref_id": "page_44_table_2_row_6",
-      "row_label": "Total current assets",
-      "page": 44,
-      "reason": null,
-      "bucket": "general"
-    },
-    {
-      "ticker": "HD",
-      "accession": "0001628280-26-019436",
-      "concept": "current_liabilities",
-      "end_year": 2026,
-      "outcome": "unverified",
-      "sub": null,
-      "app_value": "32424000000",
-      "truth_values": [],
-      "tags": [],
-      "ref_id": "page_44_table_2_row_24",
-      "row_label": "Total current liabilities",
-      "page": 44,
-      "reason": null,
-      "bucket": "general"
-    },
-    {
-      "ticker": "HD",
-      "accession": "0001628280-26-019436",
-      "concept": "equity",
-      "end_year": 2026,
-      "outcome": "unverified",
-      "sub": null,
-      "app_value": "12813000000",
-      "truth_values": [],
-      "tags": [],
-      "ref_id": "page_44_table_2_row_38",
-      "row_label": "Total stockholders\u2019 equity",
-      "page": 44,
-      "reason": null,
-      "bucket": "general"
-    },
-    {
-      "ticker": "HD",
-      "accession": "0001628280-26-019436",
       "concept": "short_term_borrowings",
-      "end_year": 2025,
+      "end_year": 2024,
       "outcome": "unverified",
       "sub": null,
       "app_value": "316000000",
@@ -12560,7 +12496,7 @@
       "ticker": "HD",
       "accession": "0001628280-26-019436",
       "concept": "short_term_borrowings",
-      "end_year": 2026,
+      "end_year": 2025,
       "outcome": "unverified",
       "sub": null,
       "app_value": "4464000000",
@@ -12568,38 +12504,6 @@
       "tags": [],
       "ref_id": "page_44_table_2_row_15",
       "row_label": "Short-term debt",
-      "page": 44,
-      "reason": null,
-      "bucket": "general"
-    },
-    {
-      "ticker": "HD",
-      "accession": "0001628280-26-019436",
-      "concept": "total_assets",
-      "end_year": 2026,
-      "outcome": "unverified",
-      "sub": null,
-      "app_value": "105095000000",
-      "truth_values": [],
-      "tags": [],
-      "ref_id": "page_44_table_2_row_12",
-      "row_label": "Total assets",
-      "page": 44,
-      "reason": null,
-      "bucket": "general"
-    },
-    {
-      "ticker": "HD",
-      "accession": "0001628280-26-019436",
-      "concept": "total_liabilities",
-      "end_year": 2026,
-      "outcome": "unverified",
-      "sub": null,
-      "app_value": "92282000000",
-      "truth_values": [],
-      "tags": [],
-      "ref_id": "page_44_table_2_row_29",
-      "row_label": "Total liabilities",
       "page": 44,
       "reason": null,
       "bucket": "general"
@@ -17497,19 +17401,19 @@
       "accession": "0001104659-25-122321",
       "concept": "revenue",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "61251000000",
       "truth_values": [
         "61251000000"
       ],
       "tags": [
         "Revenues"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_80_table_16_row_4",
+      "row_label": "Total",
+      "page": 80,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -17517,19 +17421,19 @@
       "accession": "0001104659-25-122321",
       "concept": "revenue",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "51716000000",
       "truth_values": [
         "51716000000"
       ],
       "tags": [
         "Revenues"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_80_table_16_row_4",
+      "row_label": "Total",
+      "page": 80,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -17537,19 +17441,19 @@
       "accession": "0001104659-25-122321",
       "concept": "revenue",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "45684000000",
       "truth_values": [
         "45684000000"
       ],
       "tags": [
         "Revenues"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_80_table_16_row_4",
+      "row_label": "Total",
+      "page": 80,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -17631,7 +17535,7 @@
       "ref_id": null,
       "row_label": null,
       "page": null,
-      "reason": "not_mapped",
+      "reason": "conflict: net_income: 2 rows claim it",
       "bucket": "general"
     },
     {
@@ -17653,7 +17557,7 @@
       "ref_id": null,
       "row_label": null,
       "page": null,
-      "reason": "not_mapped",
+      "reason": "conflict: net_income: 2 rows claim it",
       "bucket": "general"
     },
     {
@@ -17675,7 +17579,7 @@
       "ref_id": null,
       "row_label": null,
       "page": null,
-      "reason": "not_mapped",
+      "reason": "conflict: net_income: 2 rows claim it",
       "bucket": "general"
     },
     {
@@ -18083,6 +17987,54 @@
       "bucket": "general"
     },
     {
+      "ticker": "DE",
+      "accession": "0001104659-25-122321",
+      "concept": "cogs",
+      "end_year": 2023,
+      "outcome": "unverified",
+      "sub": null,
+      "app_value": "37715000000",
+      "truth_values": [],
+      "tags": [],
+      "ref_id": "page_80_table_16_row_6",
+      "row_label": "Cost of sales",
+      "page": 80,
+      "reason": null,
+      "bucket": "general"
+    },
+    {
+      "ticker": "DE",
+      "accession": "0001104659-25-122321",
+      "concept": "cogs",
+      "end_year": 2024,
+      "outcome": "unverified",
+      "sub": null,
+      "app_value": "30775000000",
+      "truth_values": [],
+      "tags": [],
+      "ref_id": "page_80_table_16_row_6",
+      "row_label": "Cost of sales",
+      "page": 80,
+      "reason": null,
+      "bucket": "general"
+    },
+    {
+      "ticker": "DE",
+      "accession": "0001104659-25-122321",
+      "concept": "cogs",
+      "end_year": 2025,
+      "outcome": "unverified",
+      "sub": null,
+      "app_value": "28159000000",
+      "truth_values": [],
+      "tags": [],
+      "ref_id": "page_80_table_16_row_6",
+      "row_label": "Cost of sales",
+      "page": 80,
+      "reason": null,
+      "bucket": "general"
+    },
+    {
       "ticker": "HON",
       "accession": "0000773840-26-000013",
       "concept": "revenue",
@@ -18096,7 +18048,7 @@
       "tags": [
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": "page_59_table_1_row_4",
+      "ref_id": "page_59_table_1_row_2",
       "row_label": "Net sales",
       "page": 59,
       "reason": null,
@@ -18116,7 +18068,7 @@
       "tags": [
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": "page_59_table_1_row_4",
+      "ref_id": "page_59_table_1_row_2",
       "row_label": "Net sales",
       "page": 59,
       "reason": null,
@@ -18136,7 +18088,7 @@
       "tags": [
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": "page_59_table_1_row_4",
+      "ref_id": "page_59_table_1_row_2",
       "row_label": "Net sales",
       "page": 59,
       "reason": null,
@@ -18147,9 +18099,9 @@
       "accession": "0000773840-26-000013",
       "concept": "cogs",
       "end_year": 2023,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "14836000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "20637000000",
       "truth_values": [
         "20637000000"
       ],
@@ -18157,7 +18109,7 @@
         "CostOfGoodsAndServicesSold"
       ],
       "ref_id": "page_59_table_1_row_6",
-      "row_label": "Cost of products sold",
+      "row_label": "Total Cost of products and services sold",
       "page": 59,
       "reason": null,
       "bucket": "general"
@@ -18167,9 +18119,9 @@
       "accession": "0000773840-26-000013",
       "concept": "cogs",
       "end_year": 2024,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "15017000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "21360000000",
       "truth_values": [
         "21360000000"
       ],
@@ -18177,7 +18129,7 @@
         "CostOfGoodsAndServicesSold"
       ],
       "ref_id": "page_59_table_1_row_6",
-      "row_label": "Cost of products sold",
+      "row_label": "Total Cost of products and services sold",
       "page": 59,
       "reason": null,
       "bucket": "general"
@@ -18187,9 +18139,9 @@
       "accession": "0000773840-26-000013",
       "concept": "cogs",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "16153000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "23613000000",
       "truth_values": [
         "23613000000"
       ],
@@ -18197,7 +18149,7 @@
         "CostOfGoodsAndServicesSold"
       ],
       "ref_id": "page_59_table_1_row_6",
-      "row_label": "Cost of products sold",
+      "row_label": "Total Cost of products and services sold",
       "page": 59,
       "reason": null,
       "bucket": "general"
@@ -18338,7 +18290,7 @@
         "NetIncomeLoss",
         "ProfitLoss"
       ],
-      "ref_id": "page_59_table_1_row_20",
+      "ref_id": "page_59_table_1_row_18",
       "row_label": "Net income",
       "page": 59,
       "reason": null,
@@ -18360,7 +18312,7 @@
         "NetIncomeLoss",
         "ProfitLoss"
       ],
-      "ref_id": "page_59_table_1_row_20",
+      "ref_id": "page_59_table_1_row_18",
       "row_label": "Net income",
       "page": 59,
       "reason": null,
@@ -18382,7 +18334,7 @@
         "NetIncomeLoss",
         "ProfitLoss"
       ],
-      "ref_id": "page_59_table_1_row_20",
+      "ref_id": "page_59_table_1_row_18",
       "row_label": "Net income",
       "page": 59,
       "reason": null,
@@ -18402,7 +18354,7 @@
       "tags": [
         "Assets"
       ],
-      "ref_id": "page_61_table_1_row_18",
+      "ref_id": "page_61_table_1_row_17",
       "row_label": "Total assets",
       "page": 61,
       "reason": null,
@@ -18422,7 +18374,7 @@
       "tags": [
         "Assets"
       ],
-      "ref_id": "page_61_table_1_row_18",
+      "ref_id": "page_61_table_1_row_17",
       "row_label": "Total assets",
       "page": 61,
       "reason": null,
@@ -18442,7 +18394,7 @@
       "tags": [
         "AssetsCurrent"
       ],
-      "ref_id": "page_61_table_1_row_10",
+      "ref_id": "page_61_table_1_row_9",
       "row_label": "Total current assets",
       "page": 61,
       "reason": null,
@@ -18462,7 +18414,7 @@
       "tags": [
         "AssetsCurrent"
       ],
-      "ref_id": "page_61_table_1_row_10",
+      "ref_id": "page_61_table_1_row_9",
       "row_label": "Total current assets",
       "page": 61,
       "reason": null,
@@ -18482,7 +18434,7 @@
       "tags": [
         "CashAndCashEquivalentsAtCarryingValue"
       ],
-      "ref_id": "page_61_table_1_row_3",
+      "ref_id": "page_61_table_1_row_2",
       "row_label": "Cash and cash equivalents",
       "page": 61,
       "reason": null,
@@ -18502,7 +18454,7 @@
       "tags": [
         "CashAndCashEquivalentsAtCarryingValue"
       ],
-      "ref_id": "page_61_table_1_row_3",
+      "ref_id": "page_61_table_1_row_2",
       "row_label": "Cash and cash equivalents",
       "page": 61,
       "reason": null,
@@ -18522,7 +18474,7 @@
       "tags": [
         "LiabilitiesCurrent"
       ],
-      "ref_id": "page_61_table_1_row_27",
+      "ref_id": "page_61_table_1_row_26",
       "row_label": "Total current liabilities",
       "page": 61,
       "reason": null,
@@ -18542,7 +18494,7 @@
       "tags": [
         "LiabilitiesCurrent"
       ],
-      "ref_id": "page_61_table_1_row_27",
+      "ref_id": "page_61_table_1_row_26",
       "row_label": "Total current liabilities",
       "page": 61,
       "reason": null,
@@ -18782,7 +18734,7 @@
       "app_value": "25440000000",
       "truth_values": [],
       "tags": [],
-      "ref_id": "page_61_table_1_row_28",
+      "ref_id": "page_61_table_1_row_27",
       "row_label": "Long-term debt",
       "page": 61,
       "reason": null,
@@ -18798,7 +18750,7 @@
       "app_value": "27141000000",
       "truth_values": [],
       "tags": [],
-      "ref_id": "page_61_table_1_row_28",
+      "ref_id": "page_61_table_1_row_27",
       "row_label": "Long-term debt",
       "page": 61,
       "reason": null,
@@ -18809,19 +18761,19 @@
       "accession": "0001628280-26-008432",
       "concept": "revenue",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "90958000000",
       "truth_values": [
         "90958000000"
       ],
       "tags": [
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_0",
+      "row_label": "Revenue",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -18829,19 +18781,19 @@
       "accession": "0001628280-26-008432",
       "concept": "revenue",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "91070000000",
       "truth_values": [
         "91070000000"
       ],
       "tags": [
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_0",
+      "row_label": "Revenue",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -18849,19 +18801,19 @@
       "accession": "0001628280-26-008432",
       "concept": "revenue",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "88661000000",
       "truth_values": [
         "88661000000"
       ],
       "tags": [
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_0",
+      "row_label": "Revenue",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -18869,19 +18821,19 @@
       "accession": "0001628280-26-008432",
       "concept": "operating_income",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "9141000000",
       "truth_values": [
         "9141000000"
       ],
       "tags": [
         "OperatingIncomeLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_10",
+      "row_label": "Operating Profit",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -18889,19 +18841,19 @@
       "accession": "0001628280-26-008432",
       "concept": "operating_income",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "8468000000",
       "truth_values": [
         "8468000000"
       ],
       "tags": [
         "OperatingIncomeLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_10",
+      "row_label": "Operating Profit",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -18909,19 +18861,19 @@
       "accession": "0001628280-26-008432",
       "concept": "operating_income",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "7867000000",
       "truth_values": [
         "7867000000"
       ],
       "tags": [
         "OperatingIncomeLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_10",
+      "row_label": "Operating Profit",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -18929,9 +18881,9 @@
       "accession": "0001628280-26-008432",
       "concept": "d_and_a",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "3366000000",
       "truth_values": [
         "2800000000",
         "3366000000"
@@ -18940,10 +18892,10 @@
         "DepreciationDepletionAndAmortization",
         "DepreciationAndAmortization"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_4",
+      "row_label": "Depreciation and amortization",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -18951,9 +18903,9 @@
       "accession": "0001628280-26-008432",
       "concept": "d_and_a",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "3609000000",
       "truth_values": [
         "3000000000",
         "3609000000"
@@ -18962,10 +18914,10 @@
         "DepreciationDepletionAndAmortization",
         "DepreciationAndAmortization"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_4",
+      "row_label": "Depreciation and amortization",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -18973,9 +18925,9 @@
       "accession": "0001628280-26-008432",
       "concept": "d_and_a",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "3746000000",
       "truth_values": [
         "3000000000",
         "3746000000"
@@ -18984,10 +18936,10 @@
         "DepreciationDepletionAndAmortization",
         "DepreciationAndAmortization"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_4",
+      "row_label": "Depreciation and amortization",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -18995,19 +18947,19 @@
       "accession": "0001628280-26-008432",
       "concept": "net_income",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "6708000000",
       "truth_values": [
         "6708000000"
       ],
       "tags": [
         "NetIncomeLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_17",
+      "row_label": "Net Income",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19015,19 +18967,19 @@
       "accession": "0001628280-26-008432",
       "concept": "net_income",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "5782000000",
       "truth_values": [
         "5782000000"
       ],
       "tags": [
         "NetIncomeLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_17",
+      "row_label": "Net Income",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19035,19 +18987,19 @@
       "accession": "0001628280-26-008432",
       "concept": "net_income",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "5572000000",
       "truth_values": [
         "5572000000"
       ],
       "tags": [
         "NetIncomeLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_67_table_2_row_17",
+      "row_label": "Net Income",
+      "page": 67,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19055,19 +19007,19 @@
       "accession": "0001628280-26-008432",
       "concept": "total_assets",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "70070000000",
       "truth_values": [
         "70070000000"
       ],
       "tags": [
         "Assets"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_66_table_1_row_12",
+      "row_label": "Total Assets",
+      "page": 66,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19075,19 +19027,19 @@
       "accession": "0001628280-26-008432",
       "concept": "total_assets",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "73090000000",
       "truth_values": [
         "73090000000"
       ],
       "tags": [
         "Assets"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_66_table_1_row_12",
+      "row_label": "Total Assets",
+      "page": 66,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19095,19 +19047,19 @@
       "accession": "0001628280-26-008432",
       "concept": "current_assets",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "19310000000",
       "truth_values": [
         "19310000000"
       ],
       "tags": [
         "AssetsCurrent"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_66_table_1_row_5",
+      "row_label": "Total Current Assets",
+      "page": 66,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19115,19 +19067,19 @@
       "accession": "0001628280-26-008432",
       "concept": "current_assets",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "19045000000",
       "truth_values": [
         "19045000000"
       ],
       "tags": [
         "AssetsCurrent"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_66_table_1_row_5",
+      "row_label": "Total Current Assets",
+      "page": 66,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19135,19 +19087,19 @@
       "accession": "0001628280-26-008432",
       "concept": "cash",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "6112000000",
       "truth_values": [
         "6112000000"
       ],
       "tags": [
         "CashAndCashEquivalentsAtCarryingValue"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_66_table_1_row_2",
+      "row_label": "Cash and cash equivalents",
+      "page": 66,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19155,19 +19107,19 @@
       "accession": "0001628280-26-008432",
       "concept": "cash",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "5887000000",
       "truth_values": [
         "5887000000"
       ],
       "tags": [
         "CashAndCashEquivalentsAtCarryingValue"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_66_table_1_row_2",
+      "row_label": "Cash and cash equivalents",
+      "page": 66,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19175,19 +19127,19 @@
       "accession": "0001628280-26-008432",
       "concept": "current_liabilities",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "16441000000",
       "truth_values": [
         "16441000000"
       ],
       "tags": [
         "LiabilitiesCurrent"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_66_table_1_row_22",
+      "row_label": "Total Current Liabilities",
+      "page": 66,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19195,19 +19147,19 @@
       "accession": "0001628280-26-008432",
       "concept": "current_liabilities",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "15620000000",
       "truth_values": [
         "15620000000"
       ],
       "tags": [
         "LiabilitiesCurrent"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_66_table_1_row_22",
+      "row_label": "Total Current Liabilities",
+      "page": 66,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19299,19 +19251,19 @@
       "accession": "0001628280-26-008432",
       "concept": "operating_cash_flow",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "10238000000",
       "truth_values": [
         "10238000000"
       ],
       "tags": [
         "NetCashProvidedByUsedInOperatingActivities"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_68_table_1_row_17",
+      "row_label": "Net cash from operating activities",
+      "page": 68,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19319,19 +19271,19 @@
       "accession": "0001628280-26-008432",
       "concept": "operating_cash_flow",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "10122000000",
       "truth_values": [
         "10122000000"
       ],
       "tags": [
         "NetCashProvidedByUsedInOperatingActivities"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_68_table_1_row_17",
+      "row_label": "Net cash from operating activities",
+      "page": 68,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19339,19 +19291,19 @@
       "accession": "0001628280-26-008432",
       "concept": "operating_cash_flow",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "8450000000",
       "truth_values": [
         "8450000000"
       ],
       "tags": [
         "NetCashProvidedByUsedInOperatingActivities"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_68_table_1_row_17",
+      "row_label": "Net cash from operating activities",
+      "page": 68,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19359,19 +19311,19 @@
       "accession": "0001628280-26-008432",
       "concept": "capex",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "-5158000000",
       "truth_values": [
         "5158000000"
       ],
       "tags": [
         "PaymentsToAcquirePropertyPlantAndEquipment"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_68_table_1_row_19",
+      "row_label": "Capital expenditures",
+      "page": 68,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19379,19 +19331,19 @@
       "accession": "0001628280-26-008432",
       "concept": "capex",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "-3909000000",
       "truth_values": [
         "3909000000"
       ],
       "tags": [
         "PaymentsToAcquirePropertyPlantAndEquipment"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_68_table_1_row_19",
+      "row_label": "Capital expenditures",
+      "page": 68,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -19399,19 +19351,19 @@
       "accession": "0001628280-26-008432",
       "concept": "capex",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "-3685000000",
       "truth_values": [
         "3685000000"
       ],
       "tags": [
         "PaymentsToAcquirePropertyPlantAndEquipment"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_68_table_1_row_19",
+      "row_label": "Capital expenditures",
+      "page": 68,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -22147,7 +22099,7 @@
       "tags": [
         "StockholdersEquity"
       ],
-      "ref_id": "page_48_table_1_row_32",
+      "ref_id": "page_48_table_1_row_33",
       "row_label": "Total stockholders\u2019 equity",
       "page": 48,
       "reason": null,
@@ -22167,7 +22119,7 @@
       "tags": [
         "StockholdersEquity"
       ],
-      "ref_id": "page_48_table_1_row_32",
+      "ref_id": "page_48_table_1_row_33",
       "row_label": "Total stockholders\u2019 equity",
       "page": 48,
       "reason": null,
@@ -22298,9 +22250,9 @@
       "accession": "0001628280-26-003952",
       "concept": "revenue",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "96773000000",
       "truth_values": [
         "96773000000"
       ],
@@ -22308,10 +22260,10 @@
         "Revenues",
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: revenue: 2 rows claim it",
+      "ref_id": "page_53_table_1_row_7",
+      "row_label": "Total revenues",
+      "page": 53,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -22319,9 +22271,9 @@
       "accession": "0001628280-26-003952",
       "concept": "revenue",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "97690000000",
       "truth_values": [
         "97690000000"
       ],
@@ -22329,10 +22281,10 @@
         "Revenues",
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: revenue: 2 rows claim it",
+      "ref_id": "page_53_table_1_row_7",
+      "row_label": "Total revenues",
+      "page": 53,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -22340,9 +22292,9 @@
       "accession": "0001628280-26-003952",
       "concept": "revenue",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "94827000000",
       "truth_values": [
         "94827000000"
       ],
@@ -22350,10 +22302,10 @@
         "Revenues",
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: revenue: 2 rows claim it",
+      "ref_id": "page_53_table_1_row_7",
+      "row_label": "Total revenues",
+      "page": 53,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -23071,19 +23023,19 @@
       "accession": "0000037996-26-000015",
       "concept": "revenue",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "176191000000",
       "truth_values": [
         "176191000000"
       ],
       "tags": [
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_115_table_6_row_3",
+      "row_label": "Total revenues (Note 4)",
+      "page": 115,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -23091,19 +23043,19 @@
       "accession": "0000037996-26-000015",
       "concept": "revenue",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "184992000000",
       "truth_values": [
         "184992000000"
       ],
       "tags": [
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_115_table_6_row_3",
+      "row_label": "Total revenues (Note 4)",
+      "page": 115,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -23111,19 +23063,19 @@
       "accession": "0000037996-26-000015",
       "concept": "revenue",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "187267000000",
       "truth_values": [
         "187267000000"
       ],
       "tags": [
         "RevenueFromContractWithCustomerExcludingAssessedTax"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_115_table_6_row_3",
+      "row_label": "Total revenues (Note 4)",
+      "page": 115,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -23131,19 +23083,19 @@
       "accession": "0000037996-26-000015",
       "concept": "cogs",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "150550000000",
       "truth_values": [
         "150550000000"
       ],
       "tags": [
         "CostOfGoodsAndServicesSold"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_115_table_6_row_5",
+      "row_label": "Cost of sales (Note 13)",
+      "page": 115,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -23151,19 +23103,19 @@
       "accession": "0000037996-26-000015",
       "concept": "cogs",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "158434000000",
       "truth_values": [
         "158434000000"
       ],
       "tags": [
         "CostOfGoodsAndServicesSold"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_115_table_6_row_5",
+      "row_label": "Cost of sales (Note 13)",
+      "page": 115,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -23171,19 +23123,19 @@
       "accession": "0000037996-26-000015",
       "concept": "cogs",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "174466000000",
       "truth_values": [
         "174466000000"
       ],
       "tags": [
         "CostOfGoodsAndServicesSold"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "not_mapped",
+      "ref_id": "page_115_table_6_row_5",
+      "row_label": "Cost of sales (Note 13)",
+      "page": 115,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -23311,19 +23263,19 @@
       "accession": "0000037996-26-000015",
       "concept": "net_income",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "4329000000",
       "truth_values": [
         "4329000000"
       ],
       "tags": [
         "ProfitLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: net_income: 2 rows claim it",
+      "ref_id": "page_115_table_6_row_15",
+      "row_label": "Net income/(loss)",
+      "page": 115,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -23331,19 +23283,19 @@
       "accession": "0000037996-26-000015",
       "concept": "net_income",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "5894000000",
       "truth_values": [
         "5894000000"
       ],
       "tags": [
         "ProfitLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: net_income: 2 rows claim it",
+      "ref_id": "page_115_table_6_row_15",
+      "row_label": "Net income/(loss)",
+      "page": 115,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -23351,19 +23303,19 @@
       "accession": "0000037996-26-000015",
       "concept": "net_income",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "-8162000000",
       "truth_values": [
         "-8162000000"
       ],
       "tags": [
         "ProfitLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: net_income: 2 rows claim it",
+      "ref_id": "page_115_table_6_row_15",
+      "row_label": "Net income/(loss)",
+      "page": 115,
+      "reason": null,
       "bucket": "general"
     },
     {
@@ -23471,17 +23423,17 @@
       "accession": "0000037996-26-000015",
       "concept": "cash",
       "end_year": 2024,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "2494000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "22935000000",
       "truth_values": [
         "22935000000"
       ],
       "tags": [
         "CashAndCashEquivalentsAtCarryingValue"
       ],
-      "ref_id": "page_116_table_6_row_43",
-      "row_label": "Cash and cash equivalents",
+      "ref_id": "page_116_table_6_row_1",
+      "row_label": "Cash and cash equivalents (Note 9)",
       "page": 116,
       "reason": null,
       "bucket": "general"
@@ -23491,17 +23443,17 @@
       "accession": "0000037996-26-000015",
       "concept": "cash",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "2523000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "23356000000",
       "truth_values": [
         "23356000000"
       ],
       "tags": [
         "CashAndCashEquivalentsAtCarryingValue"
       ],
-      "ref_id": "page_116_table_6_row_43",
-      "row_label": "Cash and cash equivalents",
+      "ref_id": "page_116_table_6_row_1",
+      "row_label": "Cash and cash equivalents (Note 9)",
       "page": 116,
       "reason": null,
       "bucket": "general"
@@ -23804,7 +23756,7 @@
       "tags": [
         "CostOfGoodsAndServicesSold"
       ],
-      "ref_id": "page_41_table_2_row_2",
+      "ref_id": "page_41_table_2_row_1",
       "row_label": "Cost of sales",
       "page": 41,
       "reason": null,
@@ -23815,16 +23767,16 @@
       "accession": "0000060667-26-000029",
       "concept": "cogs",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "66680000.00",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "55797000000",
       "truth_values": [
         "55797000000"
       ],
       "tags": [
         "CostOfGoodsAndServicesSold"
       ],
-      "ref_id": "page_41_table_2_row_2",
+      "ref_id": "page_41_table_2_row_1",
       "row_label": "Cost of sales",
       "page": 41,
       "reason": null,
@@ -23835,16 +23787,16 @@
       "accession": "0000060667-26-000029",
       "concept": "cogs",
       "end_year": 2026,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "66520000.00",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "57401000000",
       "truth_values": [
         "57401000000"
       ],
       "tags": [
         "CostOfGoodsAndServicesSold"
       ],
-      "ref_id": "page_41_table_2_row_2",
+      "ref_id": "page_41_table_2_row_1",
       "row_label": "Cost of sales",
       "page": 41,
       "reason": null,
@@ -23864,7 +23816,7 @@
       "tags": [
         "GrossProfit"
       ],
-      "ref_id": "page_41_table_2_row_3",
+      "ref_id": "page_41_table_2_row_2",
       "row_label": "Gross margin",
       "page": 41,
       "reason": null,
@@ -23875,16 +23827,16 @@
       "accession": "0000060667-26-000029",
       "concept": "gross_profit",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "33320000.00",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "27877000000",
       "truth_values": [
         "27877000000"
       ],
       "tags": [
         "GrossProfit"
       ],
-      "ref_id": "page_41_table_2_row_3",
+      "ref_id": "page_41_table_2_row_2",
       "row_label": "Gross margin",
       "page": 41,
       "reason": null,
@@ -23895,16 +23847,16 @@
       "accession": "0000060667-26-000029",
       "concept": "gross_profit",
       "end_year": 2026,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "33480000.00",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "28885000000",
       "truth_values": [
         "28885000000"
       ],
       "tags": [
         "GrossProfit"
       ],
-      "ref_id": "page_41_table_2_row_3",
+      "ref_id": "page_41_table_2_row_2",
       "row_label": "Gross margin",
       "page": 41,
       "reason": null,
@@ -23924,7 +23876,7 @@
       "tags": [
         "OperatingIncomeLoss"
       ],
-      "ref_id": "page_41_table_2_row_7",
+      "ref_id": "page_41_table_2_row_6",
       "row_label": "Operating income",
       "page": 41,
       "reason": null,
@@ -23935,16 +23887,16 @@
       "accession": "0000060667-26-000029",
       "concept": "operating_income",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "12510000.00",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "10466000000",
       "truth_values": [
         "10466000000"
       ],
       "tags": [
         "OperatingIncomeLoss"
       ],
-      "ref_id": "page_41_table_2_row_7",
+      "ref_id": "page_41_table_2_row_6",
       "row_label": "Operating income",
       "page": 41,
       "reason": null,
@@ -23955,16 +23907,16 @@
       "accession": "0000060667-26-000029",
       "concept": "operating_income",
       "end_year": 2026,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "11770000.00",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "10153000000",
       "truth_values": [
         "10153000000"
       ],
       "tags": [
         "OperatingIncomeLoss"
       ],
-      "ref_id": "page_41_table_2_row_7",
+      "ref_id": "page_41_table_2_row_6",
       "row_label": "Operating income",
       "page": 41,
       "reason": null,
@@ -23986,7 +23938,7 @@
         "DepreciationDepletionAndAmortization",
         "DepreciationAndAmortization"
       ],
-      "ref_id": "page_41_table_2_row_6",
+      "ref_id": "page_41_table_2_row_5",
       "row_label": "Depreciation and amortization",
       "page": 41,
       "reason": null,
@@ -23997,9 +23949,9 @@
       "accession": "0000060667-26-000029",
       "concept": "d_and_a",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "2070000.00",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "1729000000",
       "truth_values": [
         "1972000000",
         "1729000000"
@@ -24008,7 +23960,7 @@
         "DepreciationDepletionAndAmortization",
         "DepreciationAndAmortization"
       ],
-      "ref_id": "page_41_table_2_row_6",
+      "ref_id": "page_41_table_2_row_5",
       "row_label": "Depreciation and amortization",
       "page": 41,
       "reason": null,
@@ -24019,9 +23971,9 @@
       "accession": "0000060667-26-000029",
       "concept": "d_and_a",
       "end_year": 2026,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "2250000.00",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "1941000000",
       "truth_values": [
         "2194000000",
         "1941000000"
@@ -24030,7 +23982,7 @@
         "DepreciationDepletionAndAmortization",
         "DepreciationAndAmortization"
       ],
-      "ref_id": "page_41_table_2_row_6",
+      "ref_id": "page_41_table_2_row_5",
       "row_label": "Depreciation and amortization",
       "page": 41,
       "reason": null,
@@ -24701,17 +24653,17 @@
       "accession": "0001628280-26-008131",
       "concept": "total_assets",
       "end_year": 2024,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "41076000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "4002814000000",
       "truth_values": [
         "4002814000000"
       ],
       "tags": [
         "Assets"
       ],
-      "ref_id": "page_169_table_2_row_46",
-      "row_label": "Total assets",
+      "ref_id": "page_169_table_2_row_16",
+      "row_label": "Total assets(a)",
       "page": 169,
       "reason": null,
       "bucket": "financial"
@@ -24721,17 +24673,17 @@
       "accession": "0001628280-26-008131",
       "concept": "total_assets",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "43295000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "4424900000000",
       "truth_values": [
         "4424900000000"
       ],
       "tags": [
         "Assets"
       ],
-      "ref_id": "page_169_table_2_row_46",
-      "row_label": "Total assets",
+      "ref_id": "page_169_table_2_row_16",
+      "row_label": "Total assets(a)",
       "page": 169,
       "reason": null,
       "bucket": "financial"
@@ -24741,17 +24693,17 @@
       "accession": "0001628280-26-008131",
       "concept": "total_liabilities",
       "end_year": 2024,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "27777000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "3658056000000",
       "truth_values": [
         "3658056000000"
       ],
       "tags": [
         "Liabilities"
       ],
-      "ref_id": "page_169_table_2_row_50",
-      "row_label": "Total liabilities",
+      "ref_id": "page_169_table_2_row_26",
+      "row_label": "Total liabilities(a)",
       "page": 169,
       "reason": null,
       "bucket": "financial"
@@ -24761,17 +24713,17 @@
       "accession": "0001628280-26-008131",
       "concept": "total_liabilities",
       "end_year": 2025,
-      "outcome": "wrong",
-      "sub": "value",
-      "app_value": "28642000000",
+      "outcome": "correct",
+      "sub": null,
+      "app_value": "4062462000000",
       "truth_values": [
         "4062462000000"
       ],
       "tags": [
         "Liabilities"
       ],
-      "ref_id": "page_169_table_2_row_50",
-      "row_label": "Total liabilities",
+      "ref_id": "page_169_table_2_row_26",
+      "row_label": "Total liabilities(a)",
       "page": 169,
       "reason": null,
       "bucket": "financial"
@@ -25061,19 +25013,19 @@
       "accession": "0000070858-26-000157",
       "concept": "net_income",
       "end_year": 2023,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "26305000000",
       "truth_values": [
         "26305000000"
       ],
       "tags": [
         "NetIncomeLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: net_income: 2 rows claim it",
+      "ref_id": "page_99_table_0_row_22",
+      "row_label": "Net income",
+      "page": 99,
+      "reason": null,
       "bucket": "financial"
     },
     {
@@ -25081,19 +25033,19 @@
       "accession": "0000070858-26-000157",
       "concept": "net_income",
       "end_year": 2024,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "26973000000",
       "truth_values": [
         "26973000000"
       ],
       "tags": [
         "NetIncomeLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: net_income: 2 rows claim it",
+      "ref_id": "page_99_table_0_row_22",
+      "row_label": "Net income",
+      "page": 99,
+      "reason": null,
       "bucket": "financial"
     },
     {
@@ -25101,19 +25053,19 @@
       "accession": "0000070858-26-000157",
       "concept": "net_income",
       "end_year": 2025,
-      "outcome": "withheld",
+      "outcome": "correct",
       "sub": null,
-      "app_value": null,
+      "app_value": "30509000000",
       "truth_values": [
         "30509000000"
       ],
       "tags": [
         "NetIncomeLoss"
       ],
-      "ref_id": null,
-      "row_label": null,
-      "page": null,
-      "reason": "conflict: net_income: 2 rows claim it",
+      "ref_id": "page_99_table_0_row_22",
+      "row_label": "Net income",
+      "page": 99,
+      "reason": null,
       "bucket": "financial"
     },
     {

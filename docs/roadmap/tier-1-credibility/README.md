@@ -40,7 +40,11 @@ Truth cells where the truth source has no value are `no_truth` and are excluded 
 ## Tier 1 exit gate (run after T1.3, before any tier-2 work)
 
 1. Full `VERIFICATION_GATE.md` on `main`.
-2. Holdout eval, run once: `uv run python -m evals.run --split holdout`. Record the results in
+2. Before the holdout run: check the `fy`-mismatch listing (see T1.1 fact 4) for every holdout company
+   by opening that filing's statement **headers only, never its results**. Add a `fiscal_year_offset`
+   override with evidence where the header prints "Fiscal YYYY"; otherwise leave the default.
+   *(Added 2026-09-24 by human decision.)*
+   Then the holdout eval, run once: `uv run python -m evals.run --split holdout`. Record the results in
    `docs/EVAL_RESULTS.md` exactly as produced. **Do not fix anything based on holdout failures in this tier**:
    log them in `docs/KNOWN_ISSUES.md` for later. Looking at holdout failures and then fixing them turns the
    holdout into a second dev set and makes the published number dishonest.

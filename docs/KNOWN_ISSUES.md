@@ -16,6 +16,40 @@ four more (section H below), all fixed with regression tests in
 
 ## Open - needs a decision
 
+### T1.1-a. A footnote table's totals replace the balance sheet's (HIGH: a wrong number is shown)
+
+Found by the T1.1 XBRL eval pilot. JPMorgan's 10-K (accession
+0001628280-26-008131, rendered page 169) prints the consolidated balance sheet
+with "Total assets(a)" and "Total liabilities(a)" (footnote marker attached),
+then, on the same page, footnote (a)'s table of consolidated-VIE assets and
+liabilities with plain "Total assets" and "Total liabilities" rows. The app
+mapped total_assets and total_liabilities from the footnote table: 43,295 /
+41,076 and 28,642 / 27,777 $M (2025 / 2024) instead of the balance sheet's
+4,424,900 / 4,002,814 and 4,062,462 / 3,658,056 $M, which match the filer's
+XBRL `Assets` and `Liabilities`. All four are `wrong` in the eval. **Not fixed
+in T1.1** (the phase only measures); a dedicated fix phase follows.
+Reproduce: `uv run python -m evals.run --split all --only JPM`.
+
+The T1.1 dev run found the same pattern at Ford (accession
+0000037996-26-000015, rendered page 116): cash was mapped from the VIE table
+under the balance sheet (2,494 / 2,523 $M for 2024 / 2025) instead of the
+balance sheet's 22,935 / 23,356 $M.
+
+### T1.1-d. A "% of sales" column is read as amounts (HIGH: a wrong number is shown)
+
+Lowe's 10-K (accession 0000060667-26-000029, rendered page 41) prints each year
+as an Amount column and a % Sales column. The app took the % column for 2025 and
+2026: cogs 66.68 / 66.52, gross margin 33.32 / 33.48, operating income 12.51 /
+11.77, D&A 2.07 / 2.25, each scaled by millions (e.g. 66,680,000 instead of
+55,797 $M). Eight `wrong` records in the dev run. Not fixed in T1.1.
+
+### T1.1-e. One component row is mapped as total cost of revenue (HIGH: a wrong number is shown)
+
+Honeywell (accession 0000773840-26-000013, rendered page 59) prints "Cost of
+products sold", "Cost of services sold" and "Total Cost of products and services
+sold". The app skipped the total row and mapped the products row as cogs (14,836 / 15,017 / 16,153 $M for 2023-2025) against
+`CostOfGoodsAndServicesSold` 20,637 / 21,360 / 23,613 $M. Not fixed in T1.1.
+
 ### 0. Large reports are slow (MEDIUM)
 
 Wipro's 481-page report takes about 88 s; Berkshire's 152 pages about 40 s;
@@ -55,6 +89,51 @@ Gemini 503 (model overloaded) and request timeouts are not retried; the
 narrative fails intermittently on the free tier. `GeminiClient.complete_json`
 makes one request and turns any failure into `LLMError`, so the narrative
 declines. **Option.** One retry with exponential backoff for 503/timeout only.
+
+### T1.1-g. One filing's statements get different year labels (HIGH: a wrong number is shown)
+
+Home Depot's 10-K (accession 0001628280-26-019436) heads the income and
+cash-flow statements "Fiscal 2025 / 2024 / 2023" (rendered pages 45 and 48)
+and the balance sheet "February 1, 2026 / February 2, 2025" (page 44). The app
+labels the first by the fiscal year and the second by the calendar year of the
+date, so the year that ends 2026-02-01 is 2025 on the income statement and
+2026 on the balance sheet. Any ratio pairing the two (ROE, asset turnover)
+pairs different years. The T1.1 dev run scores the six balance-sheet values
+labelled 2025 (total assets 96,119, current assets 31,683, cash 1,659, total
+liabilities 89,479, current liabilities 28,661, equity 6,640 $M, all from the
+February 2, 2025 column) as `wrong_period`, because HD's truth years follow
+its "Fiscal YYYY" headers (`fiscal_year_offset = -1` in `evals/corpus.csv`).
+Not fixed in T1.1.
+
+### T1.1-f. Which net income the app reports is undecided (MEDIUM)
+
+US income statements print consolidated net income (including noncontrolling
+interests) and net income attributable to the parent. The app takes the first
+row labelled "Net income" or "Net earnings", which is usually the consolidated
+figure: MRK, UNH, HON, T, TSLA and BRK-B in the T1.1 dev run all matched XBRL
+`ProfitLoss`, not `NetIncomeLoss`. ROE divides by parent equity, so the basis
+matters. The eval accepts both tags (human decision, 2026-09-24) until the app's
+basis is decided. Target: T1.4 or T1.3.
+
+### T1.1-b. XOM is hand-locked to its pre-reorganisation CIK (LOW)
+
+On 2026-07-01 Exxon Mobil became a subsidiary of a new holding company,
+ExxonMobil Holdings Corp (CIK 2115436). The SEC ticker map now points `XOM` at
+that CIK, which has no 10-K, so automatic selection fails with "no 10-K filed
+on or before 2026-06-30". By human decision (2026-09-24) `evals/corpus.lock.json`
+pins XOM to CIK 0000034088 and accession 0000034088-26-000045 (FY2025 10-K,
+filed 2026-02-18). `evals/run.py` takes the CIK from the lock whenever an entry
+exists and never re-looks-up the ticker, so the override holds. Revisit once
+the holding company files its own 10-K.
+
+### T1.1-c. Eval PDFs rendered from EDGAR HTML are not company-published PDFs (MEDIUM)
+
+Most of the XBRL eval corpus is the filing's HTML rendered to PDF by headless
+Chromium. Those PDFs have no ruled table lines, so they exercise the
+`textgrid` path and a layout no company designed for print. Accuracy on them
+is not accuracy on the PDFs users upload. Four companies (AAPL, MSFT, BRK-B,
+MBIN) are scored on their published PDFs to cover both; `evals/README.md`
+states the caveat next to every number.
 
 ### 1. No plausibility check on any extracted number (MEDIUM)
 

@@ -30,13 +30,20 @@ For one (filing, concept, year) with a truth value:
 
 Truth is the `units.USD` facts whose `accn` is the filing's accession: 350-380
 day durations for flow concepts, instants for balance-sheet concepts. The
-truth year is the year the filing itself names: `year(end) + offset`, where
-`offset = fy - year(latest period end)` for that filing. Home Depot and Lowe's
-name a year ending in early February by its start year (offset -1); NVIDIA and
-Walmart name theirs by the end year (offset 0). If `fy` is inconsistent across
-the filing or the offset is not 0 or -1, the whole filing's truth is excluded
-with a note. If one tag gives two values for a year, that (concept, year) is
-excluded with a note rather than picked. Net income accepts `NetIncomeLoss`
+truth year is the year of the fact's `end` date. `fy` never sets a truth
+year: comparatives carry the filing's `fy`, and `fy` does not follow the
+statements either (Lowe's prints "January 30, 2026" and Salesforce calls its
+year ending 2026-01-31 "fiscal 2026", yet both carry `fy` 2025). A filing whose
+statements print "Fiscal YYYY" one lower than the end-date year gets
+`fiscal_year_offset = -1` in `corpus.csv`, applied when the frozen truth is
+read; `run.py` refuses an override whose `offset_evidence` does not cite the
+page and exact header text. Today only Home Depot has one. Each run lists, as
+"fy-mismatch", every filing where `fy - year(latest period end)` differs from
+the offset in use (also stored under `fy_mismatch` in `latest_<split>.json`):
+open those filings' statement headers only, never their results, and add an
+evidenced override where the header prints "Fiscal YYYY". If one tag gives two
+values for a year, that (concept, year) is excluded with a note rather than
+picked. Net income accepts `NetIncomeLoss`
 (attributable to the parent) and `ProfitLoss` (consolidated, including
 noncontrolling interests); which one the app should report is undecided (see
 `docs/KNOWN_ISSUES.md`).
@@ -57,7 +64,8 @@ number with this in mind.
 
 ## Corpus, split, lock
 
-- `corpus.csv`: ticker, bucket (`general` or `financial`), sector, local_pdf.
+- `corpus.csv`: ticker, bucket (`general` or `financial`), sector, local_pdf,
+  fiscal_year_offset (empty = 0, or -1) and offset_evidence.
   Financial companies (banks, insurers) are reported separately: they have no
   classified balance sheet, so blending them would distort coverage.
 - Split: `holdout` if `int(sha256(ticker), 16) % 10 < 3`, else `dev`. Never

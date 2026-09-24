@@ -101,7 +101,9 @@ date, so the year that ends 2026-02-01 is 2025 on the income statement and
 pairs different years. The T1.1 dev run scores the six balance-sheet values
 labelled 2025 (total assets 96,119, current assets 31,683, cash 1,659, total
 liabilities 89,479, current liabilities 28,661, equity 6,640 $M, all from the
-February 2, 2025 column) as `wrong_period`. Not fixed in T1.1.
+February 2, 2025 column) as `wrong_period`, because HD's truth years follow
+its "Fiscal YYYY" headers (`fiscal_year_offset = -1` in `evals/corpus.csv`).
+Not fixed in T1.1.
 
 ### T1.1-f. Which net income the app reports is undecided (MEDIUM)
 

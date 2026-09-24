@@ -14,7 +14,7 @@ zero.
 
 ![Dashboard overview](docs/screenshots/overview.png)
 
-**Status:** Phases 0-15 complete. 515 tests, all passing. Deployed on Streamlit
+**Status:** Phases 0-15 complete. 519 tests, all passing. Deployed on Streamlit
 Community Cloud; also runs entirely on your own machine, where no data leaves it.
 Validated on five real annual reports (Apple, Berkshire Hathaway, Wipro,
 Microsoft, and a small US bank), see

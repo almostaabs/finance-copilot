@@ -2,7 +2,7 @@
 
 import pytest
 
-from fincopilot.extract.periods import detect_periods, parse_period
+from fincopilot.extract.periods import detect_periods, parse_period, reconcile_fiscal_years
 from fincopilot.types import (
     ExtractedTable,
     Statement,
@@ -115,3 +115,72 @@ def test_missing_statements_are_skipped_not_fatal():
     pm = detect_periods(statements)
     assert pm.periods_for(StatementKind.BALANCE) == ()
     assert len(pm.ordered) == 2
+
+
+# --- T1.1-g: "Fiscal YYYY" statements beside a date-headed balance sheet ----
+
+HD_INCOME = "CONSOLIDATED STATEMENTS OF EARNINGS\nFiscal Fiscal Fiscal\nin millions 2025 2024 2023"
+HD_BALANCE = "CONSOLIDATED BALANCE SHEETS\nFebruary 1, February 2,\nin millions 2026 2025"
+HD_BINDING = (
+    "fiscal 2024 Fiscal year ended February 2, 2025 (includes 53 weeks)\n"
+    "fiscal 2025 Fiscal year ended February 1, 2026 (includes 52 weeks)"
+)
+
+
+def _paged(kind: StatementKind, header: tuple[str, ...], page: int) -> Statement:
+    table = ExtractedTable(f"t_{kind.value}", page, (page,), header, (), None)
+    return Statement(kind=kind, basis=StatementBasis.CONSOLIDATED, table=table)
+
+
+def _reconcile(front: str, balance: str = HD_BALANCE):
+    statements = StatementSet(
+        basis=StatementBasis.CONSOLIDATED,
+        income=_paged(StatementKind.INCOME, ("", "2025", "2024", "2023"), 2),
+        balance=_paged(StatementKind.BALANCE, ("", "2026", "2025"), 3),
+        cash_flow=NOT_FOUND,
+    )
+    return reconcile_fiscal_years(
+        statements, detect_periods(statements), (front, HD_INCOME, balance)
+    )
+
+
+def test_a_one_sentence_binding_relabels_the_date_headed_columns():
+    out = _reconcile(HD_BINDING)
+    assert out.periods_for(StatementKind.BALANCE)[0].end_year == 2025
+    assert [p.end_year for p in out.periods_for(StatementKind.BALANCE)] == [2025, 2024]
+    label = out.columns[(StatementKind.BALANCE, 1)].label
+    assert "p1" in label and "ended February 1, 2026" in label
+    assert [p.end_year for p in out.periods_for(StatementKind.INCOME)] == [2025, 2024, 2023]
+
+
+def test_mixed_headers_without_a_binding_are_ambiguous():
+    out = _reconcile("Our fiscal year ends on the Sunday nearest January 31.")
+    assert out.reason is UnavailableReason.AMBIGUOUS
+    assert "income headed by fiscal year, balance by end date" in out.detail
+
+
+def test_conflicting_bindings_are_ambiguous_and_quote_both():
+    out = _reconcile(HD_BINDING + "\nfiscal 2026 Fiscal year ended February 1, 2026")
+    assert out.reason is UnavailableReason.AMBIGUOUS
+    assert "fiscal 2025 Fiscal year ended February 1, 2026" in out.detail
+    assert "fiscal 2026 Fiscal year ended February 1, 2026" in out.detail
+
+
+def test_a_binding_date_matching_no_balance_column_is_ambiguous():
+    out = _reconcile(HD_BINDING.replace("February 1, 2026", "January 31, 2026"))
+    assert out.reason is UnavailableReason.AMBIGUOUS
+
+
+def test_a_date_only_filing_is_untouched():
+    dated = (
+        "CONSOLIDATED STATEMENTS OF EARNINGS\nJanuary 30, January 31, February 2,\n2026 2025 2024"
+    )
+    statements = StatementSet(
+        basis=StatementBasis.CONSOLIDATED,
+        income=_paged(StatementKind.INCOME, ("", "2026", "2025", "2024"), 2),
+        balance=_paged(StatementKind.BALANCE, ("", "2026", "2025"), 3),
+        cash_flow=NOT_FOUND,
+    )
+    periods = detect_periods(statements)
+    out = reconcile_fiscal_years(statements, periods, (HD_BINDING, dated, HD_BALANCE))
+    assert out is periods

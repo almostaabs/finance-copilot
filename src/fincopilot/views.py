@@ -25,8 +25,10 @@ from fincopilot.types import (
     AnalysisResult,
     AnalyticalConfidence,
     ExtractionConfidence,
+    FinancialValue,
     MetricUnit,
     ReconciliationStatus,
+    Statement,
     StatementBasis,
     Unavailable,
 )
@@ -75,6 +77,7 @@ RULE_LABEL = {
     "earnings_quality": "Earnings quality",
     "reconciliation_warning": "Cross-check warning",
     "low_confidence_kpi": "Low-confidence KPI",
+    "implausible_magnitude": "Implausible magnitude",
 }
 
 CONCEPT_LABEL = {
@@ -308,8 +311,30 @@ def provenance(result: AnalysisResult, ref_id: str) -> dict[str, Any] | None:
                 "dash_zero": v.cell.dash_zero,
                 "concept": CONCEPT_LABEL.get(v.concept.value, v.concept.value),
                 "period": v.period.end_year,
+                "notes": _mapping_notes(result, v),
             }
     return None
+
+
+def _mapping_notes(result: AnalysisResult, v: FinancialValue) -> list[str]:
+    """Rows validation passed over for this figure. The label is PDF text: escape it to render."""
+    rows = {
+        r.ref.ref_id: r.ref
+        for s in (result.statements.income, result.statements.balance, result.statements.cash_flow)
+        if isinstance(s, Statement)
+        for r in s.table.rows
+    }
+    out = []
+    for n in result.mapping.notes:
+        if n.concept is not v.concept or n.kept_ref != v.cell.ref.ref_id:
+            continue
+        ref = rows.get(n.dropped_ref)
+        where = f" (page {ref.page}, row {ref.row_idx})" if ref is not None else ""
+        out.append(
+            f"'{n.dropped_label}'{where} also matched {n.concept.value.replace('_', ' ')}; "
+            f"{n.reason}"
+        )
+    return out
 
 
 def history_metric_rows(rows) -> list[dict[str, Any]]:

@@ -15,7 +15,9 @@ from fincopilot.types import StatementKind
 class Scope(Enum):
     CONSOLIDATED = "consolidated"
     STANDALONE = "standalone"  # explicit "Standalone" prefix
-    UNPREFIXED = "unprefixed"  # single-entity reports; treated as standalone scope
+    # Single-entity reports; treated as standalone scope, except in a document
+    # carrying a 10-K cover page, where the primary statements are consolidated.
+    UNPREFIXED = "unprefixed"
 
 
 _KIND_PATTERNS: dict[StatementKind, tuple[str, ...]] = {
@@ -118,6 +120,22 @@ def find_anchors(text: str) -> list[tuple[StatementKind, Scope]]:
                 scope = Scope.UNPREFIXED
             hits.append((kind, scope))
     return hits
+
+
+# A 10-K cover page prints all three on one page. Prose elsewhere in a report
+# ("see our Form 10-K filed with the Securities and Exchange Commission") never
+# carries the commission's address, so it is not evidence.
+_SEC_COVER = (
+    re.compile(r"securities\s+and\s+exchange\s+commission"),
+    re.compile(r"washington[\s,]*d\.?\s*c\.?[\s,]*20549"),
+    re.compile(r"form\s+10[-\N{NON-BREAKING HYPHEN}]k\b"),
+)
+
+
+def is_sec_annual_report(page_text: str) -> bool:
+    """One page is a Form 10-K cover: SEC name, its Washington address and "Form 10-K"."""
+    text = page_text.lower()
+    return all(rx.search(text) for rx in _SEC_COVER)
 
 
 def is_amount_token(cell: str) -> bool:

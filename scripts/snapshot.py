@@ -102,6 +102,14 @@ def _result_lines(name: str, r: AnalysisResult) -> list[str]:
     for c in r.reconciliations:
         delta = "UNAVAILABLE" if isinstance(c.delta, Unavailable) else c.delta
         facts.append(("recon", f"{c.name}@{c.period.end_year}", f"{c.status.value} delta={delta}"))
+    for n in r.mapping.notes:
+        facts.append(
+            (
+                "note",
+                n.concept.value,
+                f"kept={n.kept_ref} dropped={n.dropped_ref} reason={n.reason}",
+            )
+        )
     for f in r.red_flags:
         facts.append(("flag", f.rule_id, f"{f.outcome.value} {f.severity.value}"))
     return [_line(name, *fact) for fact in facts]

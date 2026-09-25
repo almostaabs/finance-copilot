@@ -414,6 +414,22 @@ class RowMapping:
 
 
 @dataclass(frozen=True, slots=True)
+class MappingNote:
+    """A claim validation discarded in favour of another row, and why.
+
+    Records what the total-wins rule dropped, so the user can see that a
+    component row also matched the concept. Never changes which value wins.
+    """
+
+    concept: CanonicalConcept
+    kind: StatementKind
+    kept_ref: str
+    dropped_ref: str
+    dropped_label: str  # as printed in the PDF: untrusted, escape before rendering
+    reason: str
+
+
+@dataclass(frozen=True, slots=True)
 class MappingReport:
     """Validated values plus an explicit reason for every value that is absent."""
 
@@ -421,6 +437,7 @@ class MappingReport:
     unavailable: Mapping[tuple[CanonicalConcept, Period], Unavailable]
     unmapped: tuple[CanonicalConcept, ...]
     conflicts: tuple[Unavailable, ...]
+    notes: tuple[MappingNote, ...] = ()
 
     def get(self, concept: CanonicalConcept, period: Period) -> Maybe[FinancialValue]:
         for v in self.values:

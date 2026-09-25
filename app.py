@@ -474,6 +474,8 @@ def _provenance(result) -> None:
     b.markdown(f"Value in base units: `{p['value_in_base_units']}`")
     if p["dash_zero"]:
         b.warning("This cell was a dash, read as zero by the dash rule.")
+    for note in p["notes"]:
+        st.markdown(f'<div class="missing">{html.escape(note)}</div>', unsafe_allow_html=True)
     with st.expander("Raw record"):
         st.json(p)
 

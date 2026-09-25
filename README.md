@@ -14,7 +14,7 @@ zero.
 
 ![Dashboard overview](docs/screenshots/overview.png)
 
-**Status:** Phases 0-15 complete. 551 tests, all passing. Deployed on Streamlit
+**Status:** Phases 0-15 complete. 574 tests, all passing. Deployed on Streamlit
 Community Cloud; also runs entirely on your own machine, where no data leaves it.
 Validated on five real annual reports (Apple, Berkshire Hathaway, Wipro,
 Microsoft, and a small US bank), see
@@ -63,7 +63,7 @@ The **Results** tab leads with the verdict, then draws the evidence.
 | Panel | What it is |
 |---|---|
 | KPI cards | Latest-year net margin, operating margin, current ratio, debt to equity, return on equity, cash backing of profit. Green = verified; amber = usable but lower confidence; grey dashed = not available, with the reason printed. The change against the prior year is coloured by whether it is good news, not by its sign. |
-| Red flag grid | Ten rules, each a card: fired, clear, or not evaluated with the reason. "Checked and fine" is never confused with "could not check". |
+| Red flag grid | Eleven rules, each a card: fired, clear, or not evaluated with the reason. "Checked and fine" is never confused with "could not check". The eleventh, `implausible_magnitude` (INFO), flags a 100x year-over-year jump in revenue, assets or equity, or revenue above 20x total assets: a likely scale or parsing error. It never changes a value. |
 | Revenue and profit | Revenue down to net income, per year, in the report's own units. |
 | Margins | Gross, operating and net margin per year. |
 | Balance sheet | Assets beside liabilities plus equity. The two bars must reach the same height; a visible gap is the accounting identity failing. |
@@ -93,7 +93,8 @@ from and how it was matched:
 ![Values tab](docs/screenshots/values.png)
 
 The Provenance tab walks a single figure back to the printed cell: page, table, row,
-column, the raw text, the scale that was applied, and the value in base units.
+column, the raw text, the scale that was applied, and the value in base units. When a
+component row also matched the figure's concept and the total row was preferred, it says so.
 
 ![Provenance tab](docs/screenshots/provenance.png)
 
@@ -202,7 +203,7 @@ src/fincopilot/charts.py     the five chart specifications (pure, tested)
 src/fincopilot/panel.py      HTML for the KPI cards and red-flag grid (escaped, offline)
 src/fincopilot/store.py      SQLite history
 evals/                       XBRL accuracy eval (see evals/README.md)
-tests/fixtures/              twelve generated PDFs with hand-computed answers
+tests/fixtures/              thirteen generated PDFs with hand-computed answers
 docs/screenshots/            the images used in this README
 docs/                        design spec, build notes, validation, security review
 ```

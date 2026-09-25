@@ -139,3 +139,26 @@ def test_charts_absent_when_periods_are_ambiguous():
     at = _run_with(AMBIGUOUS)
     assert _chart_count(at) == 0
     assert at.error
+
+
+def test_provenance_shows_a_dropped_component_note_escaped():
+    """T1.4 A2: the row the total-wins rule passed over is shown, and its
+    PDF-derived label is HTML-escaped."""
+    from dataclasses import replace
+
+    result = pipeline.analyze(Path("tests/fixtures/component_total.pdf").read_bytes())
+    note = next(n for n in result.mapping.notes if n.concept.value == "revenue")
+    hostile = replace(note, dropped_label="<img src=x onerror=alert(1)>")
+    result = replace(result, mapping=replace(result.mapping, notes=(hostile,)))
+    at = AppTest.from_file(
+        str(Path(__file__).resolve().parent.parent / "app.py"), default_timeout=60
+    )
+    at.session_state["current"] = {"name": "c.pdf", "sha256": "x" * 64, "result": result}
+    at.run()
+    box = next(s for s in at.selectbox if s.label == "Choose a figure")
+    box.set_value(note.kept_ref).run()
+    assert not at.exception, at.exception
+    body = " ".join(m.value for m in at.markdown)
+    assert "&lt;img src=x onerror=alert(1)&gt;" in body
+    assert "also matched revenue; total row preferred over component" in body
+    assert "<img src=x" not in body

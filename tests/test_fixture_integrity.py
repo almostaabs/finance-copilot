@@ -27,6 +27,7 @@ EXPECTED_FIXTURES = {
     "footnote_table.pdf",
     "component_total.pdf",
     "percent_sales.pdf",
+    "unprefixed_10k.pdf",
 }
 
 

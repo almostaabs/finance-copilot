@@ -21,7 +21,7 @@ downloads). None are committed. Run any of them with `uv run python demo.py <pat
 |---|---|---|---|---|
 | Apple 10-K FY2023 | 12s | consolidated | 13/19 | revenue decline and weak liquidity both fire, and both are true |
 | Berkshire 10-K 2023 | 44s | consolidated | 5/19 | cash claimed by two segment rows, reported as a conflict |
-| Microsoft 10-K FY2024 | 16s | **standalone fallback** | 14/19 | see the open question below |
+| Microsoft 10-K FY2024 | 16s | **standalone fallback** | 14/19 | see the resolved question below |
 | Merchants Bancorp 10-K 2024 | 27s | consolidated | 5/19 | a bank: no classified balance sheet exists |
 | Wipro FY24 | 98s | consolidated | 10/19 | Ind AS and IFRS sets, one coherent group chosen |
 
@@ -41,7 +41,14 @@ exist in the document. Reporting them unavailable is right; inventing them would
 same applies to gross profit at a bank. Coverage numbers for financial institutions should be
 read against what the statement actually contains, not against all 19 concepts.
 
-### Open question: unprefixed statements in a 10-K
+### Resolved question: unprefixed statements in a 10-K
+
+*Resolved 2026-09-25 by roadmap phase T1.4 for true 10-K filings:* when any page of the document
+is a Form 10-K cover (the SEC name, "Washington, D.C. 20549" and "Form 10-K" on one page),
+unprefixed primary statements are labelled **consolidated** (spec 4.3 amendment). The Microsoft
+PDF in this validation is the glossy annual report, which has no such cover, so it still reads
+standalone fallback; that glossy-report case is tracked as T1.4-a in `docs/KNOWN_ISSUES.md`.
+The original question, for the record:
 
 Microsoft titles its primary statements "INCOME STATEMENTS" and "BALANCE SHEETS" with no
 "Consolidated" prefix, so the unprefixed rule labels the whole analysis **standalone

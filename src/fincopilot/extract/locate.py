@@ -17,6 +17,7 @@ from fincopilot.extract.anchors import (
     find_anchors,
     is_amount_token,
     is_numeric_dense,
+    is_sec_annual_report,
 )
 from fincopilot.types import (
     ExtractedTable,
@@ -250,12 +251,20 @@ def _fallback(
 
 
 def locate_statements(doc: RawDocument) -> StatementSet:
-    """Consolidated wins whenever it exists. Standalone is a labelled fallback."""
+    """Consolidated wins whenever it exists (explicitly, or unprefixed under a 10-K
+    cover page). Standalone is a labelled fallback."""
     tables = stitch_tables(doc.tables, doc.page_text)
     cands = _anchor_candidates(doc, tables)
 
     if any(c.scope is Scope.CONSOLIDATED for c in cands):
         basis, scopes = StatementBasis.CONSOLIDATED, {Scope.CONSOLIDATED}
+    elif any(c.scope is Scope.UNPREFIXED for c in cands) and any(
+        is_sec_annual_report(t) for t in doc.page_text
+    ):
+        # A 10-K's primary statements are consolidated whatever their titles
+        # say (Microsoft: "INCOME STATEMENTS"). Evidence, not assumption: a
+        # cover page must be present. An explicit "Standalone" is never promoted.
+        basis, scopes = StatementBasis.CONSOLIDATED, {Scope.UNPREFIXED}
     elif any(c.scope in (Scope.STANDALONE, Scope.UNPREFIXED) for c in cands):
         basis, scopes = StatementBasis.STANDALONE_FALLBACK, {Scope.STANDALONE, Scope.UNPREFIXED}
     else:

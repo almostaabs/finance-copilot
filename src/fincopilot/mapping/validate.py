@@ -14,6 +14,7 @@ from fincopilot.types import (
     AnalyticalConfidence,
     CanonicalConcept,
     FinancialValue,
+    MappingNote,
     MappingReport,
     NormalizedTable,
     NormalizedTables,
@@ -86,11 +87,26 @@ def validate_mappings(
     values: list[FinancialValue] = []
     unavailable: dict[tuple[CanonicalConcept, Period], Unavailable] = {}
     accepted: dict[CanonicalConcept, RowMapping] = {}
+    notes: list[MappingNote] = []
     for concept, claims in by_concept.items():
         if len({c.ref_id for c in claims}) > 1:
-            total = _total_of(claims, tables[CONCEPT_STATEMENT[concept]])
+            table = tables[CONCEPT_STATEMENT[concept]]
+            total = _total_of(claims, table)
             if total is not None:
                 accepted[concept] = total
+                dropped = next(c for c in claims if c.ref_id != total.ref_id)
+                notes.append(
+                    MappingNote(
+                        concept=concept,
+                        kind=total.kind,
+                        kept_ref=total.ref_id,
+                        dropped_ref=dropped.ref_id,
+                        dropped_label=next(
+                            r.label for r in table.table.rows if r.ref.ref_id == dropped.ref_id
+                        ),
+                        reason="total row preferred over component",
+                    )
+                )
                 continue
             conflict = Unavailable(
                 UnavailableReason.CONFLICT,
@@ -139,4 +155,5 @@ def validate_mappings(
         unavailable=unavailable,
         unmapped=unmapped,
         conflicts=tuple(conflicts),
+        notes=tuple(notes),
     )

@@ -68,7 +68,7 @@ def test_trend_rows_and_red_flag_rows(golden):
     trends = views.trend_rows(golden)
     assert trends and {"subject", "change", "direction", "reads_as"} <= trends[0].keys()
     flags = views.red_flag_rows(golden)
-    assert len(flags) == 10
+    assert len(flags) == 11
     assert {f["status"] for f in flags} <= {"fired", "clear", "not_evaluated"}
 
 
@@ -144,3 +144,16 @@ def test_rule_names_are_written_for_people(golden):
     rows = views.red_flag_rows(golden)
     assert {"Earnings quality", "Low-confidence KPI"} <= {r["rule"] for r in rows}
     assert all("_" not in r["rule"] for r in rows)
+
+
+def test_provenance_names_the_component_row_the_total_won_over(golden):
+    result = pipeline.analyze(Path("tests/fixtures/component_total.pdf").read_bytes())
+    rev = next(v for v in result.values if v.concept is C.REVENUE)
+    net_sales = next(r for r in result.statements.income.table.rows if r.label == "Net sales")
+    p = views.provenance(result, rev.cell.ref.ref_id)
+    assert p["notes"] == [
+        f"'Net sales' (page {net_sales.ref.page}, row {net_sales.ref.row_idx}) "
+        "also matched revenue; total row preferred over component"
+    ]
+    other = next(v for v in golden.values if v.cell is not None)
+    assert views.provenance(golden, other.cell.ref.ref_id)["notes"] == []

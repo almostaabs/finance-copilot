@@ -2,6 +2,9 @@
 its reason. Spec 7.5."""
 
 from decimal import Decimal
+from pathlib import Path
+
+import pipeline
 
 from fincopilot.calc.ratios import calculate_metrics
 from fincopilot.calc.reconcile import run_reconciliations
@@ -63,7 +66,7 @@ def _both(concept, v24, v23, row):
 def test_every_rule_is_reported_exactly_once():
     flags = _flags()
     assert set(flags) == {r.rule_id for r in RULES}
-    assert len(flags) == 10
+    assert len(flags) == 11
 
 
 def test_unavailable_inputs_are_not_evaluated_with_reason_never_silent_pass():
@@ -168,3 +171,61 @@ def test_rule_messages_round_numbers_for_reading():
     assert _num(Decimal("-7273000000")) == "-7,273,000,000"
     assert _num(Decimal("2.0")) == "2"
     assert _num(Decimal("0.02")) == "0.02"
+
+
+# --- implausible_magnitude: an INFO screen for scale and parsing errors
+
+
+def _magnitude(*values):
+    return _flags(*values)["implausible_magnitude"]
+
+
+def test_implausible_magnitude_fires_on_a_100x_revenue_jump():
+    f = _magnitude(*_both(C.REVENUE, "10000", "100", 0))
+    assert f.outcome is RuleOutcome.FIRED
+    assert f.severity is Severity.INFO
+    assert "revenue 2023->2024 changed 100x" in f.message
+    assert f.refs
+    assert _magnitude(*_both(C.REVENUE, "9999", "100", 0)).outcome is RuleOutcome.CLEAR
+
+
+def test_implausible_magnitude_fires_on_asset_turnover_above_ceiling():
+    flags = (_fv(C.REVENUE, P24, "2001", 0), _fv(C.TOTAL_ASSETS, P24, "100", 1))
+    f = _magnitude(*flags)
+    assert f.outcome is RuleOutcome.FIRED
+    assert "revenue/total_assets 2024 is 20.01" in f.message
+    ok = (_fv(C.REVENUE, P24, "2000", 0), _fv(C.TOTAL_ASSETS, P24, "100", 1))
+    assert _magnitude(*ok).outcome is RuleOutcome.CLEAR
+
+
+def test_implausible_magnitude_is_clear_for_golden_us():
+    data = (Path(__file__).parent / "fixtures" / "golden_us.pdf").read_bytes()
+    flags = {f.rule_id: f for f in pipeline.analyze(data).red_flags}
+    assert flags["implausible_magnitude"].outcome is RuleOutcome.CLEAR
+
+
+def test_implausible_magnitude_not_evaluated_names_its_root_cause():
+    f = _magnitude()
+    assert f.outcome is RuleOutcome.NOT_EVALUATED
+    assert f.reason.reason is UnavailableReason.MISSING_INPUT
+    assert f.reason.root().detail == "revenue unavailable for 2024"
+    assert f.message == "Could not evaluate: revenue unavailable for 2024"
+
+
+def test_implausible_magnitude_ignores_a_zero_denominator():
+    f = _magnitude(*_both(C.REVENUE, "500", "0", 0))
+    assert f.outcome is RuleOutcome.NOT_EVALUATED
+    assert f.reason.root().reason is UnavailableReason.DIVISION_BY_ZERO
+    assert f.reason.root().detail == "revenue 2023 is zero"
+    # The zero pair is skipped; any other check that can run still decides.
+    f = _magnitude(*_both(C.REVENUE, "500", "0", 0), *_both(C.EQUITY, "50", "40", 1))
+    assert f.outcome is RuleOutcome.CLEAR
+
+
+def test_hostile_pdf_fires_implausible_magnitude():
+    data = (Path(__file__).parent / "fixtures" / "hostile.pdf").read_bytes()
+    flags = {f.rule_id: f for f in pipeline.analyze(data).red_flags}
+    f = flags["implausible_magnitude"]
+    assert f.outcome is RuleOutcome.FIRED
+    assert "revenue 2023->2024" in f.message
+    assert "revenue/total_assets 2024" in f.message

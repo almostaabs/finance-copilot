@@ -12,6 +12,8 @@ Intended page layout (page 1 is the cover):
   29-34   filler (6 pages)
 """
 
+from dataclasses import replace
+
 from tests.fixtures.build_fixtures import ReportSpec, StatementBlock
 
 _OPERATIONS = StatementBlock(
@@ -76,4 +78,19 @@ GOLDEN_US = ReportSpec(
     between_filler_pages=0,
     trailing_filler_pages=6,
     blocks=(_OPERATIONS, _BALANCE, _CASH_FLOWS),
+)
+
+# The golden_us statements under Microsoft-style titles with no "Consolidated",
+# behind a real Form 10-K cover page (T1.4). Page 1 is the cover; 2-4 the statements.
+UNPREFIXED_10K = ReportSpec(
+    title="UNITED STATES SECURITIES AND EXCHANGE COMMISSION",
+    subtitle="Washington, D.C. 20549. FORM 10-K. Annual report pursuant to Section 13 "
+    "or 15(d) of the Securities Exchange Act of 1934 for the fiscal year ended "
+    "December 31, 2024. Meridian Systems, Inc.",
+    metadata_title="Meridian Systems 10-K 2024",
+    blocks=(
+        replace(_OPERATIONS, heading="INCOME STATEMENTS"),
+        replace(_BALANCE, heading="BALANCE SHEETS"),
+        replace(_CASH_FLOWS, heading="CASH FLOWS STATEMENTS"),
+    ),
 )

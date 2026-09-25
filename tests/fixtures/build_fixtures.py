@@ -237,7 +237,7 @@ def main() -> None:
         STITCHED,
     )
     from tests.fixtures.data.golden_indian import GOLDEN_INDIAN
-    from tests.fixtures.data.golden_us import GOLDEN_US
+    from tests.fixtures.data.golden_us import GOLDEN_US, UNPREFIXED_10K
 
     targets = {
         "golden_indian.pdf": GOLDEN_INDIAN,
@@ -247,6 +247,7 @@ def main() -> None:
         "ambiguous_periods.pdf": AMBIGUOUS_PERIODS,
         "no_scale.pdf": NO_SCALE,
         "hostile.pdf": HOSTILE,
+        "unprefixed_10k.pdf": UNPREFIXED_10K,
     }
     for name, spec in targets.items():
         out = FIXTURE_DIR / name

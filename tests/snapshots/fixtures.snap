@@ -1,6 +1,7 @@
 ambiguous_periods.pdf | basis | - | consolidated
 ambiguous_periods.pdf | flag | earnings_quality | not_evaluated warning
 ambiguous_periods.pdf | flag | high_leverage | not_evaluated critical
+ambiguous_periods.pdf | flag | implausible_magnitude | not_evaluated info
 ambiguous_periods.pdf | flag | leverage_increase | not_evaluated warning
 ambiguous_periods.pdf | flag | low_confidence_kpi | not_evaluated info
 ambiguous_periods.pdf | flag | margin_compression | not_evaluated warning
@@ -16,6 +17,7 @@ ambiguous_periods.pdf | statement | income | page_3_table_0 pages=(3,)
 component_total.pdf | basis | - | consolidated
 component_total.pdf | flag | earnings_quality | not_evaluated warning
 component_total.pdf | flag | high_leverage | not_evaluated critical
+component_total.pdf | flag | implausible_magnitude | clear info
 component_total.pdf | flag | leverage_increase | not_evaluated warning
 component_total.pdf | flag | low_confidence_kpi | clear info
 component_total.pdf | flag | margin_compression | not_evaluated warning
@@ -42,6 +44,8 @@ component_total.pdf | metric_unavailable | roa@2024 | missing_input: total_asset
 component_total.pdf | metric_unavailable | roa@2025 | missing_input: total_assets not mapped for 2025
 component_total.pdf | metric_unavailable | roe@2024 | missing_input: equity not mapped for 2024
 component_total.pdf | metric_unavailable | roe@2025 | missing_input: equity not mapped for 2025
+component_total.pdf | note | cogs | kept=page_1_table_0_row_8 dropped=page_1_table_0_row_6 reason=total row preferred over component
+component_total.pdf | note | revenue | kept=page_1_table_0_row_4 dropped=page_1_table_0_row_1 reason=total row preferred over component
 component_total.pdf | periods | - | 2025,2024
 component_total.pdf | recon | assets_equal_liabilities_plus_equity@2024 | unavailable delta=UNAVAILABLE
 component_total.pdf | recon | assets_equal_liabilities_plus_equity@2025 | unavailable delta=UNAVAILABLE
@@ -70,6 +74,7 @@ component_total.pdf | value_unavailable | total_debt@2025 | missing_input: short
 footnote_table.pdf | basis | - | consolidated
 footnote_table.pdf | flag | earnings_quality | not_evaluated warning
 footnote_table.pdf | flag | high_leverage | not_evaluated critical
+footnote_table.pdf | flag | implausible_magnitude | clear info
 footnote_table.pdf | flag | leverage_increase | not_evaluated warning
 footnote_table.pdf | flag | low_confidence_kpi | fired info
 footnote_table.pdf | flag | margin_compression | not_evaluated warning
@@ -127,6 +132,7 @@ footnote_table.pdf | value_unavailable | total_debt@2024 | missing_input: short_
 golden_indian.pdf | basis | - | consolidated
 golden_indian.pdf | flag | earnings_quality | clear warning
 golden_indian.pdf | flag | high_leverage | clear critical
+golden_indian.pdf | flag | implausible_magnitude | clear info
 golden_indian.pdf | flag | leverage_increase | clear warning
 golden_indian.pdf | flag | low_confidence_kpi | clear info
 golden_indian.pdf | flag | margin_compression | clear warning
@@ -215,6 +221,7 @@ golden_indian.pdf | value | total_liabilities@2024 | 66900000000.00 INR src=page
 golden_us.pdf | basis | - | consolidated
 golden_us.pdf | flag | earnings_quality | clear warning
 golden_us.pdf | flag | high_leverage | clear critical
+golden_us.pdf | flag | implausible_magnitude | clear info
 golden_us.pdf | flag | leverage_increase | clear warning
 golden_us.pdf | flag | low_confidence_kpi | clear info
 golden_us.pdf | flag | margin_compression | clear warning
@@ -340,6 +347,7 @@ golden_us.pdf | value_unavailable | total_debt@2022 | missing_input: short_term_
 hostile.pdf | basis | - | consolidated
 hostile.pdf | flag | earnings_quality | not_evaluated warning
 hostile.pdf | flag | high_leverage | not_evaluated critical
+hostile.pdf | flag | implausible_magnitude | fired info
 hostile.pdf | flag | leverage_increase | not_evaluated warning
 hostile.pdf | flag | low_confidence_kpi | clear info
 hostile.pdf | flag | margin_compression | not_evaluated warning
@@ -415,6 +423,7 @@ hostile.pdf | value_unavailable | operating_income@2024 | unparseable: cannot pa
 no_scale.pdf | basis | - | consolidated
 no_scale.pdf | flag | earnings_quality | not_evaluated warning
 no_scale.pdf | flag | high_leverage | not_evaluated critical
+no_scale.pdf | flag | implausible_magnitude | not_evaluated info
 no_scale.pdf | flag | leverage_increase | not_evaluated warning
 no_scale.pdf | flag | low_confidence_kpi | fired info
 no_scale.pdf | flag | margin_compression | not_evaluated warning
@@ -460,6 +469,7 @@ no_scale.pdf | value_unavailable | total_debt@2024 | missing_input: short_term_b
 percent_sales.pdf | basis | - | consolidated
 percent_sales.pdf | flag | earnings_quality | not_evaluated warning
 percent_sales.pdf | flag | high_leverage | not_evaluated critical
+percent_sales.pdf | flag | implausible_magnitude | clear info
 percent_sales.pdf | flag | leverage_increase | not_evaluated warning
 percent_sales.pdf | flag | low_confidence_kpi | clear info
 percent_sales.pdf | flag | margin_compression | clear warning
@@ -523,6 +533,7 @@ scanned.pdf | error | - | ScannedPDFUnsupported: no usable text layer: fewer tha
 standalone_only.pdf | basis | - | standalone_fallback
 standalone_only.pdf | flag | earnings_quality | not_evaluated warning
 standalone_only.pdf | flag | high_leverage | clear critical
+standalone_only.pdf | flag | implausible_magnitude | clear info
 standalone_only.pdf | flag | leverage_increase | clear warning
 standalone_only.pdf | flag | low_confidence_kpi | clear info
 standalone_only.pdf | flag | margin_compression | clear warning
@@ -602,6 +613,7 @@ standalone_only.pdf | value_unavailable | free_cash_flow@2024 | missing_input: o
 stitched.pdf | basis | - | consolidated
 stitched.pdf | flag | earnings_quality | not_evaluated warning
 stitched.pdf | flag | high_leverage | not_evaluated critical
+stitched.pdf | flag | implausible_magnitude | clear info
 stitched.pdf | flag | leverage_increase | not_evaluated warning
 stitched.pdf | flag | low_confidence_kpi | fired info
 stitched.pdf | flag | margin_compression | not_evaluated warning
@@ -659,6 +671,7 @@ stitched.pdf | value_unavailable | total_debt@2024 | missing_input: short_term_b
 text_aligned.pdf | basis | - | consolidated
 text_aligned.pdf | flag | earnings_quality | clear warning
 text_aligned.pdf | flag | high_leverage | not_evaluated critical
+text_aligned.pdf | flag | implausible_magnitude | clear info
 text_aligned.pdf | flag | leverage_increase | not_evaluated warning
 text_aligned.pdf | flag | low_confidence_kpi | clear info
 text_aligned.pdf | flag | margin_compression | clear warning
@@ -770,3 +783,129 @@ text_aligned.pdf | value_unavailable | ebitda@2024 | missing_input: d_and_a not 
 text_aligned.pdf | value_unavailable | total_debt@2022 | missing_input: short_term_borrowings not mapped for 2022
 text_aligned.pdf | value_unavailable | total_debt@2023 | missing_input: short_term_borrowings not mapped for 2023
 text_aligned.pdf | value_unavailable | total_debt@2024 | missing_input: short_term_borrowings not mapped for 2024
+unprefixed_10k.pdf | basis | - | consolidated
+unprefixed_10k.pdf | flag | earnings_quality | clear warning
+unprefixed_10k.pdf | flag | high_leverage | clear critical
+unprefixed_10k.pdf | flag | implausible_magnitude | clear info
+unprefixed_10k.pdf | flag | leverage_increase | clear warning
+unprefixed_10k.pdf | flag | low_confidence_kpi | clear info
+unprefixed_10k.pdf | flag | margin_compression | clear warning
+unprefixed_10k.pdf | flag | negative_fcf | clear warning
+unprefixed_10k.pdf | flag | negative_ocf | clear critical
+unprefixed_10k.pdf | flag | reconciliation_warning | clear warning
+unprefixed_10k.pdf | flag | revenue_decline | clear warning
+unprefixed_10k.pdf | flag | weak_liquidity | clear warning
+unprefixed_10k.pdf | metric | current_ratio@2023 | 2.282442748091603053435114503816794 ratio conf=high
+unprefixed_10k.pdf | metric | current_ratio@2024 | 2.623076923076923076923076923076923 ratio conf=high
+unprefixed_10k.pdf | metric | debt_to_equity@2023 | 0.6502732240437158469945355191256831 ratio conf=high
+unprefixed_10k.pdf | metric | debt_to_equity@2024 | 0.4887387387387387387387387387387387 ratio conf=high
+unprefixed_10k.pdf | metric | ebitda_margin@2022 | 0.1375358166189111747851002865329513 percent conf=high
+unprefixed_10k.pdf | metric | ebitda_margin@2023 | 0.1477124183006535947712418300653595 percent conf=high
+unprefixed_10k.pdf | metric | ebitda_margin@2024 | 0.1591448931116389548693586698337292 percent conf=high
+unprefixed_10k.pdf | metric | gross_margin@2022 | 0.3667621776504297994269340974212034 percent conf=high
+unprefixed_10k.pdf | metric | gross_margin@2023 | 0.3738562091503267973856209150326797 percent conf=high
+unprefixed_10k.pdf | metric | gross_margin@2024 | 0.3847980997624703087885985748218527 percent conf=high
+unprefixed_10k.pdf | metric | net_margin@2022 | 0.05830945558739255014326647564469914 percent conf=high
+unprefixed_10k.pdf | metric | net_margin@2023 | 0.06666666666666666666666666666666667 percent conf=high
+unprefixed_10k.pdf | metric | net_margin@2024 | 0.07636579572446555819477434679334917 percent conf=high
+unprefixed_10k.pdf | metric | ocf_to_net_income@2022 | 2.162162162162162162162162162162162 ratio conf=high
+unprefixed_10k.pdf | metric | ocf_to_net_income@2023 | 2 ratio conf=high
+unprefixed_10k.pdf | metric | ocf_to_net_income@2024 | 1.881804043545878693623639191290824 ratio conf=high
+unprefixed_10k.pdf | metric | operating_margin@2022 | 0.08739255014326647564469914040114613 percent conf=high
+unprefixed_10k.pdf | metric | operating_margin@2023 | 0.09803921568627450980392156862745098 percent conf=high
+unprefixed_10k.pdf | metric | operating_margin@2024 | 0.1104513064133016627078384798099762 percent conf=high
+unprefixed_10k.pdf | metric | roa@2024 | 0.08844566712517193947730398899587345 percent conf=high
+unprefixed_10k.pdf | metric | roe@2024 | 0.1587654320987654320987654320987654 percent conf=high
+unprefixed_10k.pdf | metric_unavailable | current_ratio@2022 | missing_input: current_assets not mapped for 2022
+unprefixed_10k.pdf | metric_unavailable | debt_to_equity@2022 | missing_input: short_term_borrowings not mapped for 2022
+unprefixed_10k.pdf | metric_unavailable | roa@2022 | missing_input: total_assets not mapped for 2022
+unprefixed_10k.pdf | metric_unavailable | roa@2023 | missing_input: total_assets not mapped for 2022
+unprefixed_10k.pdf | metric_unavailable | roe@2022 | missing_input: equity not mapped for 2022
+unprefixed_10k.pdf | metric_unavailable | roe@2023 | missing_input: equity not mapped for 2022
+unprefixed_10k.pdf | periods | - | 2024,2023,2022
+unprefixed_10k.pdf | recon | assets_equal_liabilities_plus_equity@2022 | unavailable delta=UNAVAILABLE
+unprefixed_10k.pdf | recon | assets_equal_liabilities_plus_equity@2023 | passed delta=0.0
+unprefixed_10k.pdf | recon | assets_equal_liabilities_plus_equity@2024 | passed delta=0.0
+unprefixed_10k.pdf | recon | fcf_equals_ocf_minus_capex@2022 | passed delta=0.0
+unprefixed_10k.pdf | recon | fcf_equals_ocf_minus_capex@2023 | passed delta=0.0
+unprefixed_10k.pdf | recon | fcf_equals_ocf_minus_capex@2024 | passed delta=0.0
+unprefixed_10k.pdf | recon | gross_profit_equals_revenue_minus_cogs@2022 | passed delta=0.0
+unprefixed_10k.pdf | recon | gross_profit_equals_revenue_minus_cogs@2023 | passed delta=0.0
+unprefixed_10k.pdf | recon | gross_profit_equals_revenue_minus_cogs@2024 | passed delta=0.0
+unprefixed_10k.pdf | statement | balance | page_3_table_0 pages=(3,)
+unprefixed_10k.pdf | statement | cash_flow | page_4_table_0 pages=(4,)
+unprefixed_10k.pdf | statement | income | page_2_table_0 pages=(2,)
+unprefixed_10k.pdf | trend | cash@2023->2024 | 220000000.0 rel=0.2291666666666666666666666666666667 up positive
+unprefixed_10k.pdf | trend | current_ratio@2023->2024 | 0.3406341749853200234879624193 rel=0.1492410599434010805248263442298268 up positive
+unprefixed_10k.pdf | trend | debt_to_equity@2023->2024 | -0.1615344853049771082557967804 rel=-0.2484101748807631160572337043224162 down positive
+unprefixed_10k.pdf | trend | ebitda@2022->2023 | 170000000.0 rel=0.1770833333333333333333333333333333 up positive
+unprefixed_10k.pdf | trend | ebitda@2023->2024 | 210000000.0 rel=0.1858407079646017699115044247787611 up positive
+unprefixed_10k.pdf | trend | equity@2023->2024 | 780000000.0 rel=0.2131147540983606557377049180327869 up positive
+unprefixed_10k.pdf | trend | free_cash_flow@2022->2023 | 90000000.0 rel=0.2 up positive
+unprefixed_10k.pdf | trend | free_cash_flow@2023->2024 | 130000000.0 rel=0.2407407407407407407407407407407407 up positive
+unprefixed_10k.pdf | trend | gross_margin@2022->2023 | 0.007094031499896997958686817611 rel=0.01934232026143790849673202614361042 up positive
+unprefixed_10k.pdf | trend | gross_margin@2023->2024 | 0.01094189061214351140297765979 rel=0.02926764446954470707439828580448144 up positive
+unprefixed_10k.pdf | trend | gross_profit@2022->2023 | 300000000.0 rel=0.1171875 up positive
+unprefixed_10k.pdf | trend | gross_profit@2023->2024 | 380000000.0 rel=0.1328671328671328671328671328671329 up positive
+unprefixed_10k.pdf | trend | net_income@2022->2023 | 103000000.0 rel=0.2530712530712530712530712530712531 up positive
+unprefixed_10k.pdf | trend | net_income@2023->2024 | 133000000.0 rel=0.2607843137254901960784313725490196 up positive
+unprefixed_10k.pdf | trend | net_margin@2022->2023 | 0.008357211079274116523400191022 rel=0.1433251433251433251433251433372508 up positive
+unprefixed_10k.pdf | trend | net_margin@2023->2024 | 0.009699129057798891528107680127 rel=0.1454869358669833729216152018977257 up positive
+unprefixed_10k.pdf | trend | operating_cash_flow@2022->2023 | 140000000.0 rel=0.1590909090909090909090909090909091 up positive
+unprefixed_10k.pdf | trend | operating_cash_flow@2023->2024 | 190000000.0 rel=0.1862745098039215686274509803921569 up positive
+unprefixed_10k.pdf | trend | operating_income@2022->2023 | 140000000.0 rel=0.2295081967213114754098360655737705 up positive
+unprefixed_10k.pdf | trend | operating_income@2023->2024 | 180000000.0 rel=0.24 up positive
+unprefixed_10k.pdf | trend | operating_margin@2022->2023 | 0.01064666554300803415922242823 rel=0.1218257794921247187399549984366797 up positive
+unprefixed_10k.pdf | trend | operating_margin@2023->2024 | 0.01241209072702715290391691118 rel=0.1266033254156769596199524940327083 up positive
+unprefixed_10k.pdf | trend | revenue@2022->2023 | 670000000.0 rel=0.09598853868194842406876790830945559 up positive
+unprefixed_10k.pdf | trend | revenue@2023->2024 | 770000000.0 rel=0.1006535947712418300653594771241830 up positive
+unprefixed_10k.pdf | trend | total_debt@2023->2024 | -210000000.0 rel=-0.08823529411764705882352941176470588 down positive
+unprefixed_10k.pdf | value | capex@2022 | -430000000.0 USD src=page_4_table_0_row_1 conf=synonym_match/high
+unprefixed_10k.pdf | value | capex@2023 | -480000000.0 USD src=page_4_table_0_row_1 conf=synonym_match/high
+unprefixed_10k.pdf | value | capex@2024 | -540000000.0 USD src=page_4_table_0_row_1 conf=synonym_match/high
+unprefixed_10k.pdf | value | cash@2023 | 960000000.0 USD src=page_3_table_0_row_0 conf=exact_match/high
+unprefixed_10k.pdf | value | cash@2024 | 1180000000.0 USD src=page_3_table_0_row_0 conf=exact_match/high
+unprefixed_10k.pdf | value | cogs@2022 | 4420000000.0 USD src=page_2_table_0_row_1 conf=synonym_match/high
+unprefixed_10k.pdf | value | cogs@2023 | 4790000000.0 USD src=page_2_table_0_row_1 conf=synonym_match/high
+unprefixed_10k.pdf | value | cogs@2024 | 5180000000.0 USD src=page_2_table_0_row_1 conf=synonym_match/high
+unprefixed_10k.pdf | value | current_assets@2023 | 2990000000.0 USD src=page_3_table_0_row_3 conf=exact_match/high
+unprefixed_10k.pdf | value | current_assets@2024 | 3410000000.0 USD src=page_3_table_0_row_3 conf=exact_match/high
+unprefixed_10k.pdf | value | current_liabilities@2023 | 1310000000.0 USD src=page_3_table_0_row_9 conf=exact_match/high
+unprefixed_10k.pdf | value | current_liabilities@2024 | 1300000000.0 USD src=page_3_table_0_row_9 conf=exact_match/high
+unprefixed_10k.pdf | value | d_and_a@2022 | 350000000.0 USD src=page_2_table_0_row_5 conf=exact_match/high
+unprefixed_10k.pdf | value | d_and_a@2023 | 380000000.0 USD src=page_2_table_0_row_5 conf=exact_match/high
+unprefixed_10k.pdf | value | d_and_a@2024 | 410000000.0 USD src=page_2_table_0_row_5 conf=exact_match/high
+unprefixed_10k.pdf | value | ebitda@2022 | 960000000.0 USD src=derived:operating_income+d_and_a conf=exact_match/high
+unprefixed_10k.pdf | value | ebitda@2023 | 1130000000.0 USD src=derived:operating_income+d_and_a conf=exact_match/high
+unprefixed_10k.pdf | value | ebitda@2024 | 1340000000.0 USD src=derived:operating_income+d_and_a conf=exact_match/high
+unprefixed_10k.pdf | value | equity@2023 | 3660000000.0 USD src=page_3_table_0_row_12 conf=synonym_match/high
+unprefixed_10k.pdf | value | equity@2024 | 4440000000.0 USD src=page_3_table_0_row_12 conf=synonym_match/high
+unprefixed_10k.pdf | value | free_cash_flow@2022 | 450000000.0 USD src=derived:operating_cash_flow+capex conf=exact_match/high
+unprefixed_10k.pdf | value | free_cash_flow@2023 | 540000000.0 USD src=derived:operating_cash_flow+capex conf=exact_match/high
+unprefixed_10k.pdf | value | free_cash_flow@2024 | 670000000.0 USD src=derived:operating_cash_flow+capex conf=exact_match/high
+unprefixed_10k.pdf | value | gross_profit@2022 | 2560000000.0 USD src=page_2_table_0_row_2 conf=exact_match/high
+unprefixed_10k.pdf | value | gross_profit@2023 | 2860000000.0 USD src=page_2_table_0_row_2 conf=exact_match/high
+unprefixed_10k.pdf | value | gross_profit@2024 | 3240000000.0 USD src=page_2_table_0_row_2 conf=exact_match/high
+unprefixed_10k.pdf | value | long_term_borrowings@2023 | 1980000000.0 USD src=page_3_table_0_row_10 conf=synonym_match/high
+unprefixed_10k.pdf | value | long_term_borrowings@2024 | 1850000000.0 USD src=page_3_table_0_row_10 conf=synonym_match/high
+unprefixed_10k.pdf | value | net_income@2022 | 407000000.0 USD src=page_2_table_0_row_10 conf=exact_match/high
+unprefixed_10k.pdf | value | net_income@2023 | 510000000.0 USD src=page_2_table_0_row_10 conf=exact_match/high
+unprefixed_10k.pdf | value | net_income@2024 | 643000000.0 USD src=page_2_table_0_row_10 conf=exact_match/high
+unprefixed_10k.pdf | value | operating_cash_flow@2022 | 880000000.0 USD src=page_4_table_0_row_0 conf=synonym_match/high
+unprefixed_10k.pdf | value | operating_cash_flow@2023 | 1020000000.0 USD src=page_4_table_0_row_0 conf=synonym_match/high
+unprefixed_10k.pdf | value | operating_cash_flow@2024 | 1210000000.0 USD src=page_4_table_0_row_0 conf=synonym_match/high
+unprefixed_10k.pdf | value | operating_income@2022 | 610000000.0 USD src=page_2_table_0_row_6 conf=exact_match/high
+unprefixed_10k.pdf | value | operating_income@2023 | 750000000.0 USD src=page_2_table_0_row_6 conf=exact_match/high
+unprefixed_10k.pdf | value | operating_income@2024 | 930000000.0 USD src=page_2_table_0_row_6 conf=exact_match/high
+unprefixed_10k.pdf | value | revenue@2022 | 6980000000.0 USD src=page_2_table_0_row_0 conf=synonym_match/high
+unprefixed_10k.pdf | value | revenue@2023 | 7650000000.0 USD src=page_2_table_0_row_0 conf=synonym_match/high
+unprefixed_10k.pdf | value | revenue@2024 | 8420000000.0 USD src=page_2_table_0_row_0 conf=synonym_match/high
+unprefixed_10k.pdf | value | short_term_borrowings@2023 | 400000000.0 USD src=page_3_table_0_row_8 conf=synonym_match/high
+unprefixed_10k.pdf | value | short_term_borrowings@2024 | 320000000.0 USD src=page_3_table_0_row_8 conf=synonym_match/high
+unprefixed_10k.pdf | value | total_assets@2023 | 6950000000.0 USD src=page_3_table_0_row_6 conf=exact_match/high
+unprefixed_10k.pdf | value | total_assets@2024 | 7590000000.0 USD src=page_3_table_0_row_6 conf=exact_match/high
+unprefixed_10k.pdf | value | total_debt@2023 | 2380000000.0 USD src=derived:short_term_borrowings+long_term_borrowings conf=exact_match/high
+unprefixed_10k.pdf | value | total_debt@2024 | 2170000000.0 USD src=derived:short_term_borrowings+long_term_borrowings conf=exact_match/high
+unprefixed_10k.pdf | value | total_liabilities@2023 | 3290000000.0 USD src=page_3_table_0_row_11 conf=exact_match/high
+unprefixed_10k.pdf | value | total_liabilities@2024 | 3150000000.0 USD src=page_3_table_0_row_11 conf=exact_match/high
+unprefixed_10k.pdf | value_unavailable | total_debt@2022 | missing_input: short_term_borrowings not mapped for 2022

@@ -68,7 +68,7 @@ def test_trend_rows_and_red_flag_rows(golden):
     trends = views.trend_rows(golden)
     assert trends and {"subject", "change", "direction", "reads_as"} <= trends[0].keys()
     flags = views.red_flag_rows(golden)
-    assert len(flags) == 10
+    assert len(flags) == 11
     assert {f["status"] for f in flags} <= {"fired", "clear", "not_evaluated"}
 
 

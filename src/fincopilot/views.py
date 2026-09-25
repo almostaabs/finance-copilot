@@ -75,6 +75,7 @@ RULE_LABEL = {
     "earnings_quality": "Earnings quality",
     "reconciliation_warning": "Cross-check warning",
     "low_confidence_kpi": "Low-confidence KPI",
+    "implausible_magnitude": "Implausible magnitude",
 }
 
 CONCEPT_LABEL = {

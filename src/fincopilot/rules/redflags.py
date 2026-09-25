@@ -41,6 +41,11 @@ LEVERAGE_INCREASE_FLOOR = Decimal("1.0")
 HIGH_LEVERAGE = Decimal("2.0")
 WEAK_LIQUIDITY = Decimal("1.0")
 EARNINGS_QUALITY = Decimal("0.7")
+# implausible_magnitude is an INFO screen, never a correction. Real companies'
+# asset turnover is well below 20; a 100x change in one year in revenue, assets
+# or equity almost always means a scale or parsing error, not business reality.
+MAGNITUDE_JUMP_FACTOR = Decimal(100)
+ASSET_TURNOVER_CEILING = Decimal(20)
 
 
 @dataclass(frozen=True, slots=True)
@@ -182,6 +187,74 @@ def _low_confidence_kpi(i: Inputs) -> Maybe[Verdict]:
     return Verdict(bool(weak), tuple(refs), ", ".join(weak))
 
 
+def _prior_period(i: Inputs) -> Period | None:
+    """The newest period strictly older than the one under evaluation."""
+    older = {v.period for v in i.metrics.values if v.period < i.period}
+    return max(older) if older else None
+
+
+def _implausible_magnitude(i: Inputs) -> Maybe[Verdict]:
+    """A 100x year-over-year jump, or revenue above 20x total assets. Flags, never alters."""
+    hits: list[str] = []
+    hit_values: list[FinancialValue] = []
+    seen: list[FinancialValue] = []
+    causes: list[Unavailable] = []
+    year = i.period.end_year
+    prior = _prior_period(i)
+    for concept in (C.REVENUE, C.TOTAL_ASSETS, C.EQUITY):
+        a = i.metrics.value(concept, i.period)
+        b = (
+            i.metrics.value(concept, prior)
+            if prior is not None
+            else Unavailable(UnavailableReason.MISSING_INPUT, f"no period before {year}")
+        )
+        if (u := _need(a, b)) is not None:
+            causes.append(u)
+            continue
+        if a.value == 0 or b.value == 0:
+            zero_year = year if a.value == 0 else prior.end_year
+            causes.append(
+                Unavailable(
+                    UnavailableReason.DIVISION_BY_ZERO,
+                    f"{concept.value} {zero_year} is zero",
+                    refs=_refs(a, b),
+                )
+            )
+            continue
+        seen.extend((a, b))
+        big, small = max(abs(a.value), abs(b.value)), min(abs(a.value), abs(b.value))
+        if big / small >= MAGNITUDE_JUMP_FACTOR:
+            hits.append(f"{concept.value} {prior.end_year}->{year} changed {_num(big / small)}x")
+            hit_values.extend((a, b))
+
+    revenue = i.metrics.value(C.REVENUE, i.period)
+    assets = i.metrics.value(C.TOTAL_ASSETS, i.period)
+    if (u := _need(revenue, assets)) is not None:
+        causes.append(u)
+    elif assets.value <= 0:
+        causes.append(
+            Unavailable(
+                UnavailableReason.DIVISION_BY_ZERO,
+                f"total_assets {year} is not positive",
+                refs=_refs(assets),
+            )
+        )
+    else:
+        seen.extend((revenue, assets))
+        turnover = revenue.value / assets.value
+        if turnover > ASSET_TURNOVER_CEILING:
+            hits.append(f"revenue/total_assets {year} is {_num(turnover)}")
+            hit_values.extend((revenue, assets))
+
+    if hits:
+        return Verdict(True, _refs(*hit_values), "; ".join(hits))
+    if seen:
+        return Verdict(False, _refs(*seen))
+    return Unavailable(
+        UnavailableReason.MISSING_INPUT, "no magnitude check could run", cause=causes[0]
+    )
+
+
 def _rule(rule_id, severity, fired, clear, predicate) -> Rule:
     return Rule(rule_id, severity, fired, clear, predicate)
 
@@ -256,6 +329,13 @@ RULES: tuple[Rule, ...] = (
         "A headline KPI is not deterministically sourced ({detail}).",
         "Revenue and net income are deterministically sourced.",
         _low_confidence_kpi,
+    ),
+    _rule(
+        "implausible_magnitude",
+        Severity.INFO,
+        "A figure is implausible relative to the rest of the report ({detail}).",
+        "No figure is implausibly large relative to the others.",
+        _implausible_magnitude,
     ),
 )
 

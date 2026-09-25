@@ -169,7 +169,7 @@ def test_golden_us_ratios_at_declared_precision():
 def test_golden_red_flags_are_all_evaluated_or_explained():
     result = _run("golden_us", llm=NullMapper())
     flags = {f.rule_id: f for f in result.red_flags}
-    assert len(flags) == 10
+    assert len(flags) == 11
     assert flags["low_confidence_kpi"].outcome is RuleOutcome.CLEAR
     assert flags["reconciliation_warning"].outcome is RuleOutcome.CLEAR
     assert flags["revenue_decline"].outcome is RuleOutcome.CLEAR

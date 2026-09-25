@@ -191,3 +191,43 @@ def test_two_total_rows_claiming_one_concept_are_withheld():
     out = validate_mappings(mappings, normalized, periods)
     assert out.conflicts[0].reason is UnavailableReason.CONFLICT
     assert is_unavailable(out.get(CanonicalConcept.REVENUE, Period(2025, "2025")))
+
+
+# --- T1.4 A2: the claim the total-wins rule drops is recorded, never used ----
+
+
+@pytest.mark.parametrize(
+    ("concept", "total", "component"),
+    [
+        (CanonicalConcept.REVENUE, "Total", "Net sales"),  # Deere-like
+        (
+            CanonicalConcept.COGS,
+            "Total cost of products and services sold",
+            "Cost of products sold",
+        ),  # Honeywell-like
+    ],
+)
+def test_the_dropped_component_claim_is_recorded_as_one_note(concept, total, component):
+    _, normalized, periods = _report("component_total.pdf")
+    inc = normalized.income
+    kept, dropped = _claim(concept, inc, total), _claim(concept, inc, component)
+    with_rival = validate_mappings((dropped, kept), normalized, periods)
+    alone = validate_mappings((kept,), normalized, periods)
+
+    (note,) = with_rival.notes
+    assert (note.concept, note.kind) == (concept, StatementKind.INCOME)
+    assert (note.kept_ref, note.dropped_ref) == (kept.ref_id, dropped.ref_id)
+    assert note.dropped_label == component
+    assert note.reason == "total row preferred over component"
+    # The note is a record only: the winning values are exactly those of the total alone.
+    assert with_rival.values == alone.values
+    assert alone.notes == ()
+
+
+def test_the_pipeline_records_both_component_total_notes_and_no_other():
+    report, _, _ = _report("component_total.pdf")
+    assert {(n.concept, n.dropped_label) for n in report.notes} == {
+        (CanonicalConcept.REVENUE, "Net sales"),
+        (CanonicalConcept.COGS, "Cost of products sold"),
+    }
+    assert _report("golden_us.pdf")[0].notes == ()

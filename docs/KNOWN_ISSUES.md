@@ -4,8 +4,8 @@ Everything found during the Phase 0-8 build, the first manual runs, and two
 deliberate stress-test passes. Ordered by severity. Each item says what it
 is, how to reproduce it, why it happens, and what a fix costs.
 
-Status as of 2026-09-17, Phase 15. 451 tests pass (2 deselected: the live
-Ollama and Gemini contracts), Ruff clean, CI green on GitHub Actions.
+Status as of 2026-09-25, roadmap phase T1.4. 574 tests pass (2 deselected: the
+live Ollama and Gemini contracts), Ruff clean, CI green on GitHub Actions.
 The Phase 0-8 stress passes found six defects, all fixed with regression
 tests in `tests/test_stress_findings.py`. The Phase 9-13 stress pass found
 four more (section H below), all fixed with regression tests in
@@ -67,6 +67,20 @@ Consolidated <X>" anchors added in T1.1b locate UPS directly, so the fallback
 no longer runs there, but any filing whose heading matches no anchor is still
 exposed. Not fixed in T1.1b.
 
+### T1.4-a. A glossy annual report is labelled "standalone fallback" (LOW)
+
+Microsoft's `tests/fixtures/real/microsoft_fy24.pdf` is the glossy annual
+report, not the 10-K filing. Its statements are consolidated but titled
+"INCOME STATEMENTS", "BALANCE SHEETS" with no "Consolidated", and no page
+carries a Form 10-K cover (the SEC name and "Form 10-K" appear only in prose,
+and "Washington, D.C. 20549" nowhere). The T1.4 10-K cover rule therefore does
+not apply, and the dashboard labels the analysis **standalone fallback** even
+though its statements are consolidated. The values are unaffected; the basis
+label overstates what is known. **Suggested fix (not implemented):** when only
+unprefixed headings exist and there is no evidence either way, show "basis not
+stated in document" instead of implying standalone. That needs a spec change
+to `StatementBasis` and a decision.
+
 ### T1.1-f. Which net income the app reports is undecided (MEDIUM)
 
 US income statements print consolidated net income (including noncontrolling
@@ -96,25 +110,6 @@ Chromium. Those PDFs have no ruled table lines, so they exercise the
 is not accuracy on the PDFs users upload. Four companies (AAPL, MSFT, BRK-B,
 MBIN) are scored on their published PDFs to cover both; `evals/README.md`
 states the caveat next to every number.
-
-### 1. No plausibility check on any extracted number (MEDIUM)
-
-`hostile.pdf` reports revenue of 999,999,999,999,999,999.00 crore. The system
-accepts it, carries it exactly, and reports `low_confidence_kpi: clear`
-because the row was matched deterministically from a real page.
-`revenue_decline: clear` is likewise true - revenue went up, absurdly.
-
-Defensible: confidence measures *how the row was identified*, not whether the
-figure is believable, and a magnitude ceiling risks rejecting a legitimately
-large report. But no layer asks "is this sane relative to its siblings?"
-
-Since the fixes below, a figure past 400 significant digits is refused as
-`UNPARSEABLE` rather than carried, so the ceiling is no longer unbounded -
-but 400 digits is a representability limit, not a plausibility one.
-
-**Options.** (a) Leave as is and document. (b) Add an INFO red flag when a
-value is more than N orders of magnitude from the other values on the same
-statement. (b) is new scope for a Phase 9+ brainstorming cycle, not a patch.
 
 ### 2. `types.py` is past its own review threshold (LOW)
 
@@ -187,6 +182,54 @@ running from a checkout will do this, and an unchanged version number is what
 makes it silent.
 
 ---
+
+## Resolved in T1.4 - correctness fixes
+
+### 1. No plausibility check on any extracted number (was MEDIUM)
+
+Closed by option (b) in `7bc97e2`. A new INFO red flag, `implausible_magnitude`,
+fires when revenue, total assets or equity changes 100x or more in one year,
+or when revenue exceeds 20x total assets. It never withholds or alters a value.
+`hostile.pdf` now fires it (revenue 2023->2024 and revenue/total assets 2024);
+every other synthetic fixture and every real report in `tests/fixtures/real/`
+is clear or not evaluated. Tests: `tests/test_rules_redflags.py`
+(`test_implausible_magnitude_*`, `test_hostile_pdf_fires_implausible_magnitude`).
+
+The original entry, for the record:
+
+`hostile.pdf` reports revenue of 999,999,999,999,999,999.00 crore. The system
+accepts it, carries it exactly, and reports `low_confidence_kpi: clear`
+because the row was matched deterministically from a real page.
+`revenue_decline: clear` is likewise true - revenue went up, absurdly.
+
+Defensible: confidence measures *how the row was identified*, not whether the
+figure is believable, and a magnitude ceiling risks rejecting a legitimately
+large report. But no layer asks "is this sane relative to its siblings?"
+
+Since the fixes below, a figure past 400 significant digits is refused as
+`UNPARSEABLE` rather than carried, so the ceiling is no longer unbounded -
+but 400 digits is a representability limit, not a plausibility one.
+
+**Options.** (a) Leave as is and document. (b) Add an INFO red flag when a
+value is more than N orders of magnitude from the other values on the same
+statement. (b) is new scope for a Phase 9+ brainstorming cycle, not a patch.
+
+### Unprefixed statements in a 10-K were labelled standalone fallback (was open question)
+
+From `docs/PHASE12_VALIDATION.md`. Fixed in `056f275`: when no statement heading
+carries "Consolidated" but unprefixed headings exist, and some page of the
+document is a Form 10-K cover (the SEC name, "Washington, D.C. 20549" and
+"Form 10-K" together on one page), the basis is `consolidated`. An explicit
+"Standalone" heading is never promoted. Spec 4.3 amended. Covered by
+`unprefixed_10k.pdf` and `test_unprefixed_statements_in_a_10k_are_consolidated`.
+The glossy-report case it does not cover is T1.4-a above.
+
+### T1.1b follow-up: the claim a total row wins over was invisible
+
+Since T1.1b a total row wins over a component claiming the same concept. In
+`eb7bd9a` validation records each dropped claim as a `MappingNote`, the
+Provenance tab shows it for the figure, and the snapshot carries a `note` line.
+Which value wins is unchanged.
 
 ---
 

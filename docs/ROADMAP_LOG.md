@@ -175,3 +175,53 @@ the audit trail: it is how a later reader can tell what each phase changed and w
 - Surprises / notes for the next phase: `_total_of` decides only two-way claims; three or more claims are
   withheld as CONFLICT. When the total wins, the component's claim is dropped without a conflict record.
   The KNOWN_ISSUES status line still reads "Phase 15, 451 tests" (stale, not touched here).
+
+## T1.4: Correctness fixes (10-K basis, plausibility flag). PASS, 2026-09-25
+
+- Branch / merge commit: `roadmap/t1-4` / `27728fb` (snapshot `812e7b4`). Commits: `93632b9` (phase-file
+  amendments A1-A3, human decisions), `056f275` (A: 10-K cover basis), `7bc97e2` (B: `implausible_magnitude`),
+  `eb7bd9a` (A2: `MappingNote` for the total-wins rule), `357d13c` (A3 docs).
+- Gate run by a fresh evaluator (phase ID, roadmap paths and branch only); verdict PASS on the condition that
+  the orchestrator updates the snapshot, done in `812e7b4`.
+- Tests: 551 -> 574 passed, 2 deselected (removed: none; three "ten rules" assertions now expect eleven).
+  Before the snapshot update, only `test_fixture_snapshot_matches` failed, on declared added lines.
+- Lint/format: pass
+- Snapshot: fixtures.snap 772 -> 911 lines, ADDED lines only (139): `unprefixed_10k.pdf` 126 (basis
+  `consolidated`; every value identical to `golden_us.pdf`, only page numbers differ), 11
+  `flag | implausible_magnitude` lines (hostile `fired`; ambiguous_periods, no_scale `not_evaluated`; the other
+  8 `clear`; scanned.pdf is rejected before analysis), 2 `note` lines (component_total.pdf: cogs kept row_8
+  over row_6, revenue kept row_4 over row_1). `.snapshots/real.snap` 585 -> 591: 6 added
+  `flag | implausible_magnitude | clear info` lines, one per real report; **no real-report line changed**, every
+  basis line unchanged (MSFT stays `standalone_fallback`).
+- Eval (dev, `--compare` against the T1.1b baseline): no change. All 1228 records compared (value, outcome,
+  ref_id): 0 changed. all: correct 708, wrong 0, withheld 483, unverified 37, precision 1.0000, coverage
+  0.5945 (general 654/0/433, financial 54/0/50). Baseline not updated. Holdout not run.
+- Basis changes under Part A (dev, branch vs master-equivalent run on the same extracted documents): none.
+  34 consolidated, IBM unknown, MSFT standalone_fallback. All 33 EDGAR renders have a cover on page 1 but
+  already had "Consolidated" anchors; BRK-B has a cover on p23 and was already consolidated.
+- `implausible_magnitude` firings: no real company (dev: 31 clear, 5 not_evaluated "No periods." — META, IBM,
+  CRM, COST, SBUX; real reports: 6 clear). Only the synthetic `hostile.pdf` fires: revenue 2023->2024 changed
+  ~9.1e13x and revenue/total_assets 2024 ~2.3e14 (the 999,999,999,999,999,999 crore revenue of issue #1).
+- App smoke: pass (`tests/test_app.py` 13 passed; `/_stcore/health` ok; browser click not checked)
+- Invariant spot-check: 1 ✔ no new `FinancialValue(`; 2 ✔ rule returns `Unavailable(MISSING_INPUT, cause=...)`,
+  zero divisor `DIVISION_BY_ZERO`, no enum members added; 3 ✔ no new rounding; 4 ✔ Provenance note label goes
+  through `html.escape` (`test_provenance_shows_a_dropped_component_note_escaped`); 5 ✔ no network/model calls
+- Acceptance criteria: 1-5 ✔ and amendments A1-A3 ✔. `types.py` changed only as A2 allows: new frozen
+  `MappingNote` (uses existing `CanonicalConcept`, `StatementKind`) and `MappingReport.notes = ()`.
+- Most important test and proof it can fail: `test_unprefixed_statements_in_a_10k_are_consolidated`; with
+  `locate.py` reverted to master it failed (with the page-30 cover test). A2: suppressing note appends failed
+  4 tests; letting the dropped claim win failed `test_the_total_row_wins_over_its_component` and both note
+  tests. Removing the Washington regex failed the prose-only negative.
+- New dependencies: none
+- Known issues: #1 closed (option (b), via `implausible_magnitude`); PHASE12 "unprefixed statements" resolved
+  for true 10-K filings; added T1.4-a (glossy annual report without a 10-K cover, e.g. MSFT, is labelled
+  "standalone fallback" although consolidated; suggested fix, not implemented: show "basis not stated in
+  document"). Status line updated to T1.4 / 574 tests. T1.1b note closed: the dropped component claim is now
+  recorded as a `MappingNote` and shown in the Provenance tab.
+- Human decisions and amendments (2026-09-25, in the phase file): A1 per-page cover rule (SEC name +
+  "Washington, D.C. 20549" + "Form 10-K" on one page, any page) replaces "first 3 pages"; A2 structured
+  `MappingNote`; A3 docs items. Parts A and B built sequentially by one builder on one branch, one gate run.
+- Surprises / notes for the next phase: the MSFT file in `tests/fixtures/real/` and in the eval corpus is the
+  glossy annual report, so Part A's original target (MSFT) does not move. A1's text says only Apple and
+  Merchants have a full cover page; `berkshire_2023.pdf` also has one (p23), with no effect. Five dev companies
+  resolve no periods for the flag (`not_evaluated`), worth a look in T1.3.

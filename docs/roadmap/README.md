@@ -109,7 +109,7 @@ and the ROADMAP_LOG.md entry.
 | T1.0 | Baseline and regression snapshot | ☑ | `543f3fd` |
 | T1.1 | XBRL ground-truth eval harness | ☑ | `aa4a6d9` |
 | T1.1b | Fix the wrong-number bugs found by the T1.1 eval | ☑ | `b20ace8` |
-| T1.4 | Correctness fixes (10-K basis, plausibility flag) | ☐ | |
+| T1.4 | Correctness fixes (10-K basis, plausibility flag) | ☑ | `27728fb` |
 | T1.2 | Hand-labelled Indian set | ☐ | |
 | T1.3 | Eval-driven coverage + public scoreboard | ☐ | |
 | — | **Tier 1 exit gate** | ☐ | |

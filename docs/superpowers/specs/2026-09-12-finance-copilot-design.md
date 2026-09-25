@@ -249,6 +249,8 @@ Anchor patterns cover both conventions and track scope separately:
 
 **Scope scoring rule:** consolidated and standalone candidates are scored **separately**. A standalone candidate must **never** outrank a valid consolidated candidate. Consolidated is selected whenever a valid consolidated candidate exists, regardless of relative scores.
 
+**10-K cover rule.** *(Amended 2026-09-25, roadmap phase T1.4.)* When no candidate carries a "Consolidated" prefix but unprefixed candidates exist, and **any single page** of the document is a Form 10-K cover page, the unprefixed candidates are selected with basis `CONSOLIDATED`: the primary statements of a 10-K are consolidated whatever their titles say (Microsoft titles them `INCOME STATEMENTS`, `BALANCE SHEETS`). A cover page is one page carrying all three of `Securities and Exchange Commission`, the commission's address `Washington, D.C. 20549`, and `Form 10-K` (case-insensitive, any whitespace, a non-breaking hyphen accepted; `Form 10-Q` does not count). The address is what separates a cover from prose that merely mentions the filing, so a glossy annual report that discusses its 10-K stays `STANDALONE_FALLBACK`. An explicit `Standalone` candidate is never promoted. The rule is evidence-based, not assumed, and adds no enum members.
+
 ### 4.4 Multi-Page Stitching — First-Class Requirement
 
 Statements routinely span two pages; pdfplumber returns them as separate tables with the header only on the first. Two tables are continuations when **all** hold:

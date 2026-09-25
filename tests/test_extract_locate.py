@@ -1,10 +1,11 @@
 """Statement location, scope scoring, and multi-page stitching. Spec 4.3, 4.4."""
 
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
-from fincopilot.extract.anchors import Scope, anchor_lines, find_anchors
+from fincopilot.extract.anchors import Scope, anchor_lines, find_anchors, is_sec_annual_report
 from fincopilot.extract.locate import locate_statements, stitch_tables
 from fincopilot.extract.pdf import extract_pdf, validate_input
 from fincopilot.types import (
@@ -201,3 +202,82 @@ def test_statements_of_consolidated_heading_is_a_consolidated_anchor(heading, ki
 def test_statements_of_consolidated_forms_stay_literal():
     assert find_anchors("STATEMENTS OF CONSOLIDATED COMPREHENSIVE INCOME") == []
     assert find_anchors("STATEMENTS OF CONSOLIDATED SHAREOWNERS EQUITY") == []
+
+
+# --- 10-K evidence: unprefixed statements under a Form 10-K cover are consolidated
+
+COVER_10K = "\n".join(
+    (
+        "UNITED STATES",
+        "SECURITIES AND EXCHANGE COMMISSION",
+        "Washington, D.C.  20549",
+        "FORM 10-K",
+        "ANNUAL REPORT PURSUANT TO SECTION 13 OR 15(d)",
+    )
+)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        COVER_10K,
+        COVER_10K.replace("FORM 10-K", "Form 10" + chr(0x2011) + "K"),
+        COVER_10K.replace("Washington, D.C.  20549", "Washington D.C. 20549"),
+    ],
+)
+def test_a_10k_cover_page_is_sec_annual_report_evidence(text):
+    assert is_sec_annual_report(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        COVER_10K.replace("FORM 10-K", "FORM 10-Q"),
+        # Prose names the form and the commission, but only a cover prints the address.
+        "As described in our Form 10-K filed with the Securities and Exchange Commission, "
+        "revenue grew in every segment.",
+        "Annual Report 2024. Consolidated Statements of Operations.",
+    ],
+)
+def test_text_without_a_10k_cover_is_not_sec_annual_report_evidence(text):
+    assert not is_sec_annual_report(text)
+
+
+@pytest.fixture(scope="module")
+def unprefixed_10k():
+    return _doc("unprefixed_10k.pdf")
+
+
+def test_unprefixed_statements_in_a_10k_are_consolidated(unprefixed_10k):
+    s = locate_statements(unprefixed_10k)
+    assert s.basis is StatementBasis.CONSOLIDATED
+    assert s.income.basis is StatementBasis.CONSOLIDATED
+    assert (s.income.table.first_page, s.balance.table.first_page) == (2, 3)
+    assert s.cash_flow.table.first_page == 4
+
+
+def test_a_10k_cover_found_deep_in_the_document_still_counts(unprefixed_10k):
+    # Page 30: the cover is scanned for on every page, not just the first few.
+    texts = ("",) + unprefixed_10k.page_text[1:] + ("",) * 25 + (unprefixed_10k.page_text[0],)
+    s = locate_statements(replace(unprefixed_10k, page_text=texts, page_count=len(texts)))
+    assert len(texts) == 30
+    assert s.basis is StatementBasis.CONSOLIDATED
+
+
+def test_unprefixed_statements_without_10k_cover_stay_standalone_fallback(unprefixed_10k):
+    texts = ("Meridian Systems, Inc. Annual Report 2024", *unprefixed_10k.page_text[1:])
+    s = locate_statements(replace(unprefixed_10k, page_text=texts))
+    assert s.basis is StatementBasis.STANDALONE_FALLBACK
+    assert s.income.basis is StatementBasis.STANDALONE_FALLBACK
+
+
+def test_explicit_standalone_is_never_promoted_in_a_10k(unprefixed_10k):
+    texts = tuple(
+        t.replace("INCOME STATEMENTS", "STANDALONE INCOME STATEMENTS")
+        .replace("BALANCE SHEETS", "STANDALONE BALANCE SHEETS")
+        .replace("CASH FLOWS STATEMENTS", "STANDALONE CASH FLOWS STATEMENTS")
+        for t in unprefixed_10k.page_text
+    )
+    assert is_sec_annual_report(texts[0])
+    s = locate_statements(replace(unprefixed_10k, page_text=texts))
+    assert s.basis is StatementBasis.STANDALONE_FALLBACK
